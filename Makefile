@@ -1,9 +1,12 @@
-FLAGS=-c -Wall -O2
+FLAGS=-c -Wall -O2 -Iinclude
 
 all:
-	gcc $(FLAGS) stringbuilder.c
-	gcc $(FLAGS) tokenizer.c
-	gcc $(FLAGS) parser.c
-	gcc $(FLAGS) object.c
-	gcc $(FLAGS) main.c
+	gcc $(FLAGS) src/stringbuilder.c
+	gcc $(FLAGS) src/tokenizer.c
+	gcc $(FLAGS) src/parser.c
+	gcc $(FLAGS) src/object.c
+	gcc $(FLAGS) src/main.c
 	gcc main.o stringbuilder.o tokenizer.o parser.o object.o -o swap
+
+clean:
+	rm *.o

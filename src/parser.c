@@ -209,10 +209,6 @@ jep_ast_node* jep_form_ast(jep_ast_node** nodes)
 						printf("error: expected two operands for binary operator %s\n", o->token->value->buffer);
 					}
 				}
-				else
-				{
-					printf("operator is NULL\n");
-				}
 			}while(opr.size > 0);
 		}
 			break;

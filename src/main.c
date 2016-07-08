@@ -33,10 +33,6 @@ int main(int argc, char** argv)
 						free(o->value);
 						free(o);
 					}
-					else
-					{
-						printf("NULL\n");
-					}
 				}
 			}
 			

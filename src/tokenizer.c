@@ -4,7 +4,7 @@
 const char *symbols[] = 
 {
 	"+", "-", "/", "*", ";", ",", "(", ")", "[", "]", "{", "}", "<", 
-	">", "=", ".", "&", "|", "^"
+	">", "=", ".", "&", "|", "^", "!"
 };
 
 /* two-character symbols */
@@ -70,16 +70,16 @@ void jep_classify_token(jep_token* t)
 		}
 		else if(t->value->size == 2)
 		{
-			t->token_code = jep_is_symbol2(t->value->buffer) + 20;
+			t->token_code = jep_is_symbol2(t->value->buffer) + 21;
 		}
 		else if(t->value->size == 3)
 		{
-			t->token_code = jep_is_symbol3(t->value->buffer) + 37;
+			t->token_code = jep_is_symbol3(t->value->buffer) + 38;
 		}
 	}
 	else if(t->type == T_KEYWORD)
 	{
-		t->token_code = jep_is_keyword(t->value->buffer) + 39;
+		t->token_code = jep_is_keyword(t->value->buffer) + 40;
 	}
 }
 
@@ -380,7 +380,7 @@ jep_token_builder* jep_tokenize_file(const char* file_name)
 int jep_is_symbol(const char* s)
 {
 	int i;
-	for(i = 0; i < 19; i++)
+	for(i = 0; i < 20; i++)
 	{
 		if(!strcmp(symbols[i], s))
 			return i;

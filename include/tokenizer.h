@@ -36,38 +36,39 @@
 #define T_BITAND 17
 #define T_BITOR 18
 #define T_BITXOR 19
+#define T_NOT 20
 
 /* double character symbol token codes */
-#define T_INCREMENT 20
-#define T_DECREMENT 21
-#define T_ADDASSIGN 22
-#define T_SUBASSIGN 23
-#define T_MULASSIGN 24
-#define T_DIVASSIGN 25
-#define T_EQUIVALENT 26
-#define T_LOREQUAL 27
-#define T_GOREQUAL 28
-#define T_RSHIFT 29
-#define T_LSHIFT 30
-#define T_ANDASSIGN 31
-#define T_ORASSIGN 32
-#define T_XORASSIGN 33
-#define T_LOGAND 34
-#define T_LOGOR 35
-#define T_NOTEQUIVALENT 36
+#define T_INCREMENT 21
+#define T_DECREMENT 22
+#define T_ADDASSIGN 23
+#define T_SUBASSIGN 24
+#define T_MULASSIGN 25
+#define T_DIVASSIGN 26
+#define T_EQUIVALENT 27
+#define T_LOREQUAL 28
+#define T_GOREQUAL 29
+#define T_RSHIFT 30
+#define T_LSHIFT 31
+#define T_ANDASSIGN 32
+#define T_ORASSIGN 33
+#define T_XORASSIGN 34
+#define T_LOGAND 35
+#define T_LOGOR 36
+#define T_NOTEQUIVALENT 37
 
 /* tripple character symbol token codes */
-#define T_LSHIFTASSIGN 37
-#define T_RSHIFTASSIGN 38
+#define T_LSHIFTASSIGN 38
+#define T_RSHIFTASSIGN 39
 
 /* keyword token codes */
-#define T_IF 39
-#define T_ELSE 40
-#define T_FOR 41
-#define T_WHILE 42
+#define T_IF 40
+#define T_ELSE 41
+#define T_FOR 42
+#define T_WHILE 43
 
 /* end of file */
-#define T_EOF 43
+#define T_EOF 44
 
 typedef struct Token
 {

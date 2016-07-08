@@ -419,6 +419,7 @@ int jep_priority(jep_ast_node* node)
 		case T_BITOR:
 		case T_BITXOR:
 			priority = 2;
+			break;
 
 		case T_LESS:
 		case T_GREATER:
@@ -461,6 +462,7 @@ int jep_check_unary(jep_token* cur, jep_token* prev)
 	{
 		case T_INCREMENT:
 		case T_DECREMENT:
+		case T_NOT:
 			unary = 1;
 			cur->unary = 1;
 			break;

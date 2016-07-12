@@ -19,6 +19,9 @@ typedef struct Stack
 	jep_ast_node** nodes;
 }jep_stack;
 
+/* checks if a token is a terminal */
+int jep_is_term(jep_token* token);
+
 /* parses a stream of tokens */
 jep_ast_node* jep_parse(jep_token_builder* tb, jep_ast_node** nodes);
 

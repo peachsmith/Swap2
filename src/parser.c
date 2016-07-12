@@ -1,5 +1,34 @@
 #include "parser.h"
 
+/* checks if a token is a terminal */
+int jep_is_term(jep_token* token)
+{
+	int term = 0;
+
+	/* NULL is considered a terminal */
+	if(token == NULL) 
+	{
+		return 1;
+	}
+
+	switch(token->token_code)
+	{
+		case T_SEMICOLON:
+		case T_RPAREN:
+		case T_EOF:
+		case T_COMMA:
+		case T_RSQUARE:
+		case T_RBRACE:
+			term = 1;
+			break;
+
+		default:
+			break;
+	}
+
+	return term;
+}
+
 /* parses a stream of tokens */
 jep_ast_node* jep_parse(jep_token_builder* tb, jep_ast_node** nodes)
 {
@@ -77,10 +106,7 @@ jep_ast_node* jep_form_ast(jep_ast_node** nodes)
 	cur = (*nodes)->token;
 	next = (*nodes + 1)->token;
 
-	while(cur->token_code != T_EOF 
-		&& cur->token_code != T_SEMICOLON 
-		&& cur->token_code != T_COMMA
-		&& cur->token_code != T_RPAREN)
+	while(!jep_is_term(cur))
 	{
 		// printf("invocation: %d %s\n", inv, (*nodes)->token->value->buffer);
 		switch((*nodes)->token->type)
@@ -324,6 +350,7 @@ jep_stack* jep_create_stack()
 /* pushes an AST node onto the top of the stack */
 void jep_push(jep_stack* stack, jep_ast_node* node)
 {
+
 	if(stack->size == stack->capacity)
 	{
 		int new_cap = stack->capacity + stack->capacity / 2;

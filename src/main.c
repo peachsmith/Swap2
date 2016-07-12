@@ -1,4 +1,4 @@
-#include "object.h"
+#include "ast.h"
 
 int main(int argc, char** argv)
 {

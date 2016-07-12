@@ -17,7 +17,7 @@ jep_obj* jep_number(const char* s)
 
 	if(errno == ERANGE)
 	{
-		printf("out of range\n");
+		printf("number out of range\n");
 		return NULL;
 	}
 	else if(endptr != s && *endptr != '\0')
@@ -30,7 +30,7 @@ jep_obj* jep_number(const char* s)
 
 		if(errno == ERANGE)
 		{
-			printf("out of range\n");
+			printf("number out of range\n");
 		}
 		else if(endptr != s && *endptr != '\0')
 		{

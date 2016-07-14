@@ -61,16 +61,20 @@ jep_ast_node* jep_parse(jep_token_builder* tb, jep_ast_node** nodes)
 
 	first = *nodes;
 
-	while((*nodes)->token->type != T_END)
+	while((*nodes)->token->token_code != T_EOF)
 	{
 		jep_ast_node* ast = jep_form_ast(nodes);
 		if(ast != NULL)
 		{
 			jep_add_leaf_node(root, ast);
 		}
-		if((*nodes)->token->token_code == T_SEMICOLON)
+		if(jep_is_term((*nodes)->token))
 		{
 			(*nodes)++;
+		}
+		else
+		{
+			printf("somehow, we ended on a nonterminal\n");
 		}
 	}
 
@@ -142,6 +146,27 @@ jep_ast_node* jep_form_ast(jep_ast_node** nodes)
 						}
 					}
 				}
+				else if(cur->token_code == T_LBRACE)
+				{
+					jep_ast_node* l_brace = (*nodes);
+					do
+					{
+						(*nodes)++;
+						jep_ast_node* p = jep_form_ast(nodes);
+						prev = (*nodes - 1)->token;
+						cur = (*nodes)->token;
+						if(cur->token_code != T_EOF)
+						{
+							next = (*nodes + 1)->token;
+						}
+						if(p != NULL)
+						{
+							jep_add_leaf_node(l_brace, p);
+						}
+					}
+					while(next->token_code != T_RBRACE && cur->token_code != T_EOF);
+					jep_push(&exp, l_brace);
+				}
 				else if(jep_priority(*nodes) < jep_priority(opr.top))
 				{
 					jep_ast_node* r; /* right operand */
@@ -171,7 +196,8 @@ jep_ast_node* jep_form_ast(jep_ast_node** nodes)
 							}
 							else
 							{
-								printf("error: expected two operands for binary operator %s\n", o->token->value->buffer);
+								printf("error: expected two operands for binary operator %s\n", 
+									o->token->value->buffer);
 							}
 						}
 					}while(opr.top != NULL && jep_priority(opr.top) > jep_priority(*nodes));
@@ -204,6 +230,7 @@ jep_ast_node* jep_form_ast(jep_ast_node** nodes)
 		case T_COMMA:
 		case T_EOF:
 		case T_RPAREN:
+		case T_RBRACE:
 		{
 			do
 			{
@@ -232,7 +259,8 @@ jep_ast_node* jep_form_ast(jep_ast_node** nodes)
 					}
 					else
 					{
-						printf("error: expected two operands for binary operator %s\n", o->token->value->buffer);
+						printf("error: expected two operands for binary operator %s\n", 
+							o->token->value->buffer);
 					}
 				}
 			}while(opr.size > 0);
@@ -445,6 +473,8 @@ int jep_priority(jep_ast_node* node)
 		case T_BITAND:
 		case T_BITOR:
 		case T_BITXOR:
+		case T_LSHIFT:
+		case T_RSHIFT:
 			priority = 2;
 			break;
 

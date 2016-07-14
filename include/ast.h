@@ -45,4 +45,22 @@ jep_obj* jep_and(jep_ast_node node);
 /* performs a logical or operation */
 jep_obj* jep_or(jep_ast_node node);
 
+/* performs a bitwise operation */
+jep_obj* jep_bitand(jep_ast_node node);
+
+/* performs a bitwise or operation */
+jep_obj* jep_bitor(jep_ast_node node);
+
+/* performs a bitwise xor operation */
+jep_obj* jep_bitxor(jep_ast_node node);
+
+/* performs a left bit shift operation */
+jep_obj* jep_lshift(jep_ast_node node);
+
+/* performs a right bit shift operation */
+jep_obj* jep_rshift(jep_ast_node node);
+
+/* evaluates a block of code in curly braces */
+void jep_brace(jep_ast_node node);
+
 #endif

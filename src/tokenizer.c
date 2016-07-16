@@ -215,8 +215,9 @@ jep_token_builder* jep_tokenize_file(const char* file_name)
 			{
 				i += 2;
 				while(!(s[i] == '\n') && i < sb->size)
+				{
 					i++;
-				i++;
+				}
 			}
 			
 			/* detect identifiers */
@@ -247,7 +248,7 @@ jep_token_builder* jep_tokenize_file(const char* file_name)
 				do
 				{
 					jep_append_char(c->value, s[i]);
-					if(s[i] == '\\' && s[i+1] == '\'')
+					if(s[i] == '\\')
 					{
 						i++;
 						jep_append_char(c->value, s[i]);
@@ -462,10 +463,10 @@ int jep_is_escape(char c)
 	{
 		if(escapes[i] == c)
 		{
-			return 1;
+			return i;
 		}
 	}
-	return 0;
+	return -1;
 }
 
 /* prints the tokens */

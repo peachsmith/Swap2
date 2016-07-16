@@ -15,6 +15,10 @@ jep_obj* jep_evaluate(jep_ast_node ast)
 	{
 		return jep_number(ast.token->value->buffer);
 	}
+	else if(ast.token->type == T_CHARACTER)
+	{
+		return jep_character(ast.token->value->buffer);
+	}
 
 	switch(ast.token->token_code)
 	{

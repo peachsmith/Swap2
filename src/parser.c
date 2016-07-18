@@ -64,17 +64,20 @@ jep_ast_node* jep_parse(jep_token_builder* tb, jep_ast_node** nodes)
 	while((*nodes)->token->token_code != T_EOF)
 	{
 		jep_ast_node* ast = jep_form_ast(nodes);
-		if(ast != NULL)
+		// printf("current: %s\n", (*nodes)->token->value->buffer);
+		if((*nodes)->token->token_code == T_EOF)
+		{
+			printf("unexpected EOF\n");
+		}
+		else if(jep_is_term((*nodes)->token))
 		{
 			jep_add_leaf_node(root, ast);
-		}
-		if(jep_is_term((*nodes)->token))
-		{
 			(*nodes)++;
 		}
 		else
 		{
-			printf("somehow, we ended on a nonterminal\n");
+			printf("unexpected nonterminal %s\n", 
+				(*nodes)->token->value->buffer);
 		}
 	}
 
@@ -128,9 +131,10 @@ jep_ast_node* jep_form_ast(jep_ast_node** nodes)
 				jep_check_unary(cur, prev);
 
 				/* check for parentheses */
-				if(cur->token_code == T_LPAREN)
+				if(cur->token_code == T_LPAREN && next->token_code != T_EOF)
 				{
-					if(next->token_code != T_EOF)
+					jep_ast_node* l_paren = (*nodes);
+					do
 					{
 						(*nodes)++;
 						jep_ast_node* p = jep_form_ast(nodes);
@@ -142,11 +146,13 @@ jep_ast_node* jep_form_ast(jep_ast_node** nodes)
 						}
 						if(p != NULL)
 						{
-							jep_push(&exp, p);
+							jep_add_leaf_node(l_paren, p);
 						}
 					}
+					while(cur->token_code != T_RPAREN && cur->token_code != T_EOF);
+					jep_push(&exp, l_paren);
 				}
-				else if(cur->token_code == T_LBRACE)
+				else if(cur->token_code == T_LBRACE && next->token_code != T_EOF)
 				{
 					jep_ast_node* l_brace = (*nodes);
 					do
@@ -224,52 +230,44 @@ jep_ast_node* jep_form_ast(jep_ast_node** nodes)
 		}
 	}
 
-	switch(cur->token_code)
+	if(jep_is_term(cur))
 	{
-		case T_SEMICOLON:
-		case T_COMMA:
-		case T_EOF:
-		case T_RPAREN:
-		case T_RBRACE:
+		do
 		{
-			do
+			jep_ast_node* r; /* right operand */
+			jep_ast_node* l; /* left operand */
+			jep_ast_node* o; /* operator */
+			o = jep_pop(&opr);
+			if(o != NULL && o->token->unary)
 			{
-				jep_ast_node* r; /* right operand */
-				jep_ast_node* l; /* left operand */
-				jep_ast_node* o; /* operator */
-				o = jep_pop(&opr);
-				if(o != NULL && o->token->unary)
+				r = jep_pop(&exp);
+				if(o != NULL && r != NULL)
 				{
-					r = jep_pop(&exp);
-					if(o != NULL && r != NULL)
-					{
-						jep_add_leaf_node(o, r);
-						jep_push(&exp, o);
-					}
+					jep_add_leaf_node(o, r);
+					jep_push(&exp, o);
 				}
-				else if(o != NULL)
+			}
+			else if(o != NULL)
+			{
+				r = jep_pop(&exp);
+				l = jep_pop(&exp);
+				if(o != NULL && r != NULL && l != NULL)
 				{
-					r = jep_pop(&exp);
-					l = jep_pop(&exp);
-					if(o != NULL && r != NULL && l != NULL)
-					{
-						jep_add_leaf_node(o, l);
-						jep_add_leaf_node(o, r);
-						jep_push(&exp, o);
-					}
-					else
-					{
-						printf("error: expected two operands for binary operator %s\n", 
-							o->token->value->buffer);
-					}
+					jep_add_leaf_node(o, l);
+					jep_add_leaf_node(o, r);
+					jep_push(&exp, o);
 				}
-			}while(opr.size > 0);
-		}
-			break;
-
-		default:
-			printf("invalid end of statement\n");
-			break;
+				else
+				{
+					printf("error: expected two operands for binary operator %s\n", 
+						o->token->value->buffer);
+				}
+			}
+		}while(opr.size > 0);
+	}
+	else
+	{
+		printf("invalid end of statement\n");
 	}
 
 	if(exp.size > 1 || opr.size > 0)
@@ -335,8 +333,10 @@ void jep_add_leaf_node(jep_ast_node* root, jep_ast_node* leaf)
 	{
 		jep_resize_ast_node(root);
 	}
-
-	root->leaves[root->leaf_count++] = *leaf;
+	if(leaf != NULL)
+	{
+		root->leaves[root->leaf_count++] = *leaf;
+	}
 }
 
 /* prints the AST */
@@ -401,7 +401,7 @@ void jep_push(jep_stack* stack, jep_ast_node* node)
 
 }
 
-/* poops an AST node from the top of the stack */
+/* pops an AST node from the top of the stack */
 jep_ast_node* jep_pop(jep_stack* stack)
 {
 	if(stack->size > 0)

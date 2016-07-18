@@ -60,6 +60,9 @@ jep_obj* jep_lshift(jep_ast_node node);
 /* performs a right bit shift operation */
 jep_obj* jep_rshift(jep_ast_node node);
 
+/* evaluates the contents of a set of parentheses */
+jep_obj* jep_paren(jep_ast_node node);
+
 /* evaluates a block of code in curly braces */
 void jep_brace(jep_ast_node node);
 

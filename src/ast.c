@@ -4,7 +4,7 @@
 jep_obj* jep_evaluate(jep_ast_node ast)
 {
 	jep_obj* o = NULL;
-
+	
 	if(ast.token == NULL)
 	{
 		printf("encountered NULL token\n");
@@ -92,6 +92,10 @@ jep_obj* jep_evaluate(jep_ast_node ast)
 
 		case T_RSHIFT:
 			o = jep_rshift(ast);
+			break;
+
+		case T_LPAREN:
+			o = jep_paren(ast);
 			break;
 
 		case T_LBRACE:
@@ -2231,6 +2235,33 @@ jep_obj* jep_rshift(jep_ast_node node)
 	}
 
 	return result;
+}
+
+/* evaluates the contents of a set of parentheses */
+jep_obj* jep_paren(jep_ast_node node)
+{
+	if(node.leaves == NULL)
+	{
+		return NULL;
+	}
+
+	jep_obj* o = jep_evaluate(node.leaves[0]);
+
+	int i;
+	for(i = 1; i < node.leaf_count; i++)
+	{
+		if(o->value != NULL)
+		{
+			free(o->value);
+		}
+		if(o != NULL)
+		{
+			free(o);
+		}
+		o = jep_evaluate(node.leaves[i]);
+	}
+
+	return o;
 }
 
 /* evaluates a block of code in curly braces */

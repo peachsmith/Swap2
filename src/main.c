@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 		if(root != NULL)
 		{
 			/* print the AST */
-			// jep_print_ast(*root);
+			jep_print_ast(*root);
 			if(root->leaves != NULL)
 			{
 				jep_obj* o;

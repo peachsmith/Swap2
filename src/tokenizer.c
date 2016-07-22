@@ -191,6 +191,8 @@ jep_token_builder* jep_tokenize_file(const char* file_name)
 	jep_token_builder* tb;  /* tokens */
 	
 	in_file = fopen(file_name, "r");
+	int row = 1;
+	int col = 1;
 	
 	if(in_file != NULL)
 	{
@@ -205,18 +207,33 @@ jep_token_builder* jep_tokenize_file(const char* file_name)
 			if(s[i] == '/' && s[i+1] == '*')
 			{
 				i += 2;
+				col += 2;
 				while(!(s[i] == '*' && s[i+1] == '/') && i < sb->size)
+				{
+					if(s[i] == '\n')
+					{
+						col = 1;
+						row++;
+					}
+					else
+					{
+						col++;
+					}
 					i++;
+				}
 				i += 2;
+				col +=2;
 			}
 
 			/* skip line comments */
 			if(s[i] == '/' && s[i+1] == '/')
 			{
 				i += 2;
+				col += 2;
 				while(!(s[i] == '\n') && i < sb->size)
 				{
 					i++;
+					col++;
 				}
 			}
 			
@@ -224,9 +241,12 @@ jep_token_builder* jep_tokenize_file(const char* file_name)
 			if(jep_is_ident_start(s[i]))
 			{
 				jep_token* ident = jep_create_token();
+				ident->row = row;
+				ident->column = col;
 				do
 				{
 					jep_append_char(ident->value, s[i++]);
+					col++;
 				}while(jep_is_ident(s[i]));
 				if(jep_is_keyword(ident->value->buffer) >= 0)
 				{
@@ -245,15 +265,20 @@ jep_token_builder* jep_tokenize_file(const char* file_name)
 			{
 				i++;
 				jep_token* c = jep_create_token();
+				c->row = row;
+				c->column = col;
+				col++;
 				do
 				{
 					jep_append_char(c->value, s[i]);
 					if(s[i] == '\\')
 					{
 						i++;
+						col++;
 						jep_append_char(c->value, s[i]);
 					}
 					i++;
+					col++;
 				}while(s[i] != '\'' && i < sb->size);
 				c->type = T_CHARACTER;
 				jep_append_token(tb, c);
@@ -262,17 +287,22 @@ jep_token_builder* jep_tokenize_file(const char* file_name)
 			/* detect strings */
 			if(s[i] == '"')
 			{
-				i++;
 				jep_token* str = jep_create_token();
+				str->row= row;
+				str->column = col;
+				i++;
+				col++;
 				do
 				{
 					jep_append_char(str->value, s[i]);
 					if(s[i] == '\\' && s[i+1] == '"')
 					{
 						i++;
+						col++;
 						jep_append_char(str->value, s[i]);
 					}
 					i++;
+					col++;
 				}while(s[i] != '"' && i < sb->size);
 				str->type = T_STRING;
 				jep_append_token(tb, str);
@@ -282,6 +312,8 @@ jep_token_builder* jep_tokenize_file(const char* file_name)
 			if(jep_is_symbol_char(s[i]))
 			{
 				jep_token* sym = jep_create_token();
+				sym->row = row;
+				sym->column = col;
 				char symbol[] = {s[i], '\0', '\0', '\0'};
 				if(i < sb->size - 1)
 				{
@@ -291,6 +323,7 @@ jep_token_builder* jep_tokenize_file(const char* file_name)
 					{
 						jep_append_string(sym->value, symbol);
 						i += 2;
+						col += 2;
 					}
 					else
 					{
@@ -299,6 +332,7 @@ jep_token_builder* jep_tokenize_file(const char* file_name)
 						{
 							jep_append_string(sym->value, symbol);
 							i++;
+							col++;
 						}
 						else
 						{
@@ -317,6 +351,7 @@ jep_token_builder* jep_tokenize_file(const char* file_name)
 					{
 						jep_append_string(sym->value, symbol);
 						i++;
+						col++;
 					}
 					else
 					{
@@ -336,6 +371,8 @@ jep_token_builder* jep_tokenize_file(const char* file_name)
 			if(isdigit(s[i]))
 			{
 				jep_token* num = jep_create_token();
+				num->row = row;
+				num->column = col;
 				int dec = 0;
 				do
 				{
@@ -348,12 +385,23 @@ jep_token_builder* jep_tokenize_file(const char* file_name)
 						jep_append_char(num->value, s[i]);
 						i++;
 					}
+					col++;
 				}while((isdigit(s[i]) || s[i] == '.' ) && dec < 2);
 				num->type = T_NUMBER;
 				jep_append_token(tb, num);
 				i--;
+				col--;
 			}
-			
+
+			if(s[i] == '\n')
+			{
+				row++;
+				col = 1;
+			}
+			else
+			{
+				col++;
+			}
 			i++;
 		}
 		
@@ -361,6 +409,8 @@ jep_token_builder* jep_tokenize_file(const char* file_name)
 		jep_token* end_token = jep_create_token();
 		end_token->type = T_END;
 		end_token->token_code = T_EOF;
+		end_token->row = row;
+		end_token->column = col;
 		jep_append_string(end_token->value, "__END__");
 		jep_append_token(tb, end_token);
 		
@@ -472,46 +522,53 @@ int jep_is_escape(char c)
 /* prints the tokens */
 void jep_print_tokens(jep_token_builder* tb, FILE* f)
 {
-	fprintf(f,"-------------------------------\n");
-	fprintf(f,"%-12s %-12s value\n","type","token code");
-	fprintf(f,"-------------------------------\n");
+	fprintf(f,"-----------------------------------------------\n");
+	fprintf(f,"%-12s %-7s %-7s %-12s value\n","type", "row", "column", "token code");
+	fprintf(f,"-----------------------------------------------\n");
 	int t_count;
 	for(t_count = 0; t_count < tb->size; t_count++)
 	{
 		switch(tb->tokens[t_count]->type)
 		{
 			case T_SYMBOL:
-				fprintf(f,"%-12s %-12d %s\n","[symbol]", 
+				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[symbol]", 
+				tb->tokens[t_count]->row, tb->tokens[t_count]->column, 
 				tb->tokens[t_count]->token_code,
 					tb->tokens[t_count]->value->buffer);
 				break;
 			case T_IDENTIFIER:
-				fprintf(f,"%-12s %-12d %s\n","[identifier]", 
+				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[identifier]", 
+				tb->tokens[t_count]->row, tb->tokens[t_count]->column, 
 				tb->tokens[t_count]->token_code,
 					tb->tokens[t_count]->value->buffer);
 				break;
 			case T_CHARACTER:
-				fprintf(f,"%-12s %-12d %s\n","[character]", 
+				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[character]", 
+				tb->tokens[t_count]->row, tb->tokens[t_count]->column, 
 				tb->tokens[t_count]->token_code,
 					tb->tokens[t_count]->value->buffer);
 				break;
 			case T_STRING:
-				fprintf(f,"%-12s %-12d %s\n","[string]", 
+				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[string]", 
+				tb->tokens[t_count]->row, tb->tokens[t_count]->column, 
 				tb->tokens[t_count]->token_code,
 					tb->tokens[t_count]->value->buffer);
 				break;
 			case T_NUMBER:
-				fprintf(f,"%-12s %-12d %s\n","[number]", 
+				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[number]", 
+				tb->tokens[t_count]->row, tb->tokens[t_count]->column, 
 				tb->tokens[t_count]->token_code,
 					tb->tokens[t_count]->value->buffer);
 				break;
 			case T_KEYWORD:
-				fprintf(f,"%-12s %-12d %s\n","[keyword]",
+				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[keyword]",
+				tb->tokens[t_count]->row, tb->tokens[t_count]->column, 
 				tb->tokens[t_count]->token_code,
 					tb->tokens[t_count]->value->buffer);
 				break;
 			case T_END:
-				fprintf(f,"%-12s %-12d %s\n","[end]",
+				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[end]",
+				tb->tokens[t_count]->row, tb->tokens[t_count]->column, 
 				tb->tokens[t_count]->token_code,
 					tb->tokens[t_count]->value->buffer);
 				break;

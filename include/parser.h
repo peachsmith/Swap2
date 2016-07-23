@@ -28,6 +28,24 @@ jep_ast_node* jep_parse(jep_token_builder* tb, jep_ast_node** nodes);
 /* forms an AST */
 jep_ast_node* jep_form_ast(jep_ast_node** nodes);
 
+/* advances the node pointer */
+int jep_accept(int type, jep_ast_node** nodes);
+
+/* advances the node pointer */
+int jep_accept_type(int type, jep_ast_node** nodes);
+
+/* checks for a factor */
+int jep_factor(jep_ast_node** nodes);
+
+/* checks for a terminal character */
+int jep_terminal(jep_ast_node** nodes);
+
+/* checks for an expression */
+int jep_expression(jep_ast_node** nodes);
+
+/* checks for a statement */
+int jep_statement(jep_ast_node** nodes);
+
 /* create an AST node */
 jep_ast_node* jep_create_ast_node();
 

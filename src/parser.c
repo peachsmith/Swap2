@@ -50,34 +50,41 @@ jep_ast_node* jep_parse(jep_token_builder* tb, jep_ast_node** nodes)
 	}
 
 	/* create the root of the AST */
-	root = malloc(sizeof(jep_ast_node));
-	root->leaf_count = 0;
-	root->capacity = 10;
-	root->leaves = NULL;
-	root->token = jep_create_token();
-	root->token->type = T_SYMBOL;
-	root->token->token_code = 0;
-	jep_append_string(root->token->value, "root");
+	root = NULL;
+	// root = malloc(sizeof(jep_ast_node));
+	// root->leaf_count = 0;
+	// root->capacity = 10;
+	// root->leaves = NULL;
+	// root->token = jep_create_token();
+	// root->token->type = T_SYMBOL;
+	// root->token->token_code = 0;
+	// jep_append_string(root->token->value, "root");
 
 	first = *nodes;
 
-	while((*nodes)->token->token_code != T_EOF)
+	int valid = 1;
+	while((*nodes)->token->token_code != T_EOF && valid)
 	{
-		jep_ast_node* ast = jep_form_ast(nodes);
-		// printf("current: %s\n", (*nodes)->token->value->buffer);
-		if((*nodes)->token->token_code == T_EOF)
+
+		// jep_ast_node* ast = jep_form_ast(nodes);
+		// // printf("current: %s\n", (*nodes)->token->value->buffer);
+		// if((*nodes)->token->token_code == T_EOF)
+		// {
+		// 	printf("unexpected EOF\n");
+		// }
+		// else if(jep_is_term((*nodes)->token))
+		// {
+		// 	jep_add_leaf_node(root, ast);
+		// 	(*nodes)++;
+		// }
+		// else
+		// {
+		// 	printf("unexpected nonterminal %s\n", 
+		// 		(*nodes)->token->value->buffer);
+		// }
+		if(!jep_statement(nodes))
 		{
-			printf("unexpected EOF\n");
-		}
-		else if(jep_is_term((*nodes)->token))
-		{
-			jep_add_leaf_node(root, ast);
-			(*nodes)++;
-		}
-		else
-		{
-			printf("unexpected nonterminal %s\n", 
-				(*nodes)->token->value->buffer);
+			valid = 0;
 		}
 	}
 
@@ -289,6 +296,147 @@ jep_ast_node* jep_form_ast(jep_ast_node** nodes)
 	free(opr.nodes);
 	inv--;
 	return ast;
+}
+
+/* advances the node pointer for a specfic token */
+int jep_accept(int token_code, jep_ast_node** nodes)
+{
+	if((*nodes)->token->token_code == token_code)
+	{
+		(*nodes)++;
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+/* advances the node pointer for a specfic token type */
+int jep_accept_type(int type, jep_ast_node** nodes)
+{
+	if((*nodes)->token->type == type)
+	{
+		(*nodes)++;
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+/* checks for a factor */
+int jep_factor(jep_ast_node** nodes)
+{
+	jep_token* tok = (*nodes)->token;
+	if(tok == NULL)
+	{
+		return 0;
+	}
+
+	switch(tok->type)
+	{
+		case T_IDENTIFIER:
+		case T_NUMBER:
+		case T_CHARACTER:
+		case T_STRING:
+			(*nodes)++;
+			return 1;
+			break;
+
+		default:
+			break;
+	}
+
+	if(jep_accept(T_LPAREN, nodes))
+	{
+		do
+		{
+			jep_expression(nodes);
+		}while(jep_accept(T_COMMA, nodes));
+		
+		if(jep_accept(T_RPAREN, nodes))
+		{
+			return 1;
+		}
+		else
+		{
+			printf("expected ')'\n");
+			(*nodes)++;
+			return 0;
+		}
+	}
+
+	printf("unexpected token: %s at %d,%d\n", 
+		tok->value->buffer, tok->row, tok->column);
+	return 0;
+}
+
+/* checks for a terminal character */
+int jep_terminal(jep_ast_node** nodes)
+{
+	jep_accept(T_MINUS, nodes);
+	if(!jep_factor(nodes))
+	{
+		return 0;
+	}
+	while((*nodes)->token->token_code == T_STAR 
+		|| (*nodes)->token->token_code == T_FSLASH)
+	{
+		(*nodes)++;
+		jep_accept(T_MINUS, nodes);
+		if(!jep_factor(nodes))
+		{
+			return 0;
+		}
+	}
+
+	return 1;
+}
+
+/* checks for an expression */
+int jep_expression(jep_ast_node** nodes)
+{
+	if(!jep_terminal(nodes))
+	{
+		return 0;
+	}
+	while((*nodes)->token->token_code == T_PLUS 
+		|| (*nodes)->token->token_code == T_MINUS)
+	{
+		(*nodes)++;
+		if(!jep_terminal(nodes))
+		{
+			return 0;
+		}
+	}
+
+	return 1;
+}
+
+/* checks for a statement */
+int jep_statement(jep_ast_node** nodes)
+{
+	do
+	{
+		if(!jep_expression(nodes))
+		{
+			return 0;
+		}
+	}while(jep_accept(T_COMMA, nodes));
+
+	if(!jep_accept(T_SEMICOLON, nodes))
+	{
+		printf("expected ; but found %s at %d,%d\n", 
+			(*nodes)->token->value->buffer, 
+			(*nodes)->token->row, (*nodes)->token->column);
+		return 0;
+	}
+
+	printf("found a statement\n");
+
+	return 1;
 }
 
 /* create an AST node */

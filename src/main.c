@@ -19,22 +19,25 @@ int main(int argc, char** argv)
 		if(root != NULL)
 		{
 			/* print the AST */
-			jep_print_ast(*root);
-			if(root->leaves != NULL)
+			if(!root->error)
 			{
-				jep_obj* o;
-				int i;
-				for(i = 0; i < root->leaf_count; i++)
-				{
-					o = jep_evaluate(root->leaves[i]);
-					if(o != NULL)
-					{
-						jep_print_obj(o);
-						free(o->value);
-						free(o);
-					}
-				}
+				jep_print_ast(*root);
 			}
+			// if(root->leaves != NULL)
+			// {
+			// 	jep_obj* o;
+			// 	int i;
+			// 	for(i = 0; i < root->leaf_count; i++)
+			// 	{
+			// 		o = jep_evaluate(root->leaves[i]);
+			// 		if(o != NULL)
+			// 		{
+			// 			jep_print_obj(o);
+			// 			free(o->value);
+			// 			free(o);
+			// 		}
+			// 	}
+			// }
 			
 
 			/* destroy the AST */

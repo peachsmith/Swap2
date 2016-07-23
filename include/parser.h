@@ -9,6 +9,7 @@ typedef struct ASTNode
 	int leaf_count;
 	int capacity;
 	struct ASTNode* leaves;
+	int error;
 }jep_ast_node;
 
 typedef struct Stack
@@ -22,29 +23,20 @@ typedef struct Stack
 /* checks if a token is a terminal */
 int jep_is_term(jep_token* token);
 
+/* advances the node pointer for a specific token code */
+int jep_accept(int token_code, jep_ast_node** nodes);
+
+/* advances the node pointer for a specific token type */
+int jep_accept_type(int type, jep_ast_node** nodes);
+
 /* parses a stream of tokens */
 jep_ast_node* jep_parse(jep_token_builder* tb, jep_ast_node** nodes);
 
-/* forms an AST */
-jep_ast_node* jep_form_ast(jep_ast_node** nodes);
+/* parses an expression */
+jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes);
 
-/* advances the node pointer */
-int jep_accept(int type, jep_ast_node** nodes);
-
-/* advances the node pointer */
-int jep_accept_type(int type, jep_ast_node** nodes);
-
-/* checks for a factor */
-int jep_factor(jep_ast_node** nodes);
-
-/* checks for a terminal character */
-int jep_terminal(jep_ast_node** nodes);
-
-/* checks for an expression */
-int jep_expression(jep_ast_node** nodes);
-
-/* checks for a statement */
-int jep_statement(jep_ast_node** nodes);
+/* parses a statement */
+jep_ast_node* jep_statement(jep_ast_node* root, jep_ast_node** nodes);
 
 /* create an AST node */
 jep_ast_node* jep_create_ast_node();

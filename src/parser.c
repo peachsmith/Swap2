@@ -29,6 +29,34 @@ int jep_is_term(jep_token* token)
 	return term;
 }
 
+/* advances the node pointer for a specfic token code */
+int jep_accept(int token_code, jep_ast_node** nodes)
+{
+	if((*nodes)->token->token_code == token_code)
+	{
+		(*nodes)++;
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+/* advances the node pointer for a specfic token type */
+int jep_accept_type(int type, jep_ast_node** nodes)
+{
+	if((*nodes)->token->type == type)
+	{
+		(*nodes)++;
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 /* parses a stream of tokens */
 jep_ast_node* jep_parse(jep_token_builder* tb, jep_ast_node** nodes)
 {
@@ -51,42 +79,22 @@ jep_ast_node* jep_parse(jep_token_builder* tb, jep_ast_node** nodes)
 
 	/* create the root of the AST */
 	root = NULL;
-	// root = malloc(sizeof(jep_ast_node));
-	// root->leaf_count = 0;
-	// root->capacity = 10;
-	// root->leaves = NULL;
-	// root->token = jep_create_token();
-	// root->token->type = T_SYMBOL;
-	// root->token->token_code = 0;
-	// jep_append_string(root->token->value, "root");
+	root = malloc(sizeof(jep_ast_node));
+	root->leaf_count = 0;
+	root->capacity = 10;
+	root->leaves = NULL;
+	root->token = jep_create_token();
+	root->token->type = T_SYMBOL;
+	root->token->token_code = 0;
+	root->error = 0;
+	jep_append_string(root->token->value, "root");
 
 	first = *nodes;
 
-	int valid = 1;
-	while((*nodes)->token->token_code != T_EOF && valid)
+	do
 	{
-
-		// jep_ast_node* ast = jep_form_ast(nodes);
-		// // printf("current: %s\n", (*nodes)->token->value->buffer);
-		// if((*nodes)->token->token_code == T_EOF)
-		// {
-		// 	printf("unexpected EOF\n");
-		// }
-		// else if(jep_is_term((*nodes)->token))
-		// {
-		// 	jep_add_leaf_node(root, ast);
-		// 	(*nodes)++;
-		// }
-		// else
-		// {
-		// 	printf("unexpected nonterminal %s\n", 
-		// 		(*nodes)->token->value->buffer);
-		// }
-		if(!jep_statement(nodes))
-		{
-			valid = 0;
-		}
-	}
+		jep_statement(root, nodes);
+	}while((*nodes)->token->token_code != T_EOF && root->error == 0);
 
 	(*nodes) = first;
 
@@ -94,11 +102,8 @@ jep_ast_node* jep_parse(jep_token_builder* tb, jep_ast_node** nodes)
 
 }
 
-jep_ast_node* jep_form_ast(jep_ast_node** nodes)
+jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 {
-	static int inv = 0;
-	inv++;
-
 	jep_stack exp;      /* expresion stack   */
 	jep_stack opr;      /* operator stack    */
 	jep_token* prev;    /* previous token    */
@@ -119,10 +124,21 @@ jep_ast_node* jep_form_ast(jep_ast_node** nodes)
 	prev = NULL;
 	cur = (*nodes)->token;
 	next = (*nodes + 1)->token;
+	if(jep_is_term(cur) && cur->token_code != T_SEMICOLON)
+	{
+		printf("unexpected token '%s' at %d,%d\n", 
+			(*nodes)->token->value->buffer,
+			(*nodes)->token->row, 
+			(*nodes)->token->column);
 
+		/* free the memory allocated for the stacks */
+		free(exp.nodes);
+		free(opr.nodes);
+		root->error = 1;
+		return NULL;
+	}
 	while(!jep_is_term(cur))
 	{
-		// printf("invocation: %d %s\n", inv, (*nodes)->token->value->buffer);
 		switch((*nodes)->token->type)
 		{
 			case T_IDENTIFIER:
@@ -141,10 +157,10 @@ jep_ast_node* jep_form_ast(jep_ast_node** nodes)
 				if(cur->token_code == T_LPAREN && next->token_code != T_EOF)
 				{
 					jep_ast_node* l_paren = (*nodes);
+					(*nodes)++;
 					do
 					{
-						(*nodes)++;
-						jep_ast_node* p = jep_form_ast(nodes);
+						jep_ast_node* p = jep_expression(root, nodes);
 						prev = (*nodes - 1)->token;
 						cur = (*nodes)->token;
 						if(cur->token_code != T_EOF)
@@ -155,17 +171,36 @@ jep_ast_node* jep_form_ast(jep_ast_node** nodes)
 						{
 							jep_add_leaf_node(l_paren, p);
 						}
+						else
+						{
+							free(exp.nodes);
+							free(opr.nodes);
+							return NULL;
+						}
 					}
-					while(cur->token_code != T_RPAREN && cur->token_code != T_EOF);
+					while(jep_accept(T_COMMA, nodes) 
+						&& (*nodes)->token->token_code != T_EOF);
+					if((*nodes)->token->token_code != T_RPAREN)
+					{
+						free(exp.nodes);
+						free(opr.nodes);
+						root->error = 1;
+						printf("expected ')' at %d,%d but found '%s'\n", 
+							(*nodes)->token->row, 
+							(*nodes)->token->column, 
+							(*nodes)->token->value->buffer);
+						return NULL;
+					}
+
 					jep_push(&exp, l_paren);
 				}
 				else if(cur->token_code == T_LBRACE && next->token_code != T_EOF)
 				{
 					jep_ast_node* l_brace = (*nodes);
+					(*nodes)++;
 					do
 					{
-						(*nodes)++;
-						jep_ast_node* p = jep_form_ast(nodes);
+						jep_ast_node* p = jep_expression(root, nodes);
 						prev = (*nodes - 1)->token;
 						cur = (*nodes)->token;
 						if(cur->token_code != T_EOF)
@@ -176,8 +211,26 @@ jep_ast_node* jep_form_ast(jep_ast_node** nodes)
 						{
 							jep_add_leaf_node(l_brace, p);
 						}
+						else
+						{
+							free(exp.nodes);
+							free(opr.nodes);
+							return NULL;
+						}
 					}
-					while(next->token_code != T_RBRACE && cur->token_code != T_EOF);
+					while(jep_accept(T_COMMA, nodes) 
+						&& (*nodes)->token->token_code != T_EOF);
+					if((*nodes)->token->token_code != T_RBRACE)
+					{
+						free(exp.nodes);
+						free(opr.nodes);
+						root->error = 1;
+						printf("expected '}' at %d,%d but found '%s'\n", 
+							(*nodes)->token->row, 
+							(*nodes)->token->column, 
+							(*nodes)->token->value->buffer);
+						return NULL;
+					}
 					jep_push(&exp, l_brace);
 				}
 				else if(jep_priority(*nodes) < jep_priority(opr.top))
@@ -222,8 +275,14 @@ jep_ast_node* jep_form_ast(jep_ast_node** nodes)
 				}
 				
 			}
+				break;
 
 			default:
+				printf("unexpected token '%s' at %d,%d\n", 
+					(*nodes)->token->value->buffer,
+					(*nodes)->token->row, 
+					(*nodes)->token->column);
+				root->error = 1;
 				break;
 		}
 
@@ -277,9 +336,22 @@ jep_ast_node* jep_form_ast(jep_ast_node** nodes)
 		printf("invalid end of statement\n");
 	}
 
-	if(exp.size > 1 || opr.size > 0)
+	if(exp.size > 1)
 	{
-		printf("unable to construct AST\n");
+		printf("unexpected token '%s' at %d,%d\n", 
+			exp.top->token->value->buffer,
+			exp.top->token->row, 
+			exp.top->token->column);
+		root->error = 1;
+		ast = NULL;
+	}
+	else if(opr.size > 0)
+	{
+		printf("unexpected token '%s' at %d,%d\n", 
+			opr.top->token->value->buffer,
+			opr.top->token->row, 
+			opr.top->token->column);
+		root->error = 1;
 		ast = NULL;
 	}
 	else
@@ -294,149 +366,35 @@ jep_ast_node* jep_form_ast(jep_ast_node** nodes)
 	/* free the memory allocated for the stacks */
 	free(exp.nodes);
 	free(opr.nodes);
-	inv--;
+
 	return ast;
 }
 
-/* advances the node pointer for a specfic token */
-int jep_accept(int token_code, jep_ast_node** nodes)
-{
-	if((*nodes)->token->token_code == token_code)
-	{
-		(*nodes)++;
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-/* advances the node pointer for a specfic token type */
-int jep_accept_type(int type, jep_ast_node** nodes)
-{
-	if((*nodes)->token->type == type)
-	{
-		(*nodes)++;
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-/* checks for a factor */
-int jep_factor(jep_ast_node** nodes)
-{
-	jep_token* tok = (*nodes)->token;
-	if(tok == NULL)
-	{
-		return 0;
-	}
-
-	switch(tok->type)
-	{
-		case T_IDENTIFIER:
-		case T_NUMBER:
-		case T_CHARACTER:
-		case T_STRING:
-			(*nodes)++;
-			return 1;
-			break;
-
-		default:
-			break;
-	}
-
-	if(jep_accept(T_LPAREN, nodes))
-	{
-		do
-		{
-			jep_expression(nodes);
-		}while(jep_accept(T_COMMA, nodes));
-		
-		if(jep_accept(T_RPAREN, nodes))
-		{
-			return 1;
-		}
-		else
-		{
-			printf("expected ')'\n");
-			(*nodes)++;
-			return 0;
-		}
-	}
-
-	printf("unexpected token: %s at %d,%d\n", 
-		tok->value->buffer, tok->row, tok->column);
-	return 0;
-}
-
-/* checks for a terminal character */
-int jep_terminal(jep_ast_node** nodes)
-{
-	jep_accept(T_MINUS, nodes);
-	if(!jep_factor(nodes))
-	{
-		return 0;
-	}
-	while((*nodes)->token->token_code == T_STAR 
-		|| (*nodes)->token->token_code == T_FSLASH)
-	{
-		(*nodes)++;
-		jep_accept(T_MINUS, nodes);
-		if(!jep_factor(nodes))
-		{
-			return 0;
-		}
-	}
-
-	return 1;
-}
-
-/* checks for an expression */
-int jep_expression(jep_ast_node** nodes)
-{
-	if(!jep_terminal(nodes))
-	{
-		return 0;
-	}
-	while((*nodes)->token->token_code == T_PLUS 
-		|| (*nodes)->token->token_code == T_MINUS)
-	{
-		(*nodes)++;
-		if(!jep_terminal(nodes))
-		{
-			return 0;
-		}
-	}
-
-	return 1;
-}
-
-/* checks for a statement */
-int jep_statement(jep_ast_node** nodes)
+/* parses a statement */
+jep_ast_node* jep_statement(jep_ast_node* root, jep_ast_node** nodes)
 {
 	do
 	{
-		if(!jep_expression(nodes))
+		jep_ast_node* statement = jep_expression(root, nodes);
+		if(statement != NULL)
 		{
-			return 0;
+			jep_add_leaf_node(root, statement);
 		}
 	}while(jep_accept(T_COMMA, nodes));
 
-	if(!jep_accept(T_SEMICOLON, nodes))
+	if(jep_accept(T_SEMICOLON, nodes))
 	{
-		printf("expected ; but found %s at %d,%d\n", 
-			(*nodes)->token->value->buffer, 
-			(*nodes)->token->row, (*nodes)->token->column);
-		return 0;
+		return root;	
 	}
-
-	printf("found a statement\n");
-
-	return 1;
+	else
+	{
+		printf("expected ; at %d,%d but found %s\n", 
+			(*nodes)->token->row, 
+			(*nodes)->token->column, 
+			(*nodes)->token->value->buffer);
+		root->error = 1;
+		return NULL;
+	}
 }
 
 /* create an AST node */

@@ -411,7 +411,7 @@ jep_token_builder* jep_tokenize_file(const char* file_name)
 		end_token->token_code = T_EOF;
 		end_token->row = row;
 		end_token->column = col;
-		jep_append_string(end_token->value, "__END__");
+		jep_append_string(end_token->value, "EOF");
 		jep_append_token(tb, end_token);
 		
 		/* free memory */

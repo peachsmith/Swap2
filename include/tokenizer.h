@@ -80,12 +80,12 @@ typedef struct Token
 	int unary;
 }jep_token;
 
-typedef struct TokenBuilder
+typedef struct TokenStream
 {
-	jep_token** tokens;
+	jep_token** tok;
 	int size;
 	int capacity;
-}jep_token_builder;
+}jep_token_stream;
 
 /* allocates memory for a new token */
 jep_token* jep_create_token();
@@ -96,23 +96,23 @@ void jep_destroy_token(jep_token* t);
 /* assign a token code to a token */
 void jep_classify_token(jep_token* t);
 
-/* creates a new token builder */
-jep_token_builder* jep_create_token_builder();
+/* creates a new token stream */
+jep_token_stream* jep_create_token_stream();
 
-/* increases the capacity of a token builder by approximately 50% */
-void jep_resize_token_builder(jep_token_builder* tb);
+/* increases the capacity of a token stream by approximately 50% */
+void jep_resize_token_stream(jep_token_stream* ts);
 
-/* adds a token to a token builder */
-void jep_append_token(jep_token_builder* tb, jep_token* t);
+/* adds a token to a token stream */
+void jep_append_token(jep_token_stream* tb, jep_token* t);
 
-/* frees memory allocated for a token builder */
-void jep_destroy_token_builder();
+/* frees memory allocated for a token stream */
+void jep_destroy_token_stream();
 
 /* reads the contents of a file into memory */
 void jep_scan_file(FILE* file, jep_string_builder* sb);
 
 /* tokenizes the contents of a text file */
-jep_token_builder* jep_tokenize_file(const char* file_name);
+jep_token_stream* jep_tokenize_file(const char* file_name);
 
 /* checks for a symbol character */
 int jep_is_symbol_char(char c);
@@ -142,6 +142,6 @@ int jep_is_ident(char c);
 int jep_is_escape(char c);
 
 /* prints the tokens */
-void jep_print_tokens(jep_token_builder* tb, FILE* f);
+void jep_print_tokens(jep_token_stream* ts, FILE* f);
 
 #endif /* JEP_TOKENIZER_H */

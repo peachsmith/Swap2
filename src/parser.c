@@ -47,23 +47,21 @@ int jep_accept_type(int type, jep_ast_node** nodes)
 }
 
 /* parses a stream of tokens */
-jep_ast_node* jep_parse(jep_token_builder* tb, jep_ast_node** nodes)
+jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node** nodes)
 {
-	jep_token** tok;      /* the tokens              */
 	jep_ast_node* first;  /* the first node          */
 	jep_ast_node* root;   /* the root of the AST     */
 	int i;                /* index variable          */
 
-	tok = tb->tokens;
-	*nodes = malloc(sizeof(jep_ast_node) * tb->size);
+	*nodes = malloc(sizeof(jep_ast_node) * ts->size);
 
 	/* create an AST node for each token */
-	for(i = 0; i < tb->size; i++)
+	for(i = 0; i < ts->size; i++)
 	{
 		(*nodes)[i].leaf_count = 0;
 		(*nodes)[i].capacity = 10;
 		(*nodes)[i].leaves = NULL;
-		(*nodes)[i].token = tok[i];
+		(*nodes)[i].token = ts->tok[i];
 	}
 
 	/* create the root of the AST */

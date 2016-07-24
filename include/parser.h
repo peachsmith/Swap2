@@ -14,7 +14,7 @@ int jep_accept(int token_code, jep_ast_node** nodes);
 int jep_accept_type(int type, jep_ast_node** nodes);
 
 /* parses a stream of tokens */
-jep_ast_node* jep_parse(jep_token_builder* tb, jep_ast_node** nodes);
+jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node** nodes);
 
 /* parses an expression */
 jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes);

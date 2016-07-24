@@ -4,19 +4,19 @@
 
 int main(int argc, char** argv)
 {
-	jep_token_builder* tb = NULL;
+	jep_token_stream* ts = NULL;
 	jep_ast_node* nodes = NULL;
 	jep_ast_node* root = NULL;
 	
 	if(argc > 1)
 	{
-		tb = jep_tokenize_file(argv[1]);
+		ts = jep_tokenize_file(argv[1]);
 	}
 	
-	if(tb != NULL)
+	if(ts != NULL)
 	{
-		// jep_print_tokens(tb, stdout);
-		root = jep_parse(tb, &nodes);
+		// jep_print_tokens(ts, stdout);
+		root = jep_parse(ts, &nodes);
 
 		if(root != NULL)
 		{
@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 		{
 			/* destroy all of the individual nodes */
 			int i;
-			for(i = 0; i < tb->size; i++)
+			for(i = 0; i < ts->size; i++)
 			{
 				if(nodes[i].leaves != NULL)
 				{
@@ -66,7 +66,7 @@ int main(int argc, char** argv)
 		}
 
 		/* destroy the tokens */
-		jep_destroy_token_builder(tb);
+		jep_destroy_token_stream(ts);
 	}
 	else
 	{

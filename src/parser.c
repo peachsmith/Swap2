@@ -1,16 +1,8 @@
 #include "parser.h"
 
-/* checks if a token is a terminal */
-int jep_is_term(jep_token* token)
+/* checks if a token is an 'end of expression' token */
+int jep_eoe(jep_token* token)
 {
-	int term = 0;
-
-	/* NULL is considered a terminal */
-	if(token == NULL) 
-	{
-		return 1;
-	}
-
 	switch(token->token_code)
 	{
 		case T_SEMICOLON:
@@ -19,14 +11,11 @@ int jep_is_term(jep_token* token)
 		case T_COMMA:
 		case T_RSQUARE:
 		case T_RBRACE:
-			term = 1;
-			break;
+			return 1;
 
 		default:
-			break;
+			return 0;
 	}
-
-	return term;
 }
 
 /* advances the node pointer for a specfic token code */
@@ -124,7 +113,7 @@ jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 	prev = NULL;
 	cur = (*nodes)->token;
 	next = (*nodes + 1)->token;
-	if(jep_is_term(cur) && cur->token_code != T_SEMICOLON)
+	if(jep_eoe(cur) && cur->token_code != T_SEMICOLON)
 	{
 		printf("unexpected token '%s' at %d,%d\n", 
 			(*nodes)->token->value->buffer,
@@ -137,7 +126,7 @@ jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 		root->error = 1;
 		return NULL;
 	}
-	while(!jep_is_term(cur))
+	while(!jep_eoe(cur))
 	{
 		switch((*nodes)->token->type)
 		{
@@ -296,7 +285,7 @@ jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 		}
 	}
 
-	if(jep_is_term(cur))
+	if(jep_eoe(cur))
 	{
 		do
 		{
@@ -397,148 +386,10 @@ jep_ast_node* jep_statement(jep_ast_node* root, jep_ast_node** nodes)
 	}
 }
 
-/* create an AST node */
-jep_ast_node* jep_create_ast_node()
+/* parses a block of code */
+jep_ast_node* jep_block(jep_ast_node* root, jep_ast_node** nodes)
 {
-	jep_ast_node* node = malloc(sizeof(jep_ast_node));
-	node->token = NULL;
-	node->leaf_count = 0;
-	node->capacity = 10;
-	node->leaves = NULL;
-	return node;
-}
-
-/* increases the memory allocated for an AST node's leaf nodes by about 50% */
-void jep_resize_ast_node(jep_ast_node* node)
-{
-	int new_cap = node->capacity + node->capacity / 2;
-	jep_ast_node* new_leaves = malloc(sizeof(jep_ast_node) * new_cap);
-
-	int i;
-	for(i = 0; i < node->leaf_count; i++)
-	{
-		new_leaves[i] = node->leaves[i];
-	}
-
-	free(node->leaves);
-
-	node->leaves = new_leaves;
-	node->capacity = new_cap;
-}
-
-/* adds a leaf node to an AST node */
-void jep_add_leaf_node(jep_ast_node* root, jep_ast_node* leaf)
-{
-
-	if(root->leaves == NULL)
-	{
-		root->leaves = malloc(sizeof(jep_ast_node) * root->capacity);
-	}
-
-	if(root->leaf_count == root->capacity)
-	{
-		jep_resize_ast_node(root);
-	}
-	if(leaf != NULL)
-	{
-		root->leaves[root->leaf_count++] = *leaf;
-	}
-}
-
-/* prints the AST */
-void jep_print_ast(jep_ast_node root)
-{
-	static int indent = 1;
-
-	if(root.leaf_count > 0)
-	{
-		printf("%*s\n", indent, root.token->value->buffer);
-		indent++;
-		int i;
-		for(i = 0; i < root.leaf_count; i++)
-		{
-			jep_print_ast(root.leaves[i]);
-		}
-		indent--;
-	}
-	else
-	{
-		printf("%*s\n", indent, root.token->value->buffer);
-	}
-
-}
-
-/* creates a stack */
-/*
-jep_stack* jep_create_stack()
-{
-	jep_stack* stack = malloc(sizeof(jep_stack));
-	stack->size = 0;
-	stack->capacity = 10;
-	stack->top = NULL;
-	stack->nodes = malloc(sizeof(jep_ast_node*) * stack->capacity);
-	return stack;
-}
-*/
-
-/* pushes an AST node onto the top of the stack */
-void jep_push(jep_stack* stack, jep_ast_node* node)
-{
-
-	if(stack->size == stack->capacity)
-	{
-		int new_cap = stack->capacity + stack->capacity / 2;
-		jep_ast_node** new_nodes = malloc(sizeof(jep_ast_node*) * new_cap);
-
-		int i;
-		for(i = 0; i < stack->capacity; i++)
-		{
-			new_nodes[i] = stack->nodes[i];
-		}
-
-		free(stack->nodes);
-
-		stack->nodes = new_nodes;
-		stack->capacity = new_cap;
-	}
-
-	stack->nodes[stack->size++] = node;
-	stack->top = stack->nodes[stack->size-1];
-
-}
-
-/* pops an AST node from the top of the stack */
-jep_ast_node* jep_pop(jep_stack* stack)
-{
-	if(stack->size > 0)
-	{
-		jep_ast_node* top = stack->nodes[stack->size-1];
-		stack->nodes[stack->size-1] = NULL;
-		stack->size = stack->size - 1;
-		if(stack->size > 0)
-		{
-			stack->top = stack->nodes[stack->size-1];
-		}
-		else
-		{
-			stack->top = NULL;
-		}
-		return top;
-	}
-	else
-	{
-		return NULL;
-	}
-}
-
-/* pops all AST nodes from the stack */
-void jep_pop_all(jep_stack* stack)
-{
-	int i;
-	for(i = 0; i < stack->size; i++)
-	{
-		stack->nodes[i] = NULL;
-	}
+	return NULL;
 }
 
 /* determines the priority of an operator based on order of operations */

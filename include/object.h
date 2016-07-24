@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <limits.h>
-#include "parser.h"
 
 /* the primitive types */
 #define JEP_INT 1

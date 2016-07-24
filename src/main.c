@@ -1,4 +1,6 @@
 #include "ast.h"
+#include "parser.h"
+#include "operator.h"
 
 int main(int argc, char** argv)
 {

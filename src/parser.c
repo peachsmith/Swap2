@@ -18,6 +18,24 @@ static int jep_eoe(jep_token* token)
 	}
 }
 
+/* determines an operator's associativity */
+static int jep_associativity(jep_ast_node* node)
+{
+	if(node == NULL)
+	{
+		return 0;
+	}
+	
+	switch(node->token->token_code)
+	{
+		case T_EQUALS:
+			return JEP_RIGHT_ASSOC;
+
+		default:
+			return JEP_LEFT_ASSOC;
+	}
+}
+
 /* determines the priority of an operator based on order of operations */
 static int jep_priority(jep_ast_node* node)
 {
@@ -32,7 +50,7 @@ static int jep_priority(jep_ast_node* node)
 	/* unary operators take highest priority */
 	if(node->token->unary)
 	{
-		return 8;
+		return 7;
 	}
 
 	switch(node->token->token_code)
@@ -76,15 +94,12 @@ static int jep_priority(jep_ast_node* node)
 			break;
 
 		case T_FSLASH:
+		case T_STAR:
 			priority = 5;
 			break;
 
-		case T_STAR:
-			priority = 6;
-			break;
-
 		case T_LPAREN:
-			priority = 7;
+			priority = 6;
 			break;
 
 		default:
@@ -92,6 +107,39 @@ static int jep_priority(jep_ast_node* node)
 			break;
 	}
 	return priority;
+}
+
+/* 
+ * determine whether or not the current oeprator stack should be emptied 
+ * cur is the current operator on the token stream
+ * top is the operator on the top of the operator stack
+ */
+static int jep_prioritize(jep_ast_node* cur, jep_ast_node* top)
+{
+	if(jep_associativity(top) == JEP_LEFT_ASSOC)
+	{
+		if(jep_priority(cur) <= jep_priority(top))
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	else if(jep_associativity(top) == JEP_RIGHT_ASSOC)
+	{
+		if(jep_priority(cur) < jep_priority(top))
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}	
+	}
+
+	return 0;
 }
 
 /* checks if an operator is potentially unary */
@@ -325,7 +373,7 @@ jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 					}
 					jep_push(&exp, l_brace);
 				}
-				else if(jep_priority(*nodes) < jep_priority(opr.top))
+				else if(jep_prioritize(*nodes, opr.top))
 				{
 					jep_ast_node* r; /* right operand */
 					jep_ast_node* l; /* left operand */

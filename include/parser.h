@@ -4,6 +4,9 @@
 #include "tokenizer.h"
 #include "ast.h"
 
+#define JEP_LEFT_ASSOC 1
+#define JEP_RIGHT_ASSOC 2
+
 /* advances the node pointer for a specific token code */
 int jep_accept(int token_code, jep_ast_node** nodes);
 

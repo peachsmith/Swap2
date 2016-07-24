@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 			{
 				jep_print_ast(*root);
 			}
-			// if(root->leaves != NULL)
+			// if(root->leaves != NULL && !root->error)
 			// {
 			// 	jep_obj* o;
 			// 	int i;

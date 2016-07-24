@@ -28,9 +28,6 @@ typedef struct Stack
 /* create an AST node */
 jep_ast_node* jep_create_ast_node();
 
-/* increases the memory allocated for an AST node's leaf nodes by about 50% */
-void jep_resize_ast_node(jep_ast_node* node);
-
 /* adds a leaf node to an AST node */
 void jep_add_leaf_node(jep_ast_node* root, jep_ast_node* leaf);
 

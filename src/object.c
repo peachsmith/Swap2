@@ -1,6 +1,26 @@
 #include "object.h"
 #include "tokenizer.h"
 
+/* escape characters */
+const char escapes[] = 
+{
+	'a', 'b', 'f', 'n', 'r', 't', 'v', '\\', '\'', '"', '?'
+};
+
+/* checks for an escape character */
+static int jep_is_escape(char c)
+{
+	int i;
+	for(i = 0; i < 11; i++)
+	{
+		if(escapes[i] == c)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
 jep_obj* jep_number(const char* s)
 {
 	char* endptr;

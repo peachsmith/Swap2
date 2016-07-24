@@ -93,53 +93,17 @@ jep_token* jep_create_token();
 /* frees the memory allocated for a token */
 void jep_destroy_token(jep_token* t);
 
-/* assign a token code to a token */
-void jep_classify_token(jep_token* t);
-
 /* creates a new token stream */
 jep_token_stream* jep_create_token_stream();
 
-/* increases the capacity of a token stream by approximately 50% */
-void jep_resize_token_stream(jep_token_stream* ts);
+/* frees memory allocated for a token stream */
+void jep_destroy_token_stream(jep_token_stream* ts);
 
 /* adds a token to a token stream */
 void jep_append_token(jep_token_stream* tb, jep_token* t);
 
-/* frees memory allocated for a token stream */
-void jep_destroy_token_stream();
-
-/* reads the contents of a file into memory */
-void jep_scan_file(FILE* file, jep_string_builder* sb);
-
-/* tokenizes the contents of a text file */
+/* tokenizes the contents of a file */
 jep_token_stream* jep_tokenize_file(const char* file_name);
-
-/* checks for a symbol character */
-int jep_is_symbol_char(char c);
-
-/* checks for a single-character symbol */
-int jep_is_symbol(const char* s);
-
-/* checks for a double-character symbol */
-int jep_is_symbol2(const char* s);
-
-/* checks for a tripple-character symbol */
-int jep_is_symbol3(const char* s);
-
-/* checks for a keyword */
-int jep_is_keyword(const char* s);
-
-/* checks if a token is a primitive */
-int jep_is_primitive(const char* s);
-
-/* checks for the beginning of an identifier */
-int jep_is_ident_start(char c);
-
-/* checks for identifier characters */
-int jep_is_ident(char c);
-
-/* checks for an escape character */
-int jep_is_escape(char c);
 
 /* prints the tokens */
 void jep_print_tokens(jep_token_stream* ts, FILE* f);

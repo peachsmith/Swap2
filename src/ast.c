@@ -1,18 +1,7 @@
 #include "ast.h"
 
-/* create an AST node */
-jep_ast_node* jep_create_ast_node()
-{
-	jep_ast_node* node = malloc(sizeof(jep_ast_node));
-	node->token = NULL;
-	node->leaf_count = 0;
-	node->capacity = 10;
-	node->leaves = NULL;
-	return node;
-}
-
 /* increases the memory allocated for an AST node's leaf nodes by about 50% */
-void jep_resize_ast_node(jep_ast_node* node)
+static void jep_resize_ast_node(jep_ast_node* node)
 {
 	int new_cap = node->capacity + node->capacity / 2;
 	jep_ast_node* new_leaves = malloc(sizeof(jep_ast_node) * new_cap);
@@ -27,6 +16,17 @@ void jep_resize_ast_node(jep_ast_node* node)
 
 	node->leaves = new_leaves;
 	node->capacity = new_cap;
+}
+
+/* create an AST node */
+jep_ast_node* jep_create_ast_node()
+{
+	jep_ast_node* node = malloc(sizeof(jep_ast_node));
+	node->token = NULL;
+	node->leaf_count = 0;
+	node->capacity = 10;
+	node->leaves = NULL;
+	return node;
 }
 
 /* adds a leaf node to an AST node */

@@ -1,7 +1,7 @@
 #include "parser.h"
 
 /* checks if a token is an 'end of expression' token */
-int jep_eoe(jep_token* token)
+static int jep_eoe(jep_token* token)
 {
 	switch(token->token_code)
 	{
@@ -16,6 +16,111 @@ int jep_eoe(jep_token* token)
 		default:
 			return 0;
 	}
+}
+
+/* determines the priority of an operator based on order of operations */
+static int jep_priority(jep_ast_node* node)
+{
+	int priority = -1;
+
+	/* NULL nodes take lowest riority */
+	if(node == NULL)
+	{
+		return -1;
+	}
+
+	/* unary operators take highest priority */
+	if(node->token->unary)
+	{
+		return 8;
+	}
+
+	switch(node->token->token_code)
+	{
+		case T_RPAREN:
+		case T_EQUALS:
+		case T_ADDASSIGN:
+		case T_SUBASSIGN:
+		case T_MULASSIGN:
+		case T_DIVASSIGN:
+		case T_SEMICOLON:
+		case T_EOF:
+			priority = 0;
+			break;
+
+		case T_LOGAND:
+		case T_LOGOR:
+			priority = 1;
+			break;
+
+		case T_BITAND:
+		case T_BITOR:
+		case T_BITXOR:
+		case T_LSHIFT:
+		case T_RSHIFT:
+			priority = 2;
+			break;
+
+		case T_LESS:
+		case T_GREATER:
+		case T_LOREQUAL:
+		case T_GOREQUAL:
+		case T_EQUIVALENT:
+		case T_NOTEQUIVALENT:
+			priority = 3;
+			break;
+
+		case T_PLUS:
+		case T_MINUS:
+			priority = 4;
+			break;
+
+		case T_FSLASH:
+			priority = 5;
+			break;
+
+		case T_STAR:
+			priority = 6;
+			break;
+
+		case T_LPAREN:
+			priority = 7;
+			break;
+
+		default:
+			priority = 0;
+			break;
+	}
+	return priority;
+}
+
+/* checks if an operator is potentially unary */
+static int jep_check_unary(jep_token* cur, jep_token* prev)
+{
+	int unary = 0;
+	switch(cur->token_code)
+	{
+		case T_INCREMENT:
+		case T_DECREMENT:
+		case T_NOT:
+			unary = 1;
+			cur->unary = 1;
+			break;
+
+		case T_MINUS:
+			if(prev == NULL || (prev->type == T_SYMBOL 
+				&& !prev->unary && prev->token_code != T_RPAREN))
+			{
+				unary = 1;
+				cur->unary = 1;
+			}
+			break;
+
+		default:
+			break;
+	}
+
+	return unary;
 }
 
 /* advances the node pointer for a specfic token code */
@@ -388,109 +493,4 @@ jep_ast_node* jep_statement(jep_ast_node* root, jep_ast_node** nodes)
 jep_ast_node* jep_block(jep_ast_node* root, jep_ast_node** nodes)
 {
 	return NULL;
-}
-
-/* determines the priority of an operator based on order of operations */
-int jep_priority(jep_ast_node* node)
-{
-	int priority = -1;
-
-	/* NULL nodes take lowest riority */
-	if(node == NULL)
-	{
-		return -1;
-	}
-
-	/* unary operators take highest priority */
-	if(node->token->unary)
-	{
-		return 8;
-	}
-
-	switch(node->token->token_code)
-	{
-		case T_RPAREN:
-		case T_EQUALS:
-		case T_ADDASSIGN:
-		case T_SUBASSIGN:
-		case T_MULASSIGN:
-		case T_DIVASSIGN:
-		case T_SEMICOLON:
-		case T_EOF:
-			priority = 0;
-			break;
-
-		case T_LOGAND:
-		case T_LOGOR:
-			priority = 1;
-			break;
-
-		case T_BITAND:
-		case T_BITOR:
-		case T_BITXOR:
-		case T_LSHIFT:
-		case T_RSHIFT:
-			priority = 2;
-			break;
-
-		case T_LESS:
-		case T_GREATER:
-		case T_LOREQUAL:
-		case T_GOREQUAL:
-		case T_EQUIVALENT:
-		case T_NOTEQUIVALENT:
-			priority = 3;
-			break;
-
-		case T_PLUS:
-		case T_MINUS:
-			priority = 4;
-			break;
-
-		case T_FSLASH:
-			priority = 5;
-			break;
-
-		case T_STAR:
-			priority = 6;
-			break;
-
-		case T_LPAREN:
-			priority = 7;
-			break;
-
-		default:
-			priority = 0;
-			break;
-	}
-	return priority;
-}
-
-/* checks if an operator is potentially unary */
-int jep_check_unary(jep_token* cur, jep_token* prev)
-{
-	int unary = 0;
-	switch(cur->token_code)
-	{
-		case T_INCREMENT:
-		case T_DECREMENT:
-		case T_NOT:
-			unary = 1;
-			cur->unary = 1;
-			break;
-
-		case T_MINUS:
-			if(prev == NULL || (prev->type == T_SYMBOL 
-				&& !prev->unary && prev->token_code != T_RPAREN))
-			{
-				unary = 1;
-				cur->unary = 1;
-			}
-			break;
-
-		default:
-			break;
-	}
-
-	return unary;
 }

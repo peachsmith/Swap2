@@ -26,117 +26,8 @@ const char *keywords[] =
 	"if", "else", "for", "while"
 };
 
-/* primitives */
-const char *primitives[] =
-{
-	"void", "int", "char", "float", "double"
-};
-
-
-/* escape characters */
-const char escapes[] = 
-{
-	'a', 'b', 'f', 'n', 'r', 't', 'v', '\\', '\'', '"', '?'
-};
-
-/* allocates memory for a new token */
-jep_token* jep_create_token()
-{
-	jep_token *t = malloc(sizeof(jep_token));
-	t->value = jep_create_string_builder();
-	t->type = 0;
-	t->token_code = 0;
-	t->row = 0;
-	t->column = 0;
-	t->unary = 0;
-	return t;
-}
-
-/* frees the memory allocated for a token */
-void jep_destroy_token(jep_token* t)
-{
-	jep_destroy_string_builder(t->value);
-	free(t);
-}
-
-/* assign a token code to a token */
-void jep_classify_token(jep_token* t)
-{
-	if(t->type == T_SYMBOL)
-	{
-		if(t->value->size == 1)
-		{
-			t->token_code = jep_is_symbol(t->value->buffer) + 1;
-		}
-		else if(t->value->size == 2)
-		{
-			t->token_code = jep_is_symbol2(t->value->buffer) + 21;
-		}
-		else if(t->value->size == 3)
-		{
-			t->token_code = jep_is_symbol3(t->value->buffer) + 38;
-		}
-	}
-	else if(t->type == T_KEYWORD)
-	{
-		t->token_code = jep_is_keyword(t->value->buffer) + 40;
-	}
-}
-
-/* creates a new token stream */
-jep_token_stream* jep_create_token_stream()
-{
-	jep_token_stream* ts = malloc(sizeof(jep_token_stream));
-	ts->size = 0;
-	ts->capacity = 10;
-	ts->tok = malloc(10 * sizeof(jep_token*));
-	return ts;
-}
-
-/* frees memory allocated for a token stream */
-void jep_destroy_token_stream(jep_token_stream* ts)
-{
-	int i;
-	for(i = 0; i < ts->size; i++)
-	{
-		jep_destroy_token(ts->tok[i]);
-	}
-	free(ts->tok);
-	free(ts);
-}
-
-/* increases the capacity of a token stream by approximately 50% */
-void jep_resize_token_stream(jep_token_stream* ts)
-{
-	int new_capacity;
-	jep_token** new_tokens;
-	int i;
-	
-	new_capacity = ts->capacity + ts->capacity / 2;
-	new_tokens = malloc(new_capacity * sizeof(jep_token*));
-	
-	for(i = 0; i < ts->size; i++)
-	{
-		new_tokens[i] = ts->tok[i];
-	}
-	
-	free(ts->tok);
-	ts->tok = new_tokens;
-	ts->capacity = new_capacity;
-}
-
-/* adds a token to a token stream */
-void jep_append_token(jep_token_stream* ts, jep_token* t)
-{
-	if(ts->size >= ts->capacity)
-	{
-		jep_resize_token_stream(ts);
-	}
-	ts->tok[ts->size++] = t;
-}
-
 /* checks for a symbol character */
-int jep_is_symbol_char(char c)
+static int jep_is_symbol_char(char c)
 {
 	switch(c)
 	{
@@ -166,8 +57,74 @@ int jep_is_symbol_char(char c)
 	}
 }
 
+/* checks for a single-character symbol */
+static int jep_is_symbol(const char* s)
+{
+	int i;
+	for(i = 0; i < 20; i++)
+	{
+		if(!strcmp(symbols[i], s))
+			return i;
+	}
+	return -1;
+}
+
+/* checks for a double-character symbol */
+static int jep_is_symbol2(const char* s)
+{
+	int i;
+	for(i = 0; i < 17; i++)
+	{
+		if(!strcmp(symbols2[i], s))
+			return i;
+	}
+	return -1;
+}
+
+/* checks for a tripple-character symbol */
+static int jep_is_symbol3(const char* s)
+{
+	int i;
+	for(i = 0; i < 2; i++)
+	{
+		if(!strcmp(symbols3[i], s))
+			return i;
+	}
+	return -1;
+}
+
+/* checks for a keyword */
+static int jep_is_keyword(const char* s)
+{
+	int i;
+	for(i = 0; i < 4; i++)
+	{
+		if(!strcmp(s, keywords[i]))
+			return i;
+	}
+	return -1;
+}
+
+/* checks for the beginning of an identifier */
+static int jep_is_ident_start(char c)
+{
+	if(isalpha(c) || c == '_' || c == '$')
+		return 1;
+	else
+		return 0;
+}
+
+/* checks for identifier characters */
+static int jep_is_ident(char c)
+{
+	if(isalnum(c) || c == '_' || c == '$')
+		return 1;
+	else
+		return 0;
+}
+
 /* reads the contents of a file into memory */
-void jep_scan_file(FILE* file, jep_string_builder *sb)
+static void jep_scan_file(FILE* file, jep_string_builder *sb)
 {
 	char buffer[1025];
 	size_t s;
@@ -180,6 +137,102 @@ void jep_scan_file(FILE* file, jep_string_builder *sb)
 			jep_append_string(sb, buffer);
 		}
 	}while(s > 0);
+}
+
+/* increases the capacity of a token stream by approximately 50% */
+static void jep_resize_token_stream(jep_token_stream* ts)
+{
+	int new_capacity;
+	jep_token** new_tokens;
+	int i;
+	
+	new_capacity = ts->capacity + ts->capacity / 2;
+	new_tokens = malloc(new_capacity * sizeof(jep_token*));
+	
+	for(i = 0; i < ts->size; i++)
+	{
+		new_tokens[i] = ts->tok[i];
+	}
+	
+	free(ts->tok);
+	ts->tok = new_tokens;
+	ts->capacity = new_capacity;
+}
+
+/* assign a token code to a token */
+static void jep_classify_token(jep_token* t)
+{
+	if(t->type == T_SYMBOL)
+	{
+		if(t->value->size == 1)
+		{
+			t->token_code = jep_is_symbol(t->value->buffer) + 1;
+		}
+		else if(t->value->size == 2)
+		{
+			t->token_code = jep_is_symbol2(t->value->buffer) + 21;
+		}
+		else if(t->value->size == 3)
+		{
+			t->token_code = jep_is_symbol3(t->value->buffer) + 38;
+		}
+	}
+	else if(t->type == T_KEYWORD)
+	{
+		t->token_code = jep_is_keyword(t->value->buffer) + 40;
+	}
+}
+
+/* allocates memory for a new token */
+jep_token* jep_create_token()
+{
+	jep_token *t = malloc(sizeof(jep_token));
+	t->value = jep_create_string_builder();
+	t->type = 0;
+	t->token_code = 0;
+	t->row = 0;
+	t->column = 0;
+	t->unary = 0;
+	return t;
+}
+
+/* frees the memory allocated for a token */
+void jep_destroy_token(jep_token* t)
+{
+	jep_destroy_string_builder(t->value);
+	free(t);
+}
+
+/* creates a new token stream */
+jep_token_stream* jep_create_token_stream()
+{
+	jep_token_stream* ts = malloc(sizeof(jep_token_stream));
+	ts->size = 0;
+	ts->capacity = 10;
+	ts->tok = malloc(10 * sizeof(jep_token*));
+	return ts;
+}
+
+/* frees memory allocated for a token stream */
+void jep_destroy_token_stream(jep_token_stream* ts)
+{
+	int i;
+	for(i = 0; i < ts->size; i++)
+	{
+		jep_destroy_token(ts->tok[i]);
+	}
+	free(ts->tok);
+	free(ts);
+}
+
+/* adds a token to a token stream */
+void jep_append_token(jep_token_stream* ts, jep_token* t)
+{
+	if(ts->size >= ts->capacity)
+	{
+		jep_resize_token_stream(ts);
+	}
+	ts->tok[ts->size++] = t;
 }
 
 /* tokenizes the contents of a text file */
@@ -422,100 +475,8 @@ jep_token_stream* jep_tokenize_file(const char* file_name)
 	/* free memory */
 	fclose(in_file);
 	jep_destroy_string_builder(sb);
-	
+
 	return ts;
-}
-
-/* checks for a single-character symbol */
-int jep_is_symbol(const char* s)
-{
-	int i;
-	for(i = 0; i < 20; i++)
-	{
-		if(!strcmp(symbols[i], s))
-			return i;
-	}
-	return -1;
-}
-
-/* checks for a double-character symbol */
-int jep_is_symbol2(const char* s)
-{
-	int i;
-	for(i = 0; i < 17; i++)
-	{
-		if(!strcmp(symbols2[i], s))
-			return i;
-	}
-	return -1;
-}
-
-/* checks for a tripple-character symbol */
-int jep_is_symbol3(const char* s)
-{
-	int i;
-	for(i = 0; i < 2; i++)
-	{
-		if(!strcmp(symbols3[i], s))
-			return i;
-	}
-	return -1;
-}
-
-/* checks for a keyword */
-int jep_is_keyword(const char* s)
-{
-	int i;
-	for(i = 0; i < 4; i++)
-	{
-		if(!strcmp(s, keywords[i]))
-			return i;
-	}
-	return -1;
-}
-
-/* checks if a token is a primitive */
-int jep_is_primitive(const char* s)
-{
-	int i;
-	for(i = 0; i < 5; i++)
-	{
-		if(!strcmp(s, primitives[i]))
-			return i;
-	}
-	return -1;
-}
-
-/* checks for the beginning of an identifier */
-int jep_is_ident_start(char c)
-{
-	if(isalpha(c) || c == '_' || c == '$')
-		return 1;
-	else
-		return 0;
-}
-
-/* checks for identifier characters */
-int jep_is_ident(char c)
-{
-	if(isalnum(c) || c == '_' || c == '$')
-		return 1;
-	else
-		return 0;
-}
-
-/* checks for an escape character */
-int jep_is_escape(char c)
-{
-	int i;
-	for(i = 0; i < 11; i++)
-	{
-		if(escapes[i] == c)
-		{
-			return i;
-		}
-	}
-	return -1;
 }
 
 /* prints the tokens */

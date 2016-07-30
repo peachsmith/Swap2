@@ -23,6 +23,6 @@ jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes);
 jep_ast_node* jep_statement(jep_ast_node* root, jep_ast_node** nodes);
 
 /* parses a block of code */
-jep_ast_node* jep_block(jep_ast_node* root, jep_ast_node** nodes);
+void jep_block(jep_ast_node* root, jep_ast_node** nodes);
 
 #endif

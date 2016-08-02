@@ -465,6 +465,100 @@ static jep_ast_node* jep_for(jep_ast_node* root, jep_ast_node** nodes)
 	return fo_node;
 }
 
+static jep_ast_node* jep_function(jep_ast_node* root, jep_ast_node** nodes)
+{
+	jep_ast_node* fn_node; /* the node containing the function token */
+	jep_ast_node* ident;   /* the function identifier                */ 
+	jep_ast_node* args;    /* the function arguments                 */
+	jep_ast_node* body;    /* the function body                      */
+
+	fn_node = (*nodes)++;
+
+	if((*nodes)->token->type != T_IDENTIFIER)
+	{
+		if(!root->error)
+		{
+			printf("expected identifier at %d,%d but found %s\n", 
+				(*nodes)->token->row, 
+				(*nodes)->token->column, 
+				(*nodes)->token->value->buffer);
+		}
+		root->error = 1;
+		return NULL;
+	}
+
+	ident = (*nodes)++;
+
+	if((*nodes)->token->token_code != T_LPAREN)
+	{
+		if(!root->error)
+		{
+			printf("expected '(' at %d,%d but found %s\n", 
+				(*nodes)->token->row, 
+				(*nodes)->token->column, 
+				(*nodes)->token->value->buffer);
+		}
+		root->error = 1;
+		return NULL;
+	}
+
+	jep_add_leaf_node(fn_node, ident);
+
+	args = (*nodes)++;
+	while(!jep_accept(T_RPAREN, nodes) && !root->error)
+	{
+		if((*nodes)->token->type != T_IDENTIFIER)
+		{
+			if(!root->error)
+			{
+				printf("expected identifier at %d,%d but found %s\n", 
+					(*nodes)->token->row, 
+					(*nodes)->token->column, 
+					(*nodes)->token->value->buffer);
+			}
+			root->error = 1;
+			return NULL;
+		}
+		jep_add_leaf_node(args, (*nodes)++);
+		jep_accept(T_COMMA, nodes);
+	}
+
+	jep_accept(T_RPAREN, nodes);
+	jep_add_leaf_node(fn_node, args);
+
+	if((*nodes)->token->token_code != T_LBRACE)
+	{
+		if(!root->error)
+		{
+			printf("expected '{' at %d,%d but found %s\n", 
+				(*nodes)->token->row, 
+				(*nodes)->token->column, 
+				(*nodes)->token->value->buffer);
+		}
+		root->error = 1;
+		return NULL;
+	}
+
+	body = (*nodes)++;
+	body->error = 0;
+	jep_block(body, nodes);
+	root->error = body->error;
+	if(!jep_accept(T_RBRACE, nodes) && !root->error)
+	{
+		printf("expected } at %d,%d but found %s\n", 
+			(*nodes)->token->row, 
+			(*nodes)->token->column, 
+			(*nodes)->token->value->buffer);
+		root->error = 1;
+	}
+	else
+	{
+		jep_add_leaf_node(fn_node, body);
+	}
+
+	return fn_node;
+}
+
 /* advances the node pointer for a specfic token code */
 static int jep_accept(int token_code, jep_ast_node** nodes)
 {
@@ -818,6 +912,27 @@ static jep_ast_node* jep_statement(jep_ast_node* root, jep_ast_node** nodes)
 	else if((*nodes)->token->token_code == T_FOR)
 	{
 		statement = jep_for(root, nodes);
+	}
+	else if((*nodes)->token->token_code == T_FUNCTION)
+	{
+		statement = jep_function(root, nodes);
+	}
+	else if((*nodes)->token->token_code == T_RETURN)
+	{
+		statement = (*nodes)++;
+		jep_ast_node* ret_val = jep_expression(root, nodes);
+		if(!jep_accept(T_SEMICOLON, nodes) && !root->error)
+		{
+			printf("expected ; at %d,%d but found %s\n", 
+				(*nodes)->token->row, 
+				(*nodes)->token->column, 
+				(*nodes)->token->value->buffer);
+			root->error = 1;
+		}
+		else
+		{
+			jep_add_leaf_node(statement, ret_val);
+		}
 	}
 	else
 	{

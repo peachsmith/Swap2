@@ -23,7 +23,7 @@ const char *symbols3[] =
 /* keywords */
 const char *keywords[] = 
 {
-	"if", "else", "for", "while"
+	"if", "else", "for", "while", "function", "return"
 };
 
 /* checks for a symbol character */
@@ -97,7 +97,7 @@ static int jep_is_symbol3(const char* s)
 static int jep_is_keyword(const char* s)
 {
 	int i;
-	for(i = 0; i < 4; i++)
+	for(i = 0; i < 6; i++)
 	{
 		if(!strcmp(s, keywords[i]))
 			return i;

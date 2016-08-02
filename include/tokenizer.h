@@ -66,9 +66,11 @@
 #define T_ELSE 41
 #define T_FOR 42
 #define T_WHILE 43
+#define T_FUNCTION 44
+#define T_RETURN 45
 
 /* end of file */
-#define T_EOF 44
+#define T_EOF 46
 
 typedef struct Token
 {

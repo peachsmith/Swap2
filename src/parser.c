@@ -264,6 +264,91 @@ static jep_ast_node* jep_if(jep_ast_node* root, jep_ast_node** nodes)
 	return if_node;
 }
 
+/* parses a while loop */
+static jep_ast_node* jep_while(jep_ast_node* root, jep_ast_node** nodes)
+{
+	jep_ast_node* wh_node; /* the node containing the while token */
+	jep_ast_node* con;     /* the condition                       */
+	jep_ast_node* body;    /* the body of the if statement        */
+
+	wh_node = (*nodes)++;
+	if((*nodes)->token->token_code != T_LPAREN)
+	{
+		if(!root->error)
+		{
+			printf("expected } at %d,%d but found %s\n", 
+				(*nodes)->token->row, 
+				(*nodes)->token->column, 
+				(*nodes)->token->value->buffer);
+		}
+		root->error = 1;
+		return NULL;
+	}
+
+	con = (*nodes)++;
+	jep_ast_node* p = jep_expression(root, nodes);
+	if(p != NULL)
+	{
+		jep_add_leaf_node(con, p);
+	}
+	else
+	{
+		if(!root->error)
+		{
+			printf("expected expression before ')'\n");
+			root->error = 1;
+		}
+		return NULL;
+	}
+	if(!jep_accept(T_RPAREN, nodes))
+	{
+		if(!root->error)
+		{
+			printf("expected ')' at %d,%d but found '%s'\n", 
+				(*nodes)->token->row, 
+				(*nodes)->token->column, 
+				(*nodes)->token->value->buffer);
+			root->error = 1;
+		}
+		return NULL;
+	}
+
+ 	if(con != NULL && !root->error)
+	{
+		jep_add_leaf_node(wh_node, con);
+	}
+
+	if((*nodes)->token->token_code == T_LBRACE)
+	{
+		body = (*nodes)++;
+		body->error = 0;
+		jep_block(body, nodes);
+		root->error = body->error;
+		if(!jep_accept(T_RBRACE, nodes) && !root->error)
+		{
+			printf("expected } at %d,%d but found %s\n", 
+				(*nodes)->token->row, 
+				(*nodes)->token->column, 
+				(*nodes)->token->value->buffer);
+			root->error = 1;
+		}
+		else
+		{
+			jep_add_leaf_node(wh_node, body);
+		}
+	}
+	else
+	{
+		body = jep_statement(root, nodes);
+		if(body != NULL && !root->error)
+		{
+			jep_add_leaf_node(wh_node, body);
+		}
+	}
+
+	return wh_node;
+}
+
 /* advances the node pointer for a specfic token code */
 static int jep_accept(int token_code, jep_ast_node** nodes)
 {
@@ -608,8 +693,11 @@ static jep_ast_node* jep_statement(jep_ast_node* root, jep_ast_node** nodes)
 	// TODO: for, while
 	if((*nodes)->token->token_code == T_IF)
 	{
-		printf("attempting to parse an if statement\n");
 		statement = jep_if(root, nodes);
+	}
+	else if((*nodes)->token->token_code == T_WHILE)
+	{
+		statement = jep_while(root, nodes);
 	}
 	else
 	{

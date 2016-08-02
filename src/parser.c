@@ -1,5 +1,10 @@
 #include "parser.h"
 
+static int jep_accept(int token_code, jep_ast_node** nodes);
+static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes);
+static jep_ast_node* jep_statement(jep_ast_node* root, jep_ast_node** nodes);
+static void jep_block(jep_ast_node* root, jep_ast_node** nodes);
+
 /* checks if a token is an 'end of expression' token */
 static int jep_eoe(jep_token* token)
 {
@@ -260,23 +265,9 @@ static jep_ast_node* jep_if(jep_ast_node* root, jep_ast_node** nodes)
 }
 
 /* advances the node pointer for a specfic token code */
-int jep_accept(int token_code, jep_ast_node** nodes)
+static int jep_accept(int token_code, jep_ast_node** nodes)
 {
 	if((*nodes)->token->token_code == token_code)
-	{
-		(*nodes)++;
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-/* advances the node pointer for a specfic token type */
-int jep_accept_type(int type, jep_ast_node** nodes)
-{
-	if((*nodes)->token->type == type)
 	{
 		(*nodes)++;
 		return 1;
@@ -356,7 +347,7 @@ jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node** nodes)
 
 }
 
-jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
+static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 {
 	jep_stack exp;      /* expresion stack   */
 	jep_stack opr;      /* operator stack    */
@@ -611,7 +602,7 @@ jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 }
 
 /* parses a statement */
-jep_ast_node* jep_statement(jep_ast_node* root, jep_ast_node** nodes)
+static jep_ast_node* jep_statement(jep_ast_node* root, jep_ast_node** nodes)
 {
 	jep_ast_node* statement = NULL;
 	// TODO: for, while
@@ -637,7 +628,7 @@ jep_ast_node* jep_statement(jep_ast_node* root, jep_ast_node** nodes)
 }
 
 /* parses a block of code */
-void jep_block(jep_ast_node* root, jep_ast_node** nodes)
+static void jep_block(jep_ast_node* root, jep_ast_node** nodes)
 {
 	while((*nodes)->token->token_code != T_RBRACE && !root->error)
 	{

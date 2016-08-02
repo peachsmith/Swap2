@@ -7,22 +7,7 @@
 #define JEP_LEFT_ASSOC 1
 #define JEP_RIGHT_ASSOC 2
 
-/* advances the node pointer for a specific token code */
-int jep_accept(int token_code, jep_ast_node** nodes);
-
-/* advances the node pointer for a specific token type */
-int jep_accept_type(int type, jep_ast_node** nodes);
-
-/* parses a stream of tokens */
+/* constructs  an AST from a stream of tokens */
 jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node** nodes);
-
-/* parses an expression */
-jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes);
-
-/* parses a statement */
-jep_ast_node* jep_statement(jep_ast_node* root, jep_ast_node** nodes);
-
-/* parses a block of code */
-void jep_block(jep_ast_node* root, jep_ast_node** nodes);
 
 #endif

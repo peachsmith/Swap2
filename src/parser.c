@@ -728,6 +728,52 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 		switch((*nodes)->token->type)
 		{
 			case T_IDENTIFIER:
+				if(next->token_code == T_LPAREN)
+				{
+					jep_ast_node* func = (*nodes)++;
+					jep_ast_node* l_paren = (*nodes)++;
+					jep_ast_node* p = jep_expression(root, nodes);
+					prev = (*nodes - 1)->token;
+					cur = (*nodes)->token;
+					if(cur->token_code != T_EOF)
+					{
+						next = (*nodes + 1)->token;
+					}
+					if(p != NULL)
+					{
+						jep_add_leaf_node(l_paren, p);
+					}
+					else
+					{
+						if(!root->error)
+						{
+							printf("expected expression before ')'\n");
+							root->error = 1;
+						}
+						free(exp.nodes);
+						free(opr.nodes);
+						return NULL;
+					}
+					if((*nodes)->token->token_code != T_RPAREN)
+					{
+						free(exp.nodes);
+						free(opr.nodes);
+						printf("expected ')' at %d,%d but found '%s'\n", 
+							(*nodes)->token->row, 
+							(*nodes)->token->column, 
+							(*nodes)->token->value->buffer);
+						root->error = 1;
+						return NULL;
+					}
+					jep_add_leaf_node(func, l_paren);
+					jep_push(&exp, func);
+				}
+				else
+				{
+					jep_push(&exp, *nodes);
+				}
+				break;
+
 			case T_NUMBER:
 			case T_STRING:
 			case T_CHARACTER:

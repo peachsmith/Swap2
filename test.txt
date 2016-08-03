@@ -20,3 +20,5 @@ function blat(a, b)
 {
 	return a + b;
 }
+
+z = blat(1,2) + 4;

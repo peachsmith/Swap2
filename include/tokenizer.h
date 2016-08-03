@@ -80,6 +80,7 @@ typedef struct Token
 	int row;
 	int column;
 	int unary;
+	int postfix;
 }jep_token;
 
 typedef struct TokenStream

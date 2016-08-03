@@ -193,6 +193,7 @@ jep_token* jep_create_token()
 	t->row = 0;
 	t->column = 0;
 	t->unary = 0;
+	t->postfix = 0;
 	return t;
 }
 

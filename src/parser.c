@@ -29,7 +29,7 @@ static int jep_associativity(jep_ast_node* node)
 	{
 		return 0;
 	}
-	
+
 	switch(node->token->token_code)
 	{
 		case T_EQUALS:
@@ -49,12 +49,6 @@ static int jep_priority(jep_ast_node* node)
 	if(node == NULL)
 	{
 		return -1;
-	}
-
-	/* unary operators take highest priority */
-	if(node->token->unary)
-	{
-		return 8;
 	}
 
 	switch(node->token->token_code)
@@ -97,8 +91,18 @@ static int jep_priority(jep_ast_node* node)
 			break;
 
 		case T_PLUS:
-		case T_MINUS:
 			priority = 5;
+			break;
+
+		case T_MINUS:
+			if(node->token->unary)
+			{
+				priority = 8;
+			}
+			else
+			{
+				priority = 5;
+			}
 			break;
 
 		case T_FSLASH:
@@ -108,6 +112,11 @@ static int jep_priority(jep_ast_node* node)
 
 		case T_LPAREN:
 			priority = 7;
+			break;
+
+		case T_INCREMENT:
+		case T_DECREMENT:
+			priority = 9;
 			break;
 
 		default:
@@ -177,6 +186,33 @@ static int jep_check_unary(jep_token* cur, jep_token* prev)
 	}
 
 	return unary;
+}
+
+/* checks if an operator is a postfix operator */
+static int jep_check_postfix(jep_token* cur, jep_token* prev)
+{
+	if(cur == NULL || prev == NULL)
+	{
+		return 0;
+	}
+
+	int code = cur->token_code;
+
+	/* ensure the current token can be a postfix operator */
+	if(code != T_INCREMENT && code != T_DECREMENT)
+	{
+		return 0;
+	}
+
+	if(prev->type == T_IDENTIFIER || prev->token_code == T_RPAREN)
+	{
+		cur->postfix = 1;
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 /* parses an if statement */
@@ -702,6 +738,9 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 			{
 				/* check if the symbol is a unary operator */
 				jep_check_unary(cur, prev);
+
+				/* check if the symbol is a postfix operator */
+				jep_check_postfix(cur, prev);
 
 				/* check for parentheses */
 				if(cur->token_code == T_LPAREN && next->token_code != T_EOF)

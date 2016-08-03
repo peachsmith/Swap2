@@ -1,25 +1,22 @@
-/*
-x = {1,2,3};
-y = 4;
+a = 4;
+y = {1 * (2 + 3), 4};
+
+if(a < 5)
 {
-	y++;
+	3;
 }
-if(1 < 2)
-{
-	1+2;
-	4 * 5;
-}
-while(x < 3)
-{
-	4 + 5;
-}
+
 for(i = 0; i < 3; i++)
 {
-	6 - 4;
+	5;
 }
-*/
 
-function splat(x,)
+while(a < 4)
 {
-	return;
+	a++;
+}
+
+function blat(a, b)
+{
+	return a + b;
 }

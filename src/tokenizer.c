@@ -4,7 +4,7 @@
 const char *symbols[] = 
 {
 	"+", "-", "/", "*", ";", ",", "(", ")", "[", "]", "{", "}", "<", 
-	">", "=", ".", "&", "|", "^", "!"
+	">", "=", ".", "&", "|", "^", "!", "%"
 };
 
 /* two-character symbols */
@@ -51,6 +51,7 @@ static int jep_is_symbol_char(char c)
 		case '&':
 		case '|':
 		case '^':
+		case '%':
 			return 1;
 		default:
 			return 0;
@@ -61,7 +62,7 @@ static int jep_is_symbol_char(char c)
 static int jep_is_symbol(const char* s)
 {
 	int i;
-	for(i = 0; i < 20; i++)
+	for(i = 0; i < 21; i++)
 	{
 		if(!strcmp(symbols[i], s))
 			return i;
@@ -170,16 +171,16 @@ static void jep_classify_token(jep_token* t)
 		}
 		else if(t->value->size == 2)
 		{
-			t->token_code = jep_is_symbol2(t->value->buffer) + 21;
+			t->token_code = jep_is_symbol2(t->value->buffer) + 22;
 		}
 		else if(t->value->size == 3)
 		{
-			t->token_code = jep_is_symbol3(t->value->buffer) + 38;
+			t->token_code = jep_is_symbol3(t->value->buffer) + 39;
 		}
 	}
 	else if(t->type == T_KEYWORD)
 	{
-		t->token_code = jep_is_keyword(t->value->buffer) + 40;
+		t->token_code = jep_is_keyword(t->value->buffer) + 41;
 	}
 }
 

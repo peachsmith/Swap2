@@ -107,6 +107,7 @@ static int jep_priority(jep_ast_node* node)
 
 		case T_FSLASH:
 		case T_STAR:
+		case T_MODULUS:
 			priority = 6;
 			break;
 

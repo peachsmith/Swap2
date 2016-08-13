@@ -1,32 +1,42 @@
 #include "tokenizer.h"
 
-/* one-character symbols */
+/**
+ * one-character symbols
+ */
 const char *symbols[] = 
 {
 	"+", "-", "/", "*", ";", ",", "(", ")", "[", "]", "{", "}", "<", 
 	">", "=", ".", "&", "|", "^", "!", "%"
 };
 
-/* two-character symbols */
+/**
+ * two-character symbols
+ */
 const char *symbols2[] = 
 {
 	"++", "--", "+=", "-=", "*=", "/=", "==", "<=", ">=", ">>", "<<",
 	"&=", "|=", "^=", "&&", "||", "!="
 };
 
-/* three-character symbols */
+/**
+ * three-character symbols
+ */
 const char *symbols3[] = 
 {
 	"<<=", ">>="
 };
 
-/* keywords */
+/**
+ * keywords
+ */
 const char *keywords[] = 
 {
 	"if", "else", "for", "while", "function", "return"
 };
 
-/* checks for a symbol character */
+/**
+ * checks for a symbol character
+ */
 static int jep_is_symbol_char(char c)
 {
 	switch(c)
@@ -58,7 +68,9 @@ static int jep_is_symbol_char(char c)
 	}
 }
 
-/* checks for a single-character symbol */
+/**
+ * checks for a single-character symbol
+ */
 static int jep_is_symbol(const char* s)
 {
 	int i;
@@ -70,7 +82,9 @@ static int jep_is_symbol(const char* s)
 	return -1;
 }
 
-/* checks for a double-character symbol */
+/**
+ * checks for a double-character symbol
+ */
 static int jep_is_symbol2(const char* s)
 {
 	int i;
@@ -82,7 +96,9 @@ static int jep_is_symbol2(const char* s)
 	return -1;
 }
 
-/* checks for a tripple-character symbol */
+/**
+ * checks for a tripple-character symbol
+ */
 static int jep_is_symbol3(const char* s)
 {
 	int i;
@@ -94,7 +110,9 @@ static int jep_is_symbol3(const char* s)
 	return -1;
 }
 
-/* checks for a keyword */
+/**
+ * checks for a keyword
+ */
 static int jep_is_keyword(const char* s)
 {
 	int i;
@@ -106,7 +124,9 @@ static int jep_is_keyword(const char* s)
 	return -1;
 }
 
-/* checks for the beginning of an identifier */
+/**
+ * checks for the beginning of an identifier
+ */
 static int jep_is_ident_start(char c)
 {
 	if(isalpha(c) || c == '_' || c == '$')
@@ -115,7 +135,9 @@ static int jep_is_ident_start(char c)
 		return 0;
 }
 
-/* checks for identifier characters */
+/**
+ * checks for identifier characters
+ */
 static int jep_is_ident(char c)
 {
 	if(isalnum(c) || c == '_' || c == '$')
@@ -124,7 +146,9 @@ static int jep_is_ident(char c)
 		return 0;
 }
 
-/* reads the contents of a file into memory */
+/**
+ * reads the contents of a file into memory
+ */
 static void jep_scan_file(FILE* file, jep_string_builder *sb)
 {
 	char buffer[1025];
@@ -140,7 +164,9 @@ static void jep_scan_file(FILE* file, jep_string_builder *sb)
 	}while(s > 0);
 }
 
-/* increases the capacity of a token stream by approximately 50% */
+/**
+ * increases the capacity of a token stream by approximately 50%
+ */
 static void jep_resize_token_stream(jep_token_stream* ts)
 {
 	int new_capacity;
@@ -160,7 +186,9 @@ static void jep_resize_token_stream(jep_token_stream* ts)
 	ts->capacity = new_capacity;
 }
 
-/* assign a token code to a token */
+/**
+ * assign a token code to a token
+ */
 static void jep_classify_token(jep_token* t)
 {
 	if(t->type == T_SYMBOL)
@@ -184,7 +212,9 @@ static void jep_classify_token(jep_token* t)
 	}
 }
 
-/* allocates memory for a new token */
+/**
+ * allocates memory for a new token
+ */
 jep_token* jep_create_token()
 {
 	jep_token *t = malloc(sizeof(jep_token));
@@ -198,14 +228,18 @@ jep_token* jep_create_token()
 	return t;
 }
 
-/* frees the memory allocated for a token */
+/**
+ * frees the memory allocated for a token
+ */
 void jep_destroy_token(jep_token* t)
 {
 	jep_destroy_string_builder(t->value);
 	free(t);
 }
 
-/* creates a new token stream */
+/**
+ * creates a new token stream 
+ */
 jep_token_stream* jep_create_token_stream()
 {
 	jep_token_stream* ts = malloc(sizeof(jep_token_stream));
@@ -215,7 +249,9 @@ jep_token_stream* jep_create_token_stream()
 	return ts;
 }
 
-/* frees memory allocated for a token stream */
+/**
+ * frees memory allocated for a token stream
+ */
 void jep_destroy_token_stream(jep_token_stream* ts)
 {
 	int i;
@@ -227,7 +263,9 @@ void jep_destroy_token_stream(jep_token_stream* ts)
 	free(ts);
 }
 
-/* adds a token to a token stream */
+/**
+ * adds a token to a token stream
+ */
 void jep_append_token(jep_token_stream* ts, jep_token* t)
 {
 	if(ts->size >= ts->capacity)
@@ -237,7 +275,9 @@ void jep_append_token(jep_token_stream* ts, jep_token* t)
 	ts->tok[ts->size++] = t;
 }
 
-/* tokenizes the contents of a text file */
+/**
+ * tokenizes the contents of a text file
+ */
 jep_token_stream* jep_tokenize_file(const char* file_name)
 {
 	FILE* in_file;          /* the input file */
@@ -481,7 +521,9 @@ jep_token_stream* jep_tokenize_file(const char* file_name)
 	return ts;
 }
 
-/* prints the tokens */
+/**
+ * prints the tokens in a token stream
+ */
 void jep_print_tokens(jep_token_stream* ts, FILE* f)
 {
 	fprintf(f,"-----------------------------------------------\n");

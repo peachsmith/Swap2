@@ -91,25 +91,39 @@ typedef struct TokenStream
 	int capacity;
 }jep_token_stream;
 
-/* allocates memory for a new token */
+/**
+ * allocates memory for a new token
+ */
 jep_token* jep_create_token();
 
-/* frees the memory allocated for a token */
+/**
+ * frees the memory allocated for a token
+ */
 void jep_destroy_token(jep_token* t);
 
-/* creates a new token stream */
+/**
+ * creates a new token stream
+ */
 jep_token_stream* jep_create_token_stream();
 
-/* frees memory allocated for a token stream */
+/**
+ * frees memory allocated for a token stream
+ */
 void jep_destroy_token_stream(jep_token_stream* ts);
 
-/* adds a token to a token stream */
+/**
+ * adds a token to a token stream
+ */
 void jep_append_token(jep_token_stream* tb, jep_token* t);
 
-/* tokenizes the contents of a file */
+/**
+ * tokenizes the contents of a file
+ */
 jep_token_stream* jep_tokenize_file(const char* file_name);
 
-/* prints the tokens */
+/**
+ * prints the tokens
+ */
 void jep_print_tokens(jep_token_stream* ts, FILE* f);
 
 #endif /* JEP_TOKENIZER_H */

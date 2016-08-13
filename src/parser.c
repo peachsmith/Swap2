@@ -1,11 +1,13 @@
 #include "parser.h"
 
-static int jep_accept(int token_code, jep_ast_node** nodes);
-static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes);
-static jep_ast_node* jep_statement(jep_ast_node* root, jep_ast_node** nodes);
-static void jep_block(jep_ast_node* root, jep_ast_node** nodes);
+static int jep_accept(int, jep_ast_node**);
+static jep_ast_node* jep_expression(jep_ast_node*, jep_ast_node**);
+static jep_ast_node* jep_statement(jep_ast_node*, jep_ast_node**);
+static void jep_block(jep_ast_node*, jep_ast_node**);
 
-/* checks if a token is an 'end of expression' token */
+/**
+ * checks if a token is an 'end of expression' token
+ */
 static int jep_eoe(jep_token* token)
 {
 	switch(token->token_code)
@@ -22,7 +24,9 @@ static int jep_eoe(jep_token* token)
 	}
 }
 
-/* determines an operator's associativity */
+/**
+ * determines an operator's associativity
+ */
 static int jep_associativity(jep_ast_node* node)
 {
 	if(node == NULL)
@@ -40,7 +44,9 @@ static int jep_associativity(jep_ast_node* node)
 	}
 }
 
-/* determines the priority of an operator based on order of operations */
+/**
+ * determines the priority of an operator based on order of operations
+ */
 static int jep_priority(jep_ast_node* node)
 {
 	int priority = -1;
@@ -127,8 +133,8 @@ static int jep_priority(jep_ast_node* node)
 	return priority;
 }
 
-/* 
- * determine whether or not the current oeprator stack should be emptied 
+/**
+ * determine whether or not the current oeprator stack should be emptied
  * cur is the current operator on the token stream
  * top is the operator on the top of the operator stack
  */
@@ -160,7 +166,9 @@ static int jep_prioritize(jep_ast_node* cur, jep_ast_node* top)
 	return 0;
 }
 
-/* checks if an operator is potentially unary */
+/**
+ * checks if an operator is potentially unary
+ */
 static int jep_check_unary(jep_token* cur, jep_token* prev)
 {
 	int unary = 0;
@@ -189,7 +197,9 @@ static int jep_check_unary(jep_token* cur, jep_token* prev)
 	return unary;
 }
 
-/* checks if an operator is a postfix operator */
+/**
+ * checks if an operator is a postfix operator
+ */
 static int jep_check_postfix(jep_token* cur, jep_token* prev)
 {
 	if(cur == NULL || prev == NULL)
@@ -216,7 +226,9 @@ static int jep_check_postfix(jep_token* cur, jep_token* prev)
 	}
 }
 
-/* parses an if statement */
+/**
+ * parses an if statement
+ */
 static jep_ast_node* jep_if(jep_ast_node* root, jep_ast_node** nodes)
 {
 	jep_ast_node* if_node; /* the node containing the if token */
@@ -301,7 +313,9 @@ static jep_ast_node* jep_if(jep_ast_node* root, jep_ast_node** nodes)
 	return if_node;
 }
 
-/* parses a while loop */
+/**
+ * parses a while loop
+ */
 static jep_ast_node* jep_while(jep_ast_node* root, jep_ast_node** nodes)
 {
 	jep_ast_node* wh_node; /* the node containing the while token */
@@ -386,7 +400,9 @@ static jep_ast_node* jep_while(jep_ast_node* root, jep_ast_node** nodes)
 	return wh_node;
 }
 
-/* parses a for loop */
+/**
+ * parses a for loop
+ */
 static jep_ast_node* jep_for(jep_ast_node* root, jep_ast_node** nodes)
 {
 	jep_ast_node* fo_node; /* the node containing the while token */
@@ -502,6 +518,9 @@ static jep_ast_node* jep_for(jep_ast_node* root, jep_ast_node** nodes)
 	return fo_node;
 }
 
+/**
+ * parses a function call
+ */
 static jep_ast_node* jep_function(jep_ast_node* root, jep_ast_node** nodes)
 {
 	jep_ast_node* fn_node; /* the node containing the function token */
@@ -609,7 +628,9 @@ static jep_ast_node* jep_function(jep_ast_node* root, jep_ast_node** nodes)
 	return fn_node;
 }
 
-/* advances the node pointer for a specfic token code */
+/**
+ * advances the node pointer for a specfic token code
+ */
 static int jep_accept(int token_code, jep_ast_node** nodes)
 {
 	if((*nodes)->token->token_code == token_code)
@@ -623,7 +644,9 @@ static int jep_accept(int token_code, jep_ast_node** nodes)
 	}
 }
 
-/* parses a stream of tokens */
+/**
+ * constructs an AST from a stream of tokens
+ */
 jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node** nodes)
 {
 	jep_ast_node* first;  /* the first node          */
@@ -692,6 +715,9 @@ jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node** nodes)
 
 }
 
+/**
+ * parses an expression
+ */
 static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 {
 	jep_stack exp;      /* expresion stack   */
@@ -995,7 +1021,9 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 	return ast;
 }
 
-/* parses a statement */
+/**
+ * parses a statement
+ */
 static jep_ast_node* jep_statement(jep_ast_node* root, jep_ast_node** nodes)
 {
 	jep_ast_node* statement = NULL;
@@ -1049,7 +1077,9 @@ static jep_ast_node* jep_statement(jep_ast_node* root, jep_ast_node** nodes)
 	return statement;
 }
 
-/* parses a block of code */
+/**
+ * parses a block of code
+ */
 static void jep_block(jep_ast_node* root, jep_ast_node** nodes)
 {
 	while((*nodes)->token->token_code != T_RBRACE && !root->error)

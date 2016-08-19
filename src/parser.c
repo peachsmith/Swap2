@@ -732,7 +732,9 @@ jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node** nodes)
 }
 
 /**
- * attaches the operators on the stack to their appropriate operands
+ * attaches the operators on the stack to their appropriate operands until the
+ * priority of the top of the operator stack is less than or equal to the
+ * current operator on the stream
  */
 static void jep_attach(jep_stack* exp, jep_stack* opr, jep_ast_node* root, jep_ast_node** nodes)
 {
@@ -772,16 +774,54 @@ static void jep_attach(jep_stack* exp, jep_stack* opr, jep_ast_node* root, jep_a
 				root->error = 1;
 			}
 		}
-		// if(jep_priority(opr->top) <= jep_priority(*nodes))
-		// {
-		// 	printf("no more attaching to do.\n");
-		// 	if(opr->top != NULL)
-		// 	{
-		// 		printf("opr->top: %s\n", opr->top->token->value->buffer);
-		// 	}
-		// }
 	}
-	while(opr->top != NULL);// && jep_priority(opr->top) > jep_priority(*nodes));
+	while(opr->top != NULL && jep_priority(opr->top) > jep_priority(*nodes));
+}
+
+/**
+ * attaches all of the operators in the operator stack to their operands on the
+ * expression stack
+ */
+static void jep_attach_all(jep_stack* exp, jep_stack* opr, jep_ast_node* root, jep_ast_node** nodes)
+{
+	jep_ast_node* r; /* right operand     */
+	jep_ast_node* l; /* left operand      */
+	jep_ast_node* o; /* operator          */
+	jep_token* cur;  /* the current token */
+
+	cur = (*nodes)->token;
+
+	do
+	{
+		o = jep_pop(opr);
+		if(o != NULL && o->token->unary)
+		{
+			r = jep_pop(exp);
+			if(o != NULL && r != NULL)
+			{
+				jep_add_leaf_node(o, r);
+				jep_push(exp, o);
+			}
+		}
+		else if(o != NULL)
+		{
+			r = jep_pop(exp);
+			l = jep_pop(exp);
+			if(o != NULL && r != NULL && l != NULL)
+			{
+				jep_add_leaf_node(o, l);
+				jep_add_leaf_node(o, r);
+				jep_push(exp, o);
+			}
+			else
+			{
+				printf("expected expression before '%s' \n", 
+					cur->value->buffer);
+				root->error = 1;
+			}
+		}
+	}
+	while(opr->top != NULL);
 }
 
 /**
@@ -995,7 +1035,7 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 
 	if(jep_eoe(cur))
 	{
-		jep_attach(&exp, &opr, root, nodes);
+		jep_attach_all(&exp, &opr, root, nodes);
 	}
 	else
 	{

@@ -49,9 +49,6 @@ static int jep_associativity(jep_ast_node* node)
  */
 static int jep_priority(jep_ast_node* node)
 {
-	int priority = -1;
-
-	/* NULL nodes take lowest riority */
 	if(node == NULL)
 	{
 		return -1;
@@ -60,8 +57,7 @@ static int jep_priority(jep_ast_node* node)
 	switch(node->token->token_code)
 	{
 		case T_COMMA:
-			priority = 0;
-			break;
+			return 0;
 
 		case T_RPAREN:
 		case T_EQUALS:
@@ -70,22 +66,21 @@ static int jep_priority(jep_ast_node* node)
 		case T_MULASSIGN:
 		case T_DIVASSIGN:
 		case T_SEMICOLON:
+		case T_LSHIFTASSIGN:
+		case T_RSHIFTASSIGN:
 		case T_EOF:
-			priority = 1;
-			break;
+			return 1;
 
 		case T_LOGAND:
 		case T_LOGOR:
-			priority = 2;
-			break;
+			return 2;
 
 		case T_BITAND:
 		case T_BITOR:
 		case T_BITXOR:
 		case T_LSHIFT:
 		case T_RSHIFT:
-			priority = 3;
-			break;
+			return 3;
 
 		case T_LESS:
 		case T_GREATER:
@@ -93,44 +88,33 @@ static int jep_priority(jep_ast_node* node)
 		case T_GOREQUAL:
 		case T_EQUIVALENT:
 		case T_NOTEQUIVALENT:
-			priority = 4;
-			break;
+			return 4;
 
 		case T_PLUS:
-			priority = 5;
-			break;
+			return 5;
 
 		case T_MINUS:
 			if(node->token->unary)
 			{
-				priority = 8;
+				return 8;
 			}
-			else
-			{
-				priority = 5;
-			}
-			break;
+			return 5;
 
 		case T_FSLASH:
 		case T_STAR:
 		case T_MODULUS:
-			priority = 6;
-			break;
+			return 6;
 
 		case T_LPAREN:
-			priority = 7;
-			break;
+			return 7;
 
 		case T_INCREMENT:
 		case T_DECREMENT:
-			priority = 9;
-			break;
+			return 9;
 
 		default:
-			priority = 0;
-			break;
+			return 0;
 	}
-	return priority;
 }
 
 /**

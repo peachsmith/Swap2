@@ -26,6 +26,8 @@ static int jep_eoe(jep_token* token)
 
 /**
  * determines an operator's associativity
+ * JEP_RIGHT_ASSOC - right to left associativity
+ * JEP_LEFT_ASSOC - left to right associativity
  */
 static int jep_associativity(jep_ast_node* node)
 {
@@ -37,7 +39,21 @@ static int jep_associativity(jep_ast_node* node)
 	switch(node->token->token_code)
 	{
 		case T_EQUALS:
+		case T_ADDASSIGN:
+		case T_SUBASSIGN:
+		case T_MULASSIGN:
+		case T_DIVASSIGN:
+		case T_LSHIFTASSIGN:
+		case T_RSHIFTASSIGN:
+		case T_NOT:
 			return JEP_RIGHT_ASSOC;
+
+		case T_MINUS:
+			if(node->token->unary)
+			{
+				return JEP_RIGHT_ASSOC;
+			}
+			return JEP_LEFT_ASSOC;
 
 		default:
 			return JEP_LEFT_ASSOC;
@@ -65,9 +81,10 @@ static int jep_priority(jep_ast_node* node)
 		case T_SUBASSIGN:
 		case T_MULASSIGN:
 		case T_DIVASSIGN:
-		case T_SEMICOLON:
+		case T_MODASSIGN:
 		case T_LSHIFTASSIGN:
 		case T_RSHIFTASSIGN:
+		case T_SEMICOLON:
 		case T_EOF:
 			return 1;
 
@@ -106,7 +123,11 @@ static int jep_priority(jep_ast_node* node)
 			return 6;
 
 		case T_LPAREN:
+		case T_LSQUARE:
 			return 7;
+
+		case T_NOT:
+			return 8;
 
 		case T_INCREMENT:
 		case T_DECREMENT:
@@ -119,8 +140,6 @@ static int jep_priority(jep_ast_node* node)
 
 /**
  * determine whether or not the current oeprator stack should be emptied
- * cur is the current operator on the token stream
- * top is the operator on the top of the operator stack
  */
 static int jep_prioritize(jep_ast_node* cur, jep_ast_node* top)
 {
@@ -155,34 +174,45 @@ static int jep_prioritize(jep_ast_node* cur, jep_ast_node* top)
  */
 static int jep_check_unary(jep_token* cur, jep_token* prev)
 {
-	int unary = 0;
 	switch(cur->token_code)
 	{
 		case T_INCREMENT:
 		case T_DECREMENT:
 		case T_NOT:
-			unary = 1;
 			cur->unary = 1;
-			break;
+			return 1;
 
 		case T_MINUS:
 			if(prev == NULL || (prev->type == T_SYMBOL 
 				&& !prev->unary && prev->token_code != T_RPAREN))
 			{
-				unary = 1;
 				cur->unary = 1;
+				return 1;
 			}
-			break;
+			return 0;
+
+		case T_LPAREN:
+			if(prev == NULL || prev->type == T_IDENTIFIER 
+				|| prev->token_code == T_RPAREN 
+				|| prev->token_code == T_RSQUARE)
+			{
+				cur->unary = 1;
+				return 1;
+			}
+			return 0;
 
 		default:
-			break;
+			return 0;
 	}
-
-	return unary;
 }
 
 /**
  * checks if an operator is a postfix operator
+ * possible postfix operators are
+ * ++ increment
+ * -- decrement
+ * () function call
+ * [] array subscripting
  */
 static int jep_check_postfix(jep_token* cur, jep_token* prev)
 {
@@ -194,12 +224,14 @@ static int jep_check_postfix(jep_token* cur, jep_token* prev)
 	int code = cur->token_code;
 
 	/* ensure the current token can be a postfix operator */
-	if(code != T_INCREMENT && code != T_DECREMENT)
+	if(code != T_INCREMENT && code != T_DECREMENT
+		&& code != T_LPAREN && code != T_LSQUARE)
 	{
 		return 0;
 	}
 
-	if(prev->type == T_IDENTIFIER || prev->token_code == T_RPAREN)
+	if(prev->type == T_IDENTIFIER || prev->token_code == T_RPAREN
+		|| prev->token_code == T_RSQUARE)
 	{
 		cur->postfix = 1;
 		return 1;
@@ -700,6 +732,59 @@ jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node** nodes)
 }
 
 /**
+ * attaches the operators on the stack to their appropriate operands
+ */
+static void jep_attach(jep_stack* exp, jep_stack* opr, jep_ast_node* root, jep_ast_node** nodes)
+{
+	jep_ast_node* r; /* right operand     */
+	jep_ast_node* l; /* left operand      */
+	jep_ast_node* o; /* operator          */
+	jep_token* cur;  /* the current token */
+
+	cur = (*nodes)->token;
+
+	do
+	{
+		o = jep_pop(opr);
+		if(o != NULL && o->token->unary)
+		{
+			r = jep_pop(exp);
+			if(o != NULL && r != NULL)
+			{
+				jep_add_leaf_node(o, r);
+				jep_push(exp, o);
+			}
+		}
+		else if(o != NULL)
+		{
+			r = jep_pop(exp);
+			l = jep_pop(exp);
+			if(o != NULL && r != NULL && l != NULL)
+			{
+				jep_add_leaf_node(o, l);
+				jep_add_leaf_node(o, r);
+				jep_push(exp, o);
+			}
+			else
+			{
+				printf("expected expression before '%s' \n", 
+					cur->value->buffer);
+				root->error = 1;
+			}
+		}
+		// if(jep_priority(opr->top) <= jep_priority(*nodes))
+		// {
+		// 	printf("no more attaching to do.\n");
+		// 	if(opr->top != NULL)
+		// 	{
+		// 		printf("opr->top: %s\n", opr->top->token->value->buffer);
+		// 	}
+		// }
+	}
+	while(opr->top != NULL);// && jep_priority(opr->top) > jep_priority(*nodes));
+}
+
+/**
  * parses an expression
  */
 static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
@@ -725,7 +810,7 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 	cur = (*nodes)->token;
 	next = (*nodes + 1)->token;
 
-	// check for an empty expression
+	/* check for an empty expression */
 	if(jep_eoe(cur) && cur->token_code)
 	{
 		/* free the memory allocated for the stacks */
@@ -739,52 +824,6 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 		switch((*nodes)->token->type)
 		{
 			case T_IDENTIFIER:
-				if(next->token_code == T_LPAREN)
-				{
-					jep_ast_node* func = (*nodes)++;
-					jep_ast_node* l_paren = (*nodes)++;
-					jep_ast_node* p = jep_expression(root, nodes);
-					prev = (*nodes - 1)->token;
-					cur = (*nodes)->token;
-					if(cur->token_code != T_EOF)
-					{
-						next = (*nodes + 1)->token;
-					}
-					if(p != NULL)
-					{
-						jep_add_leaf_node(l_paren, p);
-					}
-					else
-					{
-						if(!root->error)
-						{
-							printf("expected expression before ')'\n");
-							root->error = 1;
-						}
-						free(exp.nodes);
-						free(opr.nodes);
-						return NULL;
-					}
-					if((*nodes)->token->token_code != T_RPAREN)
-					{
-						free(exp.nodes);
-						free(opr.nodes);
-						printf("expected ')' at %d,%d but found '%s'\n", 
-							(*nodes)->token->row, 
-							(*nodes)->token->column, 
-							(*nodes)->token->value->buffer);
-						root->error = 1;
-						return NULL;
-					}
-					jep_add_leaf_node(func, l_paren);
-					jep_push(&exp, func);
-				}
-				else
-				{
-					jep_push(&exp, *nodes);
-				}
-				break;
-
 			case T_NUMBER:
 			case T_STRING:
 			case T_CHARACTER:
@@ -803,27 +842,31 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 				if(cur->token_code == T_LPAREN && next->token_code != T_EOF)
 				{
 					jep_ast_node* l_paren = (*nodes)++;
-					jep_ast_node* p = jep_expression(root, nodes);
+					jep_ast_node* par = jep_expression(root, nodes);
 					prev = (*nodes - 1)->token;
 					cur = (*nodes)->token;
 					if(cur->token_code != T_EOF)
 					{
 						next = (*nodes + 1)->token;
 					}
-					if(p != NULL)
+					if(par != NULL)
 					{
-						jep_add_leaf_node(l_paren, p);
+						jep_add_leaf_node(l_paren, par);
 					}
 					else
 					{
-						if(!root->error)
+						/* a postfix () might have no contents */
+						if(!l_paren->token->postfix)
 						{
-							printf("expected expression before ')'\n");
-							root->error = 1;
+							if(!root->error)
+							{
+								printf("expected expression before ')'\n");
+								root->error = 1;
+							}
+							free(exp.nodes);
+							free(opr.nodes);
+							return NULL;
 						}
-						free(exp.nodes);
-						free(opr.nodes);
-						return NULL;
 					}
 					if((*nodes)->token->token_code != T_RPAREN)
 					{
@@ -836,22 +879,74 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 						root->error = 1;
 						return NULL;
 					}
-
-					jep_push(&exp, l_paren);
+					if(l_paren->token->postfix)
+					{
+						if(jep_prioritize(l_paren, opr.top))
+						{
+							jep_attach(&exp, &opr, root, nodes);
+						}
+						jep_push(&opr, l_paren);
+					}
+					else
+					{
+						jep_push(&exp, l_paren);
+					}
 				}
-				else if(cur->token_code == T_LBRACE && next->token_code != T_EOF)
+				else if(cur->token_code == T_LSQUARE && next->token_code != T_EOF)
 				{
-					jep_ast_node* l_brace = (*nodes)++;
-					jep_ast_node* p = jep_expression(root, nodes);
+					jep_ast_node* l_square = (*nodes)++;
+					jep_ast_node* sqr = jep_expression(root, nodes);
 					prev = (*nodes - 1)->token;
 					cur = (*nodes)->token;
 					if(cur->token_code != T_EOF)
 					{
 						next = (*nodes + 1)->token;
 					}
-					if(p != NULL)
+					if(sqr != NULL)
 					{
-						jep_add_leaf_node(l_brace, p);
+						jep_add_leaf_node(l_square, sqr);
+					}
+					else
+					{
+						if(!root->error)
+						{
+							printf("expected expression before ']'\n");
+							root->error = 1;
+						}
+						free(exp.nodes);
+						free(opr.nodes);
+						return NULL;
+					}
+					if((*nodes)->token->token_code != T_RSQUARE)
+					{
+						free(exp.nodes);
+						free(opr.nodes);
+						printf("expected ']' at %d,%d but found '%s'\n", 
+							(*nodes)->token->row, 
+							(*nodes)->token->column, 
+							(*nodes)->token->value->buffer);
+						root->error = 1;
+						return NULL;
+					}
+					if(jep_prioritize(l_square, opr.top))
+					{
+						jep_attach(&exp, &opr, root, nodes);
+					}
+					jep_push(&opr, l_square);
+				}
+				else if(cur->token_code == T_LBRACE && next->token_code != T_EOF)
+				{
+					jep_ast_node* l_brace = (*nodes)++;
+					jep_ast_node* brc = jep_expression(root, nodes);
+					prev = (*nodes - 1)->token;
+					cur = (*nodes)->token;
+					if(cur->token_code != T_EOF)
+					{
+						next = (*nodes + 1)->token;
+					}
+					if(brc != NULL)
+					{
+						jep_add_leaf_node(l_brace, brc);
 					}
 					if((*nodes)->token->token_code != T_RBRACE)
 					{
@@ -868,39 +963,7 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 				}
 				else if(jep_prioritize(*nodes, opr.top))
 				{
-					jep_ast_node* r; /* right operand */
-					jep_ast_node* l; /* left operand */
-					jep_ast_node* o; /* operator */
-					do
-					{
-						o = jep_pop(&opr);
-						if(o != NULL && o->token->unary)
-						{
-							r = jep_pop(&exp);
-							if(o != NULL && r != NULL)
-							{
-								jep_add_leaf_node(o, r);
-								jep_push(&exp, o);
-							}
-						}
-						else if(o != NULL)
-						{
-							r = jep_pop(&exp);
-							l = jep_pop(&exp);
-							if(o != NULL && r != NULL && l != NULL)
-							{
-								jep_add_leaf_node(o, l);
-								jep_add_leaf_node(o, r);
-								jep_push(&exp, o);
-							}
-							else
-							{
-								printf("expected expression before '%s' \n", 
-									cur->value->buffer);
-								root->error = 1;
-							}
-						}
-					}while(opr.top != NULL && jep_priority(opr.top) > jep_priority(*nodes));
+					jep_attach(&exp, &opr, root, nodes);
 					jep_push(&opr, *nodes);
 				}
 				else
@@ -912,7 +975,7 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 				break;
 
 			default:
-				printf("unexpected token '%s' at %d,%d\n", 
+				printf("unexpected idon't even know token '%s' at %d,%d\n", 
 					(*nodes)->token->value->buffer,
 					(*nodes)->token->row, 
 					(*nodes)->token->column);
@@ -932,39 +995,7 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 
 	if(jep_eoe(cur))
 	{
-		do
-		{
-			jep_ast_node* r; /* right operand */
-			jep_ast_node* l; /* left operand */
-			jep_ast_node* o; /* operator */
-			o = jep_pop(&opr);
-			if(o != NULL && o->token->unary)
-			{
-				r = jep_pop(&exp);
-				if(o != NULL && r != NULL)
-				{
-					jep_add_leaf_node(o, r);
-					jep_push(&exp, o);
-				}
-			}
-			else if(o != NULL)
-			{
-				r = jep_pop(&exp);
-				l = jep_pop(&exp);
-				if(o != NULL && r != NULL && l != NULL)
-				{
-					jep_add_leaf_node(o, l);
-					jep_add_leaf_node(o, r);
-					jep_push(&exp, o);
-				}
-				else
-				{
-					printf("expected expression before '%s' \n", 
-						cur->value->buffer);
-					root->error = 1;
-				}
-			}
-		}while(opr.size > 0);
+		jep_attach(&exp, &opr, root, nodes);
 	}
 	else
 	{
@@ -973,7 +1004,7 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 
 	if(exp.size > 1)
 	{
-		printf("unexpected token '%s' at %d,%d\n", 
+		printf("unexpected exp token '%s' at %d,%d\n",
 			exp.top->token->value->buffer,
 			exp.top->token->row, 
 			exp.top->token->column);
@@ -982,7 +1013,7 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 	}
 	else if(opr.size > 0)
 	{
-		printf("unexpected token '%s' at %d,%d\n", 
+		printf("unexpected opr token '%s' at %d,%d\n",
 			opr.top->token->value->buffer,
 			opr.top->token->row, 
 			opr.top->token->column);

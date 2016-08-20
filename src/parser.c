@@ -12,9 +12,9 @@ static int jep_eoe(jep_token* token)
 {
 	switch(token->token_code)
 	{
+		case T_EOF:
 		case T_SEMICOLON:
 		case T_RPAREN:
-		case T_EOF:
 		case T_RSQUARE:
 		case T_RBRACE:
 			return 1;
@@ -43,6 +43,7 @@ static int jep_associativity(jep_ast_node* node)
 		case T_SUBASSIGN:
 		case T_MULASSIGN:
 		case T_DIVASSIGN:
+		case T_MODASSIGN:
 		case T_LSHIFTASSIGN:
 		case T_RSHIFTASSIGN:
 		case T_NOT:
@@ -75,6 +76,8 @@ static int jep_priority(jep_ast_node* node)
 		case T_COMMA:
 			return 0;
 
+		case T_SEMICOLON:
+		case T_EOF:
 		case T_RPAREN:
 		case T_EQUALS:
 		case T_ADDASSIGN:
@@ -84,8 +87,6 @@ static int jep_priority(jep_ast_node* node)
 		case T_MODASSIGN:
 		case T_LSHIFTASSIGN:
 		case T_RSHIFTASSIGN:
-		case T_SEMICOLON:
-		case T_EOF:
 			return 1;
 
 		case T_LOGAND:
@@ -179,12 +180,14 @@ static int jep_check_unary(jep_token* cur, jep_token* prev)
 		case T_INCREMENT:
 		case T_DECREMENT:
 		case T_NOT:
+		case T_LSQUARE:
 			cur->unary = 1;
 			return 1;
 
 		case T_MINUS:
 			if(prev == NULL || (prev->type == T_SYMBOL 
-				&& !prev->unary && prev->token_code != T_RPAREN))
+				&& !prev->unary && prev->token_code != T_RPAREN 
+				&& prev->token_code != T_RSQUARE))
 			{
 				cur->unary = 1;
 				return 1;
@@ -794,6 +797,7 @@ static void jep_attach_all(jep_stack* exp, jep_stack* opr, jep_ast_node* root, j
 	do
 	{
 		o = jep_pop(opr);
+
 		if(o != NULL && o->token->unary)
 		{
 			r = jep_pop(exp);
@@ -1015,7 +1019,7 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 				break;
 
 			default:
-				printf("unexpected idon't even know token '%s' at %d,%d\n", 
+				printf("unexpected token '%s' at %d,%d\n", 
 					(*nodes)->token->value->buffer,
 					(*nodes)->token->row, 
 					(*nodes)->token->column);

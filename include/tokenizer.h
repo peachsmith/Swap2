@@ -74,6 +74,9 @@
 /* end of file */
 #define T_EOF 48
 
+/**
+ * a single token
+ */
 typedef struct Token
 {
 	jep_string_builder *value;
@@ -85,6 +88,9 @@ typedef struct Token
 	int postfix;
 }jep_token;
 
+/**
+ * a sequence of tokens
+ */
 typedef struct TokenStream
 {
 	jep_token** tok;

@@ -77,7 +77,9 @@ static int jep_is_symbol(const char* s)
 	for(i = 0; i < 21; i++)
 	{
 		if(!strcmp(symbols[i], s))
+		{
 			return i;
+		}
 	}
 	return -1;
 }
@@ -91,7 +93,9 @@ static int jep_is_symbol2(const char* s)
 	for(i = 0; i < 18; i++)
 	{
 		if(!strcmp(symbols2[i], s))
+		{
 			return i;
+		}
 	}
 	return -1;
 }
@@ -105,7 +109,9 @@ static int jep_is_symbol3(const char* s)
 	for(i = 0; i < 2; i++)
 	{
 		if(!strcmp(symbols3[i], s))
+		{
 			return i;
+		}
 	}
 	return -1;
 }
@@ -119,7 +125,9 @@ static int jep_is_keyword(const char* s)
 	for(i = 0; i < 6; i++)
 	{
 		if(!strcmp(s, keywords[i]))
+		{
 			return i;
+		}
 	}
 	return -1;
 }
@@ -130,9 +138,13 @@ static int jep_is_keyword(const char* s)
 static int jep_is_ident_start(char c)
 {
 	if(isalpha(c) || c == '_' || c == '$')
+	{
 		return 1;
+	}
 	else
+	{
 		return 0;
+	}
 }
 
 /**
@@ -141,9 +153,13 @@ static int jep_is_ident_start(char c)
 static int jep_is_ident(char c)
 {
 	if(isalnum(c) || c == '_' || c == '$')
+	{
 		return 1;
+	}
 	else
+	{
 		return 0;
+	}
 }
 
 /**

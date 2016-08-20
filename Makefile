@@ -1,5 +1,6 @@
 FLAGS=-c -Wall -O2 -Iinclude
 SWAP=./swap
+VERIFY=./verify.sh
 
 all: build clean
 
@@ -22,3 +23,4 @@ test:
 	@$(SWAP) ./tests/test3.txt > ./tests/result3.txt
 	@$(SWAP) ./tests/test4.txt > ./tests/result4.txt
 	@$(SWAP) ./tests/test5.txt > ./tests/result5.txt
+	@$(VERIFY)

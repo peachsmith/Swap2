@@ -1,6 +1,8 @@
 FLAGS=-c -Wall -O2 -Iinclude
 
-all:
+all: build clean
+
+build:
 	gcc $(FLAGS) src/stringbuilder.c
 	gcc $(FLAGS) src/tokenizer.c
 	gcc $(FLAGS) src/parser.c

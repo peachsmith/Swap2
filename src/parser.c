@@ -140,7 +140,7 @@ static int jep_priority(jep_ast_node* node)
 }
 
 /**
- * determine whether or not the current oeprator stack should be emptied
+ * determine whether or not the current operator stack should be emptied
  */
 static int jep_prioritize(jep_ast_node* cur, jep_ast_node* top)
 {

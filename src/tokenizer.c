@@ -199,7 +199,7 @@ static void jep_classify_token(jep_token* t)
 		}
 		else if(t->value->size == 2)
 		{
-			t->token_code = jep_is_symbol2(t->value->buffer) + 23;
+			t->token_code = jep_is_symbol2(t->value->buffer) + 22;
 		}
 		else if(t->value->size == 3)
 		{

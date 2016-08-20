@@ -1,14 +1,28 @@
-x = 4;
+if(a < b) {
+	c;
+} else if (a < d) {
+	darf;
+} else if (a > 3){
+	eff;
+} else {
+	burp;
+}
 
-if(x < 5) {
+x = 4 % 7;
+x += a = 4;
+
+for(i = 0; i < 2; i++) {
 	x++;
 }
 
+while(x > 2) {
+	x--;
+}
 
-function blat(a, b) {
+function blat(a,b) {
 	return a + b;
 }
 
-x %= 3;
+(1 + 2) * -3 - !4;
 
-1 & 2;
+1 - a[1] - 4;

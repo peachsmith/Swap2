@@ -255,11 +255,11 @@ static jep_ast_node* jep_if(jep_ast_node* root, jep_ast_node** nodes)
 	jep_ast_node* body;    /* the body of the if statement     */
 
 	if_node = (*nodes)++;
-	if((*nodes)->token->token_code != T_LPAREN)
+	if(if_node->token->token_code == T_IF && (*nodes)->token->token_code != T_LPAREN)
 	{
 		if(!root->error)
 		{
-			printf("expected } at %d,%d but found %s\n", 
+			printf("expected ( at %d,%d but found %s\n", 
 				(*nodes)->token->row, 
 				(*nodes)->token->column, 
 				(*nodes)->token->value->buffer);
@@ -268,37 +268,40 @@ static jep_ast_node* jep_if(jep_ast_node* root, jep_ast_node** nodes)
 		return NULL;
 	}
 
-	con = (*nodes)++;
-	jep_ast_node* p = jep_expression(root, nodes);
-	if(p != NULL)
+	if(if_node->token->token_code == T_IF)
 	{
-		jep_add_leaf_node(con, p);
-	}
-	else
-	{
-		if(!root->error)
+		con = (*nodes)++;
+		jep_ast_node* p = jep_expression(root, nodes);
+		if(p != NULL)
 		{
-			printf("expected expression before ')'\n");
-			root->error = 1;
+			jep_add_leaf_node(con, p);
 		}
-		return NULL;
-	}
-	if(!jep_accept(T_RPAREN, nodes))
-	{
-		if(!root->error)
+		else
 		{
-			printf("expected ')' at %d,%d but found '%s'\n", 
-				(*nodes)->token->row, 
-				(*nodes)->token->column, 
-				(*nodes)->token->value->buffer);
-			root->error = 1;
+			if(!root->error)
+			{
+				printf("expected expression at %d,%d\n",
+					(*nodes)->token->row, (*nodes)->token->column);
+				root->error = 1;
+			}
+			return NULL;
 		}
-		return NULL;
-	}
-
- 	if(con != NULL && !root->error)
-	{
-		jep_add_leaf_node(if_node, con);
+		if(!jep_accept(T_RPAREN, nodes))
+		{
+			if(!root->error)
+			{
+				printf("expected ')' at %d,%d but found '%s'\n", 
+					(*nodes)->token->row, 
+					(*nodes)->token->column, 
+					(*nodes)->token->value->buffer);
+				root->error = 1;
+			}
+			return NULL;
+		}
+		if(con != NULL && !root->error)
+		{
+			jep_add_leaf_node(if_node, con);
+		}
 	}
 
 	if((*nodes)->token->token_code == T_LBRACE)
@@ -326,6 +329,20 @@ static jep_ast_node* jep_if(jep_ast_node* root, jep_ast_node** nodes)
 		if(body != NULL && !root->error)
 		{
 			jep_add_leaf_node(if_node, body);
+		}
+	}
+
+	/* parse else blocks */
+	if((*nodes)->token->token_code == T_ELSE && !root->error)
+	{
+		if((*nodes + 1)->token->token_code == T_IF)
+		{
+			(*nodes)++;
+		}
+		jep_ast_node* els = jep_if(root, nodes);
+		if(els != NULL)
+		{
+			jep_add_leaf_node(if_node, els);
 		}
 	}
 
@@ -773,8 +790,9 @@ static void jep_attach(jep_stack* exp, jep_stack* opr, jep_ast_node* root, jep_a
 			}
 			else
 			{
-				printf("expected expression before '%s' \n", 
-					cur->value->buffer);
+				printf("expected expression before '%s' at %d,%d\n", 
+					cur->value->buffer,
+					cur->row, cur->column);
 				root->error = 1;
 			}
 		}
@@ -820,8 +838,9 @@ static void jep_attach_all(jep_stack* exp, jep_stack* opr, jep_ast_node* root, j
 			}
 			else
 			{
-				printf("expected expression before '%s' \n", 
-					cur->value->buffer);
+				printf("expected expression before '%s' at %d,%d\n", 
+					cur->value->buffer,
+					cur->row, cur->column);
 				root->error = 1;
 			}
 		}
@@ -905,7 +924,8 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 						{
 							if(!root->error)
 							{
-								printf("expected expression before ')'\n");
+								printf("expected expression before ')' at %d,%d\n",
+									cur->row, cur->column);
 								root->error = 1;
 							}
 							free(exp.nodes);
@@ -1020,12 +1040,17 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 				break;
 
 			default:
-				printf("unexpected token '%s' at %d,%d\n", 
-					(*nodes)->token->value->buffer,
-					(*nodes)->token->row, 
-					(*nodes)->token->column);
-				root->error = 1;
-				break;
+				if(!root->error)
+				{
+					printf("unexpected token '%s' at %d,%d\n", 
+						(*nodes)->token->value->buffer,
+						(*nodes)->token->row, 
+						(*nodes)->token->column);
+					root->error = 1;
+				}
+				free(exp.nodes);
+				free(opr.nodes);
+				return NULL;
 		}
 
 		(*nodes)++;

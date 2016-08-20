@@ -157,7 +157,7 @@ static int jep_prioritize(jep_ast_node* cur, jep_ast_node* top)
 	}
 	else if(jep_associativity(top) == JEP_RIGHT_ASSOC)
 	{
-		if(jep_priority(cur) < jep_priority(top))
+		if(jep_priority(cur) < jep_priority(top) && jep_associativity(cur) == JEP_LEFT_ASSOC)
 		{
 			return 1;
 		}
@@ -186,7 +186,7 @@ static int jep_check_unary(jep_token* cur, jep_token* prev)
 
 		case T_MINUS:
 			if(prev == NULL || (prev->type == T_SYMBOL 
-				&& !prev->unary && prev->token_code != T_RPAREN 
+				&& prev->token_code != T_RPAREN 
 				&& prev->token_code != T_RSQUARE))
 			{
 				cur->unary = 1;
@@ -751,6 +751,7 @@ static void jep_attach(jep_stack* exp, jep_stack* opr, jep_ast_node* root, jep_a
 	do
 	{
 		o = jep_pop(opr);
+
 		if(o != NULL && o->token->unary)
 		{
 			r = jep_pop(exp);
@@ -1036,7 +1037,7 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 			next = (*nodes + 1)->token;
 		}
 	}
-
+	
 	if(jep_eoe(cur))
 	{
 		jep_attach_all(&exp, &opr, root, nodes);

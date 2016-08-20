@@ -63,3 +63,21 @@ void jep_append_string(jep_string_builder* sb, const char* str)
 	while(str[i] != '\0')
 		jep_append_char(sb, str[i++]);
 }
+
+/**
+ * reads the contents of a file into memory
+ */
+void jep_scan_file(FILE* file, jep_string_builder *sb)
+{
+	char buffer[1025];
+	size_t s;
+	do
+	{
+		s = fread(buffer, 1, 1024, file);
+		if(s > 0)
+		{
+			buffer[s] = '\0';
+			jep_append_string(sb, buffer);
+		}
+	}while(s > 0);
+}

@@ -147,24 +147,6 @@ static int jep_is_ident(char c)
 }
 
 /**
- * reads the contents of a file into memory
- */
-static void jep_scan_file(FILE* file, jep_string_builder *sb)
-{
-	char buffer[1025];
-	size_t s;
-	do
-	{
-		s = fread(buffer, 1, 1024, file);
-		if(s > 0)
-		{
-			buffer[s] = '\0';
-			jep_append_string(sb, buffer);
-		}
-	}while(s > 0);
-}
-
-/**
  * increases the capacity of a token stream by approximately 50%
  */
 static void jep_resize_token_stream(jep_token_stream* ts)

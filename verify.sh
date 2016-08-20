@@ -14,9 +14,11 @@ res3=$(<./tests/result3.txt)
 res4=$(<./tests/result4.txt)
 res5=$(<./tests/result5.txt)
 
+# the total number of test cases
 cases=5
+
+# the number of test cases that passed
 passed=0
-success=0
 
 # compare expected results with actual results
 if [ "$res1" == "$cor1" ]; then
@@ -54,7 +56,6 @@ else
 	echo Test 5: fail
 fi
 
-let "success = passed / cases * 100"
 echo ============================================
 echo $passed out of $cases test cases succeeded
 echo ============================================

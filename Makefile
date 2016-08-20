@@ -1,4 +1,5 @@
 FLAGS=-c -Wall -O2 -Iinclude
+SWAP=./swap
 
 all: build clean
 
@@ -14,3 +15,10 @@ build:
 
 clean:
 	rm *.o
+
+test:
+	@$(SWAP) ./tests/test1.txt > ./tests/result1.txt
+	@$(SWAP) ./tests/test2.txt > ./tests/result2.txt
+	@$(SWAP) ./tests/test3.txt > ./tests/result3.txt
+	@$(SWAP) ./tests/test4.txt > ./tests/result4.txt
+	@$(SWAP) ./tests/test5.txt > ./tests/result5.txt

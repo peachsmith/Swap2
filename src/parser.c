@@ -259,13 +259,16 @@ static int jep_check_postfix(jep_token* cur, jep_token* prev)
 	int code = cur->token_code;
 
 	/* ensure the current token can be a postfix operator */
-	if(code != T_INCREMENT && code != T_DECREMENT
-		&& code != T_LPAREN && code != T_LSQUARE)
+	if(code != T_INCREMENT 
+		&& code != T_DECREMENT
+		&& code != T_LPAREN 
+		&& code != T_LSQUARE)
 	{
 		return 0;
 	}
 
-	if(prev->type == T_IDENTIFIER || prev->token_code == T_RPAREN
+	if(prev->type == T_IDENTIFIER 
+		|| prev->token_code == T_RPAREN
 		|| prev->token_code == T_RSQUARE)
 	{
 		cur->postfix = 1;

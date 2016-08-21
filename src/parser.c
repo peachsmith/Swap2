@@ -188,10 +188,7 @@ static int jep_prioritize(jep_ast_node* cur, jep_ast_node* top)
 		{
 			return 1;
 		}
-		else
-		{
-			return 0;
-		}
+		return 0;
 	}
 	else if(jep_associativity(top) == JEP_RIGHT_ASSOC)
 	{
@@ -199,10 +196,7 @@ static int jep_prioritize(jep_ast_node* cur, jep_ast_node* top)
 		{
 			return 1;
 		}
-		else
-		{
-			return 0;
-		}	
+		return 0;
 	}
 
 	return 0;
@@ -277,10 +271,7 @@ static int jep_check_postfix(jep_token* cur, jep_token* prev)
 		cur->postfix = 1;
 		return 1;
 	}
-	else
-	{
-		return 0;
-	}
+	return 0;
 }
 
 /**
@@ -600,10 +591,7 @@ static int jep_accept(int token_code, jep_ast_node** nodes)
 		(*nodes)++;
 		return 1;
 	}
-	else
-	{
-		return 0;
-	}
+	return 0;
 }
 
 /**
@@ -670,7 +658,6 @@ jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node** nodes)
 	(*nodes) = first;
 
 	return root;
-
 }
 
 /**
@@ -694,7 +681,7 @@ static void jep_attach(jep_stack* exp, jep_stack* opr, jep_ast_node* root, jep_a
 		if(o != NULL && o->token->unary)
 		{
 			r = jep_pop(exp);
-			if(o != NULL && r != NULL)
+			if(r != NULL)
 			{
 				jep_add_leaf_node(o, r);
 				jep_push(exp, o);
@@ -704,7 +691,7 @@ static void jep_attach(jep_stack* exp, jep_stack* opr, jep_ast_node* root, jep_a
 		{
 			r = jep_pop(exp);
 			l = jep_pop(exp);
-			if(o != NULL && r != NULL && l != NULL)
+			if(r != NULL && l != NULL)
 			{
 				jep_add_leaf_node(o, l);
 				jep_add_leaf_node(o, r);
@@ -716,7 +703,7 @@ static void jep_attach(jep_stack* exp, jep_stack* opr, jep_ast_node* root, jep_a
 			}
 		}
 	}
-	while(opr->top != NULL && jep_priority(opr->top) > jep_priority(*nodes));
+	while(opr->size && jep_priority(opr->top) > jep_priority(*nodes));
 }
 
 /**
@@ -739,7 +726,7 @@ static void jep_attach_all(jep_stack* exp, jep_stack* opr, jep_ast_node* root, j
 		if(o != NULL && o->token->unary)
 		{
 			r = jep_pop(exp);
-			if(o != NULL && r != NULL)
+			if(r != NULL)
 			{
 				jep_add_leaf_node(o, r);
 				jep_push(exp, o);
@@ -749,7 +736,7 @@ static void jep_attach_all(jep_stack* exp, jep_stack* opr, jep_ast_node* root, j
 		{
 			r = jep_pop(exp);
 			l = jep_pop(exp);
-			if(o != NULL && r != NULL && l != NULL)
+			if(r != NULL && l != NULL)
 			{
 				jep_add_leaf_node(o, l);
 				jep_add_leaf_node(o, r);
@@ -761,7 +748,7 @@ static void jep_attach_all(jep_stack* exp, jep_stack* opr, jep_ast_node* root, j
 			}
 		}
 	}
-	while(opr->top != NULL);
+	while(opr->size);
 }
 
 /**
@@ -779,12 +766,12 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 	exp.size = 0;
 	exp.capacity = 10;
 	exp.top = NULL;
-	exp.nodes = malloc(sizeof(jep_ast_node*) * exp.capacity);
+	exp.nodes = malloc(sizeof(jep_ast_node*) * 10);
 
 	opr.size = 0;
 	opr.capacity = 10;
 	opr.top = NULL;
-	opr.nodes = malloc(sizeof(jep_ast_node*) * opr.capacity);
+	opr.nodes = malloc(sizeof(jep_ast_node*) * 10);
 
 	prev = NULL;
 	cur = (*nodes)->token;
@@ -821,8 +808,8 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 				/* check for parentheses */
 				if(cur->token_code == T_LPAREN && next->token_code != T_EOF)
 				{
-					jep_ast_node* l_paren = (*nodes)++;
-					jep_ast_node* par = jep_expression(root, nodes);
+					jep_ast_node* l_brac = (*nodes)++;
+					jep_ast_node* e = jep_expression(root, nodes);
 					prev = (*nodes - 1)->token;
 					cur = (*nodes)->token;
 					if(cur->token_code != T_EOF)
@@ -838,14 +825,14 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 						return NULL;
 					}
 
-					if(par != NULL)
+					if(e != NULL)
 					{
-						jep_add_leaf_node(l_paren, par);
+						jep_add_leaf_node(l_brac, e);
 					}
 					else
 					{
 						/* a postfix () might have no contents */
-						if(!l_paren->token->postfix)
+						if(!l_brac->token->postfix)
 						{
 							jep_err(ERR_EXPRESSION, cur, root, ")");
 							free(exp.nodes);
@@ -854,23 +841,23 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 						}
 					}
 
-					if(l_paren->token->postfix)
+					if(l_brac->token->postfix)
 					{
-						if(jep_prioritize(l_paren, opr.top))
+						if(jep_prioritize(l_brac, opr.top))
 						{
 							jep_attach(&exp, &opr, root, nodes);
 						}
-						jep_push(&opr, l_paren);
+						jep_push(&opr, l_brac);
 					}
 					else
 					{
-						jep_push(&exp, l_paren);
+						jep_push(&exp, l_brac);
 					}
 				}
 				else if(cur->token_code == T_LSQUARE && next->token_code != T_EOF)
 				{
-					jep_ast_node* l_square = (*nodes)++;
-					jep_ast_node* sqr = jep_expression(root, nodes);
+					jep_ast_node* l_brac = (*nodes)++;
+					jep_ast_node* e = jep_expression(root, nodes);
 					prev = (*nodes - 1)->token;
 					cur = (*nodes)->token;
 					if(cur->token_code != T_EOF)
@@ -886,9 +873,9 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 						return NULL;
 					}
 
-					if(sqr != NULL)
+					if(e != NULL)
 					{
-						jep_add_leaf_node(l_square, sqr);
+						jep_add_leaf_node(l_brac, e);
 					}
 					else
 					{
@@ -898,26 +885,23 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 						return NULL;
 					}
 
-					if(jep_prioritize(l_square, opr.top))
+					if(jep_prioritize(l_brac, opr.top))
 					{
 						jep_attach(&exp, &opr, root, nodes);
 					}
-					jep_push(&opr, l_square);
+					jep_push(&opr, l_brac);
 				}
 				else if(cur->token_code == T_LBRACE && next->token_code != T_EOF)
 				{
-					jep_ast_node* l_brace = (*nodes)++;
-					jep_ast_node* brc = jep_expression(root, nodes);
+					jep_ast_node* l_brac = (*nodes)++;
+					jep_ast_node* e = jep_expression(root, nodes);
 					prev = (*nodes - 1)->token;
 					cur = (*nodes)->token;
 					if(cur->token_code != T_EOF)
 					{
 						next = (*nodes + 1)->token;
 					}
-					if(brc != NULL)
-					{
-						jep_add_leaf_node(l_brace, brc);
-					}
+
 					if((*nodes)->token->token_code != T_RBRACE)
 					{
 						jep_err(ERR_EXPECTED, cur, root, "}");
@@ -925,7 +909,12 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 						free(opr.nodes);
 						return NULL;
 					}
-					jep_push(&exp, l_brace);
+
+					if(e != NULL)
+					{
+						jep_add_leaf_node(l_brac, e);
+					}
+					jep_push(&exp, l_brac);
 				}
 				else if(jep_prioritize(*nodes, opr.top))
 				{
@@ -936,7 +925,6 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 				{
 					jep_push(&opr, *nodes);	
 				}
-				
 			}
 				break;
 

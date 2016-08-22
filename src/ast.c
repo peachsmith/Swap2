@@ -1,6 +1,8 @@
 #include "ast.h"
 
-/* increases the memory allocated for an AST node's leaf nodes by about 50% */
+/**
+ * increases the memory allocated for an AST node's leaf nodes by about 50% 
+ */
 static void jep_resize_ast_node(jep_ast_node* node)
 {
 	int new_cap = node->capacity + node->capacity / 2;
@@ -18,7 +20,9 @@ static void jep_resize_ast_node(jep_ast_node* node)
 	node->capacity = new_cap;
 }
 
-/* create an AST node */
+/**
+ * create an AST node
+ */
 jep_ast_node* jep_create_ast_node()
 {
 	jep_ast_node* node = malloc(sizeof(jep_ast_node));
@@ -29,7 +33,9 @@ jep_ast_node* jep_create_ast_node()
 	return node;
 }
 
-/* adds a leaf node to an AST node */
+/**
+ * adds a leaf node to an AST node
+ */
 void jep_add_leaf_node(jep_ast_node* root, jep_ast_node* leaf)
 {
 
@@ -48,7 +54,9 @@ void jep_add_leaf_node(jep_ast_node* root, jep_ast_node* leaf)
 	}
 }
 
-/* prints the AST */
+/**
+ * prints the AST
+ */
 void jep_print_ast(jep_ast_node root)
 {
 	static int indent = 1;
@@ -71,7 +79,9 @@ void jep_print_ast(jep_ast_node root)
 
 }
 
-/* pushes an AST node onto the top of the stack */
+/**
+ * pushes an AST node onto the top of the stack
+ */
 void jep_push(jep_stack* stack, jep_ast_node* node)
 {
 
@@ -97,7 +107,9 @@ void jep_push(jep_stack* stack, jep_ast_node* node)
 
 }
 
-/* pops an AST node from the top of the stack */
+/**
+ * pops an AST node from the top of the stack
+ */
 jep_ast_node* jep_pop(jep_stack* stack)
 {
 	if(stack->size > 0)
@@ -121,7 +133,9 @@ jep_ast_node* jep_pop(jep_stack* stack)
 	}
 }
 
-/* pops all AST nodes from the stack */
+/**
+ * pops all AST nodes from the stack
+ */
 void jep_pop_all(jep_stack* stack)
 {
 	int i;

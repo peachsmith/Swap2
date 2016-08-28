@@ -1,6 +1,28 @@
 #include "stringbuilder.h"
 
 /**
+ * increases a StringBuilder's capacity by approximately 50 percent
+ */
+static void jep_resize_string_builder(jep_string_builder* sb)
+{
+	int new_capacity;
+	char* new_buffer;
+	int i;
+
+	new_capacity = sb->capacity + sb->capacity / 2;
+	new_buffer = malloc(new_capacity);
+
+	for(i = 0; i < sb->size; i++)
+	{
+		new_buffer[i] = sb->buffer[i];
+	}
+
+	free(sb->buffer);
+	sb->buffer = new_buffer;
+	sb->capacity = new_capacity;
+}
+
+/**
  * allocates memory for a StringBuilder
  */
 jep_string_builder* jep_create_string_builder()
@@ -31,28 +53,6 @@ void jep_init_string_builder(jep_string_builder* sb)
 	sb->capacity = 50;
 	sb->buffer = malloc(sb->capacity);
 	sb->buffer[0] = '\0';
-}
-
-/**
- * increases a StringBuilder's capacity by approximately 50 percent
- */
-void jep_resize_string_builder(jep_string_builder* sb)
-{
-	int new_capacity;
-	char* new_buffer;
-	int i;
-
-	new_capacity = sb->capacity + sb->capacity / 2;
-	new_buffer = malloc(new_capacity);
-
-	for(i = 0; i < sb->size; i++)
-	{
-		new_buffer[i] = sb->buffer[i];
-	}
-
-	free(sb->buffer);
-	sb->buffer = new_buffer;
-	sb->capacity = new_capacity;
 }
 
 /**

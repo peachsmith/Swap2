@@ -22,16 +22,6 @@ jep_string_builder* jep_create_string_builder();
 void jep_destroy_string_builder(jep_string_builder* sb);
 
 /**
- * initializes a StringBuilder
- */
-void jep_init_string_builder(jep_string_builder* sb);
-
-/**
- * increases a StringBuilder's capacity by approximately 50 percent
- */
-void jep_resize_string_builder(jep_string_builder* sb);
-
-/**
  * add a new character to a StringBuilder's buffer
  */
 void jep_append_char(jep_string_builder* sb, char c);

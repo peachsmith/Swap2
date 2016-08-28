@@ -10,7 +10,7 @@ typedef struct ASTNode
 	jep_token token;
 	int leaf_count;
 	int capacity;
-	struct ASTNode* leaves;
+	struct ASTNode** leaves;
 	int error;
 }jep_ast_node;
 

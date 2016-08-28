@@ -523,55 +523,51 @@ jep_token_stream* jep_tokenize_file(const char* file_name)
  */
 void jep_print_tokens(jep_token_stream* ts, FILE* f)
 {
-	jep_token* start; /* the beginning of the token stream */
-	int i;            /* amount of tokens in the stream    */
+	int i;
 	fprintf(f,"-----------------------------------------------\n");
 	fprintf(f,"%-12s %-7s %-7s %-12s value\n","type", "row", "column", "token code");
 	fprintf(f,"-----------------------------------------------\n");
-	start = ts->tok;
-	for(i = 0; i < ts->size; i++, ts->tok++)
+	for(i = 0; i < ts->size; i++)
 	{
-		switch(ts->tok->type)
+		switch(ts->tok[i].type)
 		{
 			case T_SYMBOL:
 				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[symbol]", 
-				ts->tok->row, ts->tok->column, 
-				ts->tok->token_code, ts->tok->value->buffer);
+				ts->tok[i].row, ts->tok[i].column, 
+				ts->tok[i].token_code, ts->tok[i].value->buffer);
 				break;
 			case T_IDENTIFIER:
 				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[identifier]", 
-				ts->tok->row, ts->tok->column, 
-				ts->tok->token_code, ts->tok->value->buffer);
+				ts->tok[i].row, ts->tok[i].column, 
+				ts->tok[i].token_code, ts->tok[i].value->buffer);
 				break;
 			case T_CHARACTER:
 				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[character]", 
-				ts->tok->row, ts->tok->column, 
-				ts->tok->token_code, ts->tok->value->buffer);
+				ts->tok[i].row, ts->tok[i].column, 
+				ts->tok[i].token_code, ts->tok[i].value->buffer);
 				break;
 			case T_STRING:
 				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[string]", 
-				ts->tok->row, ts->tok->column, 
-				ts->tok->token_code, ts->tok->value->buffer);
+				ts->tok[i].row, ts->tok[i].column, 
+				ts->tok[i].token_code, ts->tok[i].value->buffer);
 				break;
 			case T_NUMBER:
 				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[number]", 
-				ts->tok->row, ts->tok->column, 
-				ts->tok->token_code, ts->tok->value->buffer);
+				ts->tok[i].row, ts->tok[i].column, 
+				ts->tok[i].token_code, ts->tok[i].value->buffer);
 				break;
 			case T_KEYWORD:
 				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[keyword]",
-				ts->tok->row, ts->tok->column, 
-				ts->tok->token_code, ts->tok->value->buffer);
+				ts->tok[i].row, ts->tok[i].column, 
+				ts->tok[i].token_code, ts->tok[i].value->buffer);
 				break;
 			case T_END:
 				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[end]",
-				ts->tok->row, ts->tok->column, 
-				ts->tok->token_code, ts->tok->value->buffer);
+				ts->tok[i].row, ts->tok[i].column, 
+				ts->tok[i].token_code, ts->tok[i].value->buffer);
 				break;
 			default:
 				break;
 		}
 	}
-	/* reset the token pointer */
-	ts->tok = start;
 }

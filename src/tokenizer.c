@@ -177,9 +177,6 @@ static void jep_resize_token_stream(jep_token_stream* ts)
 	for(i = 0; i < ts->size; i++)
 	{
 		new_tokens[i] = ts->tok[i];
-		new_tokens[i].value = jep_create_string_builder();
-		jep_append_string(new_tokens[i].value, ts->tok[i].value->buffer);
-		jep_destroy_string_builder(ts->tok[i].value);
 	}
 
 	free(ts->tok);

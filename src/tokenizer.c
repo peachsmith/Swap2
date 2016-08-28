@@ -168,17 +168,20 @@ static int jep_is_ident(char c)
 static void jep_resize_token_stream(jep_token_stream* ts)
 {
 	int new_capacity;
-	jep_token** new_tokens;
+	jep_token* new_tokens;
 	int i;
 	
 	new_capacity = ts->capacity + ts->capacity / 2;
-	new_tokens = malloc(new_capacity * sizeof(jep_token*));
-	
+	new_tokens = malloc(new_capacity * sizeof(jep_token));
+
 	for(i = 0; i < ts->size; i++)
 	{
 		new_tokens[i] = ts->tok[i];
+		new_tokens[i].value = jep_create_string_builder();
+		jep_append_string(new_tokens[i].value, ts->tok[i].value->buffer);
+		jep_destroy_string_builder(ts->tok[i].value);
 	}
-	
+
 	free(ts->tok);
 	ts->tok = new_tokens;
 	ts->capacity = new_capacity;
@@ -242,8 +245,8 @@ jep_token_stream* jep_create_token_stream()
 {
 	jep_token_stream* ts = malloc(sizeof(jep_token_stream));
 	ts->size = 0;
-	ts->capacity = 10;
-	ts->tok = malloc(10 * sizeof(jep_token*));
+	ts->capacity = 50;
+	ts->tok = malloc(50 * sizeof(jep_token));
 	return ts;
 }
 
@@ -255,7 +258,7 @@ void jep_destroy_token_stream(jep_token_stream* ts)
 	int i;
 	for(i = 0; i < ts->size; i++)
 	{
-		jep_destroy_token(ts->tok[i]);
+		jep_destroy_string_builder(ts->tok[i].value);
 	}
 	free(ts->tok);
 	free(ts);
@@ -264,7 +267,7 @@ void jep_destroy_token_stream(jep_token_stream* ts)
 /**
  * adds a token to a token stream
  */
-void jep_append_token(jep_token_stream* ts, jep_token* t)
+void jep_append_token(jep_token_stream* ts, jep_token t)
 {
 	if(ts->size >= ts->capacity)
 	{
@@ -338,80 +341,78 @@ jep_token_stream* jep_tokenize_file(const char* file_name)
 		/* detect identifiers */
 		if(jep_is_ident_start(s[i]))
 		{
-			jep_token* ident = jep_create_token();
-			ident->row = row;
-			ident->column = col;
+			jep_token ident = 
+			{
+				jep_create_string_builder(), T_IDENTIFIER, 0, row, col, 0, 0
+			};
 			do
 			{
-				jep_append_char(ident->value, s[i++]);
+				jep_append_char(ident.value, s[i++]);
 				col++;
 			}while(jep_is_ident(s[i]));
-			if(jep_is_keyword(ident->value->buffer) >= 0)
+			if(jep_is_keyword(ident.value->buffer) >= 0)
 			{
-				ident->type = T_KEYWORD;
+				ident.type = T_KEYWORD;
 			}
-			else
-			{
-				ident->type = T_IDENTIFIER;
-			}
-			jep_classify_token(ident);
+			jep_classify_token(&ident);
 			jep_append_token(ts, ident);
 		}
 			
 		/* detect characters */
 		if(s[i] == '\'')
 		{
+			jep_token c = 
+			{
+				jep_create_string_builder(), T_CHARACTER, 0, row, col, 0, 0
+			};
 			i++;
-			jep_token* c = jep_create_token();
-			c->row = row;
-			c->column = col;
 			col++;
 			do
 			{
-				jep_append_char(c->value, s[i]);
+				jep_append_char(c.value, s[i]);
 				if(s[i] == '\\')
 				{
 					i++;
 					col++;
-					jep_append_char(c->value, s[i]);
+					jep_append_char(c.value, s[i]);
 				}
 				i++;
 				col++;
 			}while(s[i] != '\'' && i < sb->size);
-			c->type = T_CHARACTER;
 			jep_append_token(ts, c);
 		}
 		
 		/* detect strings */
 		if(s[i] == '"')
 		{
-			jep_token* str = jep_create_token();
-			str->row= row;
-			str->column = col;
+			jep_token str = 
+			{
+				jep_create_string_builder(), T_STRING, 0, row, col, 0, 0
+			};
 			i++;
 			col++;
 			do
 			{
-				jep_append_char(str->value, s[i]);
+				jep_append_char(str.value, s[i]);
 				if(s[i] == '\\' && s[i+1] == '"')
 				{
 					i++;
 					col++;
-					jep_append_char(str->value, s[i]);
+					jep_append_char(str.value, s[i]);
 				}
 				i++;
 				col++;
 			}while(s[i] != '"' && i < sb->size);
-			str->type = T_STRING;
 			jep_append_token(ts, str);
 		}
 		
 		/* detect symbols */
 		if(jep_is_symbol_char(s[i]))
 		{
-			jep_token* sym = jep_create_token();
-			sym->row = row;
-			sym->column = col;
+			jep_token sym = 
+			{
+				jep_create_string_builder(), T_SYMBOL, 0, row, col, 0, 0
+			};
 			char symbol[] = {s[i], '\0', '\0', '\0'};
 			if(i < sb->size - 1)
 			{
@@ -419,7 +420,7 @@ jep_token_stream* jep_tokenize_file(const char* file_name)
 				symbol[2] = s[i+2];
 				if(jep_is_symbol3(symbol) >= 0)
 				{
-					jep_append_string(sym->value, symbol);
+					jep_append_string(sym.value, symbol);
 					i += 2;
 					col += 2;
 				}
@@ -428,7 +429,7 @@ jep_token_stream* jep_tokenize_file(const char* file_name)
 					symbol[2] = '\0';
 					if(jep_is_symbol2(symbol) >= 0)
 					{
-						jep_append_string(sym->value, symbol);
+						jep_append_string(sym.value, symbol);
 						i++;
 						col++;
 					}
@@ -437,7 +438,7 @@ jep_token_stream* jep_tokenize_file(const char* file_name)
 						symbol[1] = '\0';
 						if(jep_is_symbol(symbol) >= 0)
 						{
-							jep_append_string(sym->value, symbol);
+							jep_append_string(sym.value, symbol);
 						}
 					}
 				}
@@ -447,7 +448,7 @@ jep_token_stream* jep_tokenize_file(const char* file_name)
 				symbol[1] = s[i+1];
 				if(jep_is_symbol2(symbol) >= 0)
 				{
-					jep_append_string(sym->value, symbol);
+					jep_append_string(sym.value, symbol);
 					i++;
 					col++;
 				}
@@ -456,21 +457,21 @@ jep_token_stream* jep_tokenize_file(const char* file_name)
 					symbol[1] = '\0';
 					if(jep_is_symbol(symbol) >= 0)
 					{
-						jep_append_string(sym->value, symbol);
+						jep_append_string(sym.value, symbol);
 					}
 				}
 			}
-			sym->type = T_SYMBOL;
-			jep_classify_token(sym);
+			jep_classify_token(&sym);
 			jep_append_token(ts, sym);
 		}
 		
 		/* detect numbers */
 		if(isdigit(s[i]))
 		{
-			jep_token* num = jep_create_token();
-			num->row = row;
-			num->column = col;
+			jep_token num = 
+			{
+				jep_create_string_builder(), T_NUMBER, 0, row, col, 0, 0
+			};
 			int dec = 0;
 			do
 			{
@@ -480,12 +481,11 @@ jep_token_stream* jep_tokenize_file(const char* file_name)
 				}
 				if(dec < 2)
 				{
-					jep_append_char(num->value, s[i]);
+					jep_append_char(num.value, s[i]);
 					i++;
 				}
 				col++;
 			}while((isdigit(s[i]) || s[i] == '.' ) && dec < 2);
-			num->type = T_NUMBER;
 			jep_append_token(ts, num);
 			i--;
 			col--;
@@ -502,14 +502,13 @@ jep_token_stream* jep_tokenize_file(const char* file_name)
 		}
 		i++;
 	}
-	
+
 	/* append an END token */
-	jep_token* end_token = jep_create_token();
-	end_token->type = T_END;
-	end_token->token_code = T_EOF;
-	end_token->row = row;
-	end_token->column = col;
-	jep_append_string(end_token->value, "EOF");
+	jep_token end_token = 
+	{
+		jep_create_string_builder(), T_END, T_EOF, row, col, 0, 0
+	};
+	jep_append_string(end_token.value, "EOF");
 	jep_append_token(ts, end_token);
 	
 	/* free memory */
@@ -524,59 +523,55 @@ jep_token_stream* jep_tokenize_file(const char* file_name)
  */
 void jep_print_tokens(jep_token_stream* ts, FILE* f)
 {
+	jep_token* start; /* the beginning of the token stream */
+	int i;            /* amount of tokens in the stream    */
 	fprintf(f,"-----------------------------------------------\n");
 	fprintf(f,"%-12s %-7s %-7s %-12s value\n","type", "row", "column", "token code");
 	fprintf(f,"-----------------------------------------------\n");
-	int t_count;
-	for(t_count = 0; t_count < ts->size; t_count++)
+	start = ts->tok;
+	for(i = 0; i < ts->size; i++, ts->tok++)
 	{
-		switch(ts->tok[t_count]->type)
+		switch(ts->tok->type)
 		{
 			case T_SYMBOL:
 				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[symbol]", 
-				ts->tok[t_count]->row, ts->tok[t_count]->column, 
-				ts->tok[t_count]->token_code,
-					ts->tok[t_count]->value->buffer);
+				ts->tok->row, ts->tok->column, 
+				ts->tok->token_code, ts->tok->value->buffer);
 				break;
 			case T_IDENTIFIER:
 				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[identifier]", 
-				ts->tok[t_count]->row, ts->tok[t_count]->column, 
-				ts->tok[t_count]->token_code,
-					ts->tok[t_count]->value->buffer);
+				ts->tok->row, ts->tok->column, 
+				ts->tok->token_code, ts->tok->value->buffer);
 				break;
 			case T_CHARACTER:
 				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[character]", 
-				ts->tok[t_count]->row, ts->tok[t_count]->column, 
-				ts->tok[t_count]->token_code,
-					ts->tok[t_count]->value->buffer);
+				ts->tok->row, ts->tok->column, 
+				ts->tok->token_code, ts->tok->value->buffer);
 				break;
 			case T_STRING:
 				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[string]", 
-				ts->tok[t_count]->row, ts->tok[t_count]->column, 
-				ts->tok[t_count]->token_code,
-					ts->tok[t_count]->value->buffer);
+				ts->tok->row, ts->tok->column, 
+				ts->tok->token_code, ts->tok->value->buffer);
 				break;
 			case T_NUMBER:
 				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[number]", 
-				ts->tok[t_count]->row, ts->tok[t_count]->column, 
-				ts->tok[t_count]->token_code,
-					ts->tok[t_count]->value->buffer);
+				ts->tok->row, ts->tok->column, 
+				ts->tok->token_code, ts->tok->value->buffer);
 				break;
 			case T_KEYWORD:
 				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[keyword]",
-				ts->tok[t_count]->row, ts->tok[t_count]->column, 
-				ts->tok[t_count]->token_code,
-					ts->tok[t_count]->value->buffer);
+				ts->tok->row, ts->tok->column, 
+				ts->tok->token_code, ts->tok->value->buffer);
 				break;
 			case T_END:
 				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[end]",
-				ts->tok[t_count]->row, ts->tok[t_count]->column, 
-				ts->tok[t_count]->token_code,
-					ts->tok[t_count]->value->buffer);
+				ts->tok->row, ts->tok->column, 
+				ts->tok->token_code, ts->tok->value->buffer);
 				break;
 			default:
 				break;
 		}
-		
 	}
+	/* reset the token pointer */
+	ts->tok = start;
 }

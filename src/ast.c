@@ -26,7 +26,6 @@ static void jep_resize_ast_node(jep_ast_node* node)
 jep_ast_node* jep_create_ast_node()
 {
 	jep_ast_node* node = malloc(sizeof(jep_ast_node));
-	node->token = NULL;
 	node->leaf_count = 0;
 	node->capacity = 10;
 	node->leaves = NULL;
@@ -63,7 +62,7 @@ void jep_print_ast(jep_ast_node root)
 
 	if(root.leaf_count > 0)
 	{
-		printf("%*s\n", indent, root.token->value->buffer);
+		printf("%*s\n", indent, root.token.value->buffer);
 		indent++;
 		int i;
 		for(i = 0; i < root.leaf_count; i++)
@@ -74,7 +73,7 @@ void jep_print_ast(jep_ast_node root)
 	}
 	else
 	{
-		printf("%*s\n", indent, root.token->value->buffer);
+		printf("%*s\n", indent, root.token.value->buffer);
 	}
 
 }

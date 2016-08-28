@@ -15,6 +15,7 @@ int main(int argc, char** argv)
 	
 	if(ts != NULL)
 	{
+
 		// jep_print_tokens(ts, stdout);
 		root = jep_parse(ts, &nodes);
 
@@ -43,7 +44,7 @@ int main(int argc, char** argv)
 			
 
 			/* destroy the AST */
-			jep_destroy_token(root->token);
+			jep_destroy_string_builder(root->token.value);
 			if(root->leaves != NULL)
 			{
 				free(root->leaves);

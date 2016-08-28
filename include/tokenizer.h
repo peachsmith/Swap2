@@ -93,7 +93,7 @@ typedef struct Token
  */
 typedef struct TokenStream
 {
-	jep_token** tok;
+	jep_token* tok;
 	int size;
 	int capacity;
 }jep_token_stream;
@@ -121,7 +121,7 @@ void jep_destroy_token_stream(jep_token_stream* ts);
 /**
  * adds a token to a token stream
  */
-void jep_append_token(jep_token_stream* tb, jep_token* t);
+void jep_append_token(jep_token_stream* tb, jep_token t);
 
 /**
  * tokenizes the contents of a file

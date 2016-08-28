@@ -4,23 +4,17 @@
 jep_obj* jep_evaluate(jep_ast_node ast)
 {
 	jep_obj* o = NULL;
-	
-	if(ast.token == NULL)
+
+	if(ast.token.type == T_NUMBER)
 	{
-		printf("encountered NULL token\n");
-		return NULL;
+		return jep_number(ast.token.value->buffer);
+	}
+	else if(ast.token.type == T_CHARACTER)
+	{
+		return jep_character(ast.token.value->buffer);
 	}
 
-	if(ast.token->type == T_NUMBER)
-	{
-		return jep_number(ast.token->value->buffer);
-	}
-	else if(ast.token->type == T_CHARACTER)
-	{
-		return jep_character(ast.token->value->buffer);
-	}
-
-	switch(ast.token->token_code)
+	switch(ast.token.token_code)
 	{
 		case T_PLUS:
 			o = jep_add(ast);
@@ -104,7 +98,7 @@ jep_obj* jep_evaluate(jep_ast_node ast)
 
 		default:
 			printf("unrecognized token: %s\n", 
-				ast.token->value->buffer);
+				ast.token.value->buffer);
 			break;
 	}
 

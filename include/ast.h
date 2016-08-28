@@ -7,7 +7,7 @@
 /* a node in an AST */
 typedef struct ASTNode
 {
-	jep_token* token;
+	jep_token token;
 	int leaf_count;
 	int capacity;
 	struct ASTNode* leaves;

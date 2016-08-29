@@ -6,7 +6,7 @@
 static void jep_resize_ast_node(jep_ast_node* node)
 {
 	int new_cap = node->capacity + node->capacity / 2;
-	jep_ast_node** new_leaves = malloc(new_cap * sizeof(jep_ast_node*));
+	jep_ast_node* new_leaves = malloc(new_cap * sizeof(jep_ast_node));
 
 	int i;
 	for(i = 0; i < node->leaf_count; i++)
@@ -40,7 +40,7 @@ void jep_add_leaf_node(jep_ast_node* root, jep_ast_node* leaf)
 
 	if(root->leaves == NULL)
 	{
-		root->leaves = malloc(root->capacity * sizeof(jep_ast_node*));
+		root->leaves = malloc(root->capacity * sizeof(jep_ast_node));
 	}
 
 	if(root->leaf_count == root->capacity)
@@ -49,7 +49,7 @@ void jep_add_leaf_node(jep_ast_node* root, jep_ast_node* leaf)
 	}
 	if(leaf != NULL)
 	{
-		root->leaves[root->leaf_count++] = leaf;
+		root->leaves[root->leaf_count++] = *leaf;
 	}
 }
 
@@ -67,7 +67,7 @@ void jep_print_ast(jep_ast_node root)
 		int i;
 		for(i = 0; i < root.leaf_count; i++)
 		{
-			jep_print_ast(*root.leaves[i]);
+			jep_print_ast(root.leaves[i]);
 		}
 		indent--;
 	}

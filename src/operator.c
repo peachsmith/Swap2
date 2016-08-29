@@ -118,8 +118,8 @@ jep_obj* jep_add(jep_ast_node node)
 	}
 	
 
-	l = jep_evaluate(*node.leaves[0]);
-	r = jep_evaluate(*node.leaves[1]);
+	l = jep_evaluate(node.leaves[0]);
+	r = jep_evaluate(node.leaves[1]);
 
 	if(l != NULL && r != NULL)
 	{
@@ -247,11 +247,11 @@ jep_obj* jep_sub(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(*node.leaves[0]);
+	l = jep_evaluate(node.leaves[0]);
 
 	if(node.leaf_count > 1)
 	{
-		r = jep_evaluate(*node.leaves[1]);
+		r = jep_evaluate(node.leaves[1]);
 	}
 
 	if(node.leaf_count == 1 && l != NULL)
@@ -412,8 +412,8 @@ jep_obj* jep_mul(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(*node.leaves[0]);
-	r = jep_evaluate(*node.leaves[1]);
+	l = jep_evaluate(node.leaves[0]);
+	r = jep_evaluate(node.leaves[1]);
 
 	if(l != NULL && r != NULL)
 	{
@@ -542,8 +542,8 @@ jep_obj* jep_div(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(*node.leaves[0]);
-	r = jep_evaluate(*node.leaves[1]);
+	l = jep_evaluate(node.leaves[0]);
+	r = jep_evaluate(node.leaves[1]);
 
 	if(l != NULL && r != NULL)
 	{
@@ -671,8 +671,8 @@ jep_obj* jep_less(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(*node.leaves[0]);
-	r = jep_evaluate(*node.leaves[1]);
+	l = jep_evaluate(node.leaves[0]);
+	r = jep_evaluate(node.leaves[1]);
 
 	if(l != NULL && r != NULL)
 	{
@@ -800,8 +800,8 @@ jep_obj* jep_greater(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(*node.leaves[0]);
-	r = jep_evaluate(*node.leaves[1]);
+	l = jep_evaluate(node.leaves[0]);
+	r = jep_evaluate(node.leaves[1]);
 
 	if(l != NULL && r != NULL)
 	{
@@ -929,8 +929,8 @@ jep_obj* jep_lorequal(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(*node.leaves[0]);
-	r = jep_evaluate(*node.leaves[1]);
+	l = jep_evaluate(node.leaves[0]);
+	r = jep_evaluate(node.leaves[1]);
 
 	if(l != NULL && r != NULL)
 	{
@@ -1058,8 +1058,8 @@ jep_obj* jep_gorequal(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(*node.leaves[0]);
-	r = jep_evaluate(*node.leaves[1]);
+	l = jep_evaluate(node.leaves[0]);
+	r = jep_evaluate(node.leaves[1]);
 
 	if(l != NULL && r != NULL)
 	{
@@ -1187,8 +1187,8 @@ jep_obj* jep_equiv(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(*node.leaves[0]);
-	r = jep_evaluate(*node.leaves[1]);
+	l = jep_evaluate(node.leaves[0]);
+	r = jep_evaluate(node.leaves[1]);
 
 	if(l != NULL && r != NULL)
 	{
@@ -1316,8 +1316,8 @@ jep_obj* jep_noteq(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(*node.leaves[0]);
-	r = jep_evaluate(*node.leaves[1]);
+	l = jep_evaluate(node.leaves[0]);
+	r = jep_evaluate(node.leaves[1]);
 
 	if(l != NULL && r != NULL)
 	{
@@ -1444,7 +1444,7 @@ jep_obj* jep_not(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(*node.leaves[0]);
+	l = jep_evaluate(node.leaves[0]);
 
 	if(l != NULL)
 	{
@@ -1505,8 +1505,8 @@ jep_obj* jep_and(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(*node.leaves[0]);
-	r = jep_evaluate(*node.leaves[1]);
+	l = jep_evaluate(node.leaves[0]);
+	r = jep_evaluate(node.leaves[1]);
 
 	if(l != NULL && r != NULL)
 	{
@@ -1634,8 +1634,8 @@ jep_obj* jep_or(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(*node.leaves[0]);
-	r = jep_evaluate(*node.leaves[1]);
+	l = jep_evaluate(node.leaves[0]);
+	r = jep_evaluate(node.leaves[1]);
 
 	if(l != NULL && r != NULL)
 	{
@@ -1763,8 +1763,8 @@ jep_obj* jep_bitand(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(*node.leaves[0]);
-	r = jep_evaluate(*node.leaves[1]);
+	l = jep_evaluate(node.leaves[0]);
+	r = jep_evaluate(node.leaves[1]);
 
 	if(l != NULL && r != NULL)
 	{
@@ -1859,8 +1859,8 @@ jep_obj* jep_bitor(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(*node.leaves[0]);
-	r = jep_evaluate(*node.leaves[1]);
+	l = jep_evaluate(node.leaves[0]);
+	r = jep_evaluate(node.leaves[1]);
 
 	if(l != NULL && r != NULL)
 	{
@@ -1955,8 +1955,8 @@ jep_obj* jep_bitxor(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(*node.leaves[0]);
-	r = jep_evaluate(*node.leaves[1]);
+	l = jep_evaluate(node.leaves[0]);
+	r = jep_evaluate(node.leaves[1]);
 
 	if(l != NULL && r != NULL)
 	{
@@ -2051,8 +2051,8 @@ jep_obj* jep_lshift(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(*node.leaves[0]);
-	r = jep_evaluate(*node.leaves[1]);
+	l = jep_evaluate(node.leaves[0]);
+	r = jep_evaluate(node.leaves[1]);
 
 	if(l != NULL && r != NULL)
 	{
@@ -2147,8 +2147,8 @@ jep_obj* jep_rshift(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(*node.leaves[0]);
-	r = jep_evaluate(*node.leaves[1]);
+	l = jep_evaluate(node.leaves[0]);
+	r = jep_evaluate(node.leaves[1]);
 
 	if(l != NULL && r != NULL)
 	{
@@ -2234,12 +2234,12 @@ jep_obj* jep_rshift(jep_ast_node node)
 /* evaluates the contents of a set of parentheses */
 jep_obj* jep_paren(jep_ast_node node)
 {
-	if(*node.leaves == NULL)
+	if(node.leaves == NULL)
 	{
 		return NULL;
 	}
 
-	jep_obj* o = jep_evaluate(*node.leaves[0]);
+	jep_obj* o = jep_evaluate(node.leaves[0]);
 
 	int i;
 	for(i = 1; i < node.leaf_count; i++)
@@ -2252,7 +2252,7 @@ jep_obj* jep_paren(jep_ast_node node)
 		{
 			free(o);
 		}
-		o = jep_evaluate(*node.leaves[i]);
+		o = jep_evaluate(node.leaves[i]);
 	}
 
 	return o;
@@ -2262,7 +2262,7 @@ jep_obj* jep_paren(jep_ast_node node)
 void jep_brace(jep_ast_node node)
 {
 	static int indent = 0;
-	if(*node.leaves == NULL)
+	if(node.leaves == NULL)
 	{
 		return;
 	}
@@ -2271,7 +2271,7 @@ void jep_brace(jep_ast_node node)
 	int i;
 	for(i = 0; i < node.leaf_count; i++)
 	{
-		jep_obj* o = jep_evaluate(*node.leaves[i]);
+		jep_obj* o = jep_evaluate(node.leaves[i]);
 		if(o != NULL)
 		{
 			printf("%*s", indent, "");

@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 			
 
 			/* destroy the AST */
-			jep_destroy_string_builder(root->token.value);
+			jep_destroy_string_builder(root->token.val);
 			if(root->leaves != NULL)
 			{
 				free(root->leaves);

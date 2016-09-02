@@ -9,7 +9,7 @@ typedef struct ASTNode
 {
 	jep_token token;
 	int leaf_count;
-	int capacity;
+	int cap;
 	struct ASTNode* leaves;
 	int error;
 }jep_ast_node;
@@ -18,7 +18,7 @@ typedef struct ASTNode
 typedef struct Stack
 {
 	int size;
-	int capacity;
+	int cap;
 	jep_ast_node* top;
 	jep_ast_node** nodes;
 }jep_stack;

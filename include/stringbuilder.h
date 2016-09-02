@@ -8,7 +8,7 @@ typedef struct StringBuilder
 {
 	char* buffer;
 	int size;
-	int capacity;
+	int cap;
 } jep_string_builder;
 
 /**

@@ -29,17 +29,17 @@ static void jep_err(int err, jep_token tok, jep_ast_node* root, char* val)
 	else if(err == ERR_IDENTIFIER)
 	{
 		printf("expected identifier at %d,%d but found %s\n", 
-			tok.row, tok.column, tok.value->buffer);
+			tok.row, tok.column, tok.val->buffer);
 	}
 	else if(err == ERR_UNEXPECTED)
 	{
 		printf("unexpected token '%s' at %d,%d\n",
-			tok.value->buffer, tok.row, tok.column);
+			tok.val->buffer, tok.row, tok.column);
 	}
 	else if(err == ERR_EXPECTED)
 	{
 		printf("expected '%s' at %d,%d but found '%s'\n", 
-			val, tok.row, tok.column, tok.value->buffer);
+			val, tok.row, tok.column, tok.val->buffer);
 	}
 }
 
@@ -612,7 +612,7 @@ jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node** nodes)
 	for(i = 0; i < ts->size; i++)
 	{
 		(*nodes)[i].leaf_count = 0;
-		(*nodes)[i].capacity = 10;
+		(*nodes)[i].cap = 10;
 		(*nodes)[i].leaves = NULL;
 		(*nodes)[i].token = ts->tok[i];
 	}
@@ -621,9 +621,9 @@ jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node** nodes)
 	root = NULL;
 	root = malloc(sizeof(jep_ast_node));
 	root->leaf_count = 0;
-	root->capacity = 10;
+	root->cap = 10;
 	root->leaves = NULL;
-	root->token.value = jep_create_string_builder();
+	root->token.val = jep_create_string_builder();
 	root->token.type = T_SYMBOL;
 	root->token.token_code = 0;
 	root->token.row = 0;
@@ -631,7 +631,7 @@ jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node** nodes)
 	root->token.unary = 0;
 	root->token.postfix = 0;
 	root->error = 0;
-	jep_append_string(root->token.value, "root");
+	jep_append_string(root->token.val, "root");
 
 	first = *nodes;
 
@@ -706,7 +706,7 @@ static void jep_attach(jep_stack* exp, jep_stack* opr, jep_ast_node* root, jep_a
 			}
 			else
 			{
-				jep_err(ERR_EXPRESSION, *cur, root, cur->value->buffer);
+				jep_err(ERR_EXPRESSION, *cur, root, cur->val->buffer);
 			}
 		}
 	}
@@ -751,7 +751,7 @@ static void jep_attach_all(jep_stack* exp, jep_stack* opr, jep_ast_node* root, j
 			}
 			else
 			{
-				jep_err(ERR_EXPRESSION, *cur, root, cur->value->buffer);
+				jep_err(ERR_EXPRESSION, *cur, root, cur->val->buffer);
 			}
 		}
 	}
@@ -771,12 +771,12 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 	jep_ast_node* ast;  /* the resulting AST */
 
 	exp.size = 0;
-	exp.capacity = 10;
+	exp.cap = 10;
 	exp.top = NULL;
 	exp.nodes = malloc(sizeof(jep_ast_node*) * 10);
 
 	opr.size = 0;
-	opr.capacity = 10;
+	opr.cap = 10;
 	opr.top = NULL;
 	opr.nodes = malloc(sizeof(jep_ast_node*) * 10);
 

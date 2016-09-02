@@ -79,23 +79,24 @@
  */
 typedef struct Token
 {
-	jep_string_builder *value;
-	int type;
-	int token_code;
-	int row;
-	int column;
-	int unary;
-	int postfix;
+	jep_string_builder *val; /* the text of the token               */
+	int type;                /* the type of token                   */
+	int token_code;          /* identifies symbols and keywords     */
+	int row;                 /* the row of the token in the file    */
+	int column;              /* the column of the token in the file */
+	int unary;               /* flag indicating a unary operator    */
+	int postfix;             /* flag indicating a postfix operator  */
 }jep_token;
 
 /**
- * a sequence of tokens
+ * a sequence of tokens. when the size reaches the capacity, the token
+ * buffer should be resized
  */
 typedef struct TokenStream
 {
-	jep_token* tok;
-	int size;
-	int capacity;
+	jep_token* tok; /* the tokens                           */
+	int size;       /* the amount of tokens in the stream   */
+	int cap;        /* the maximum amount of tokens allowed */
 }jep_token_stream;
 
 /**

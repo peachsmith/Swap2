@@ -1,33 +1,13 @@
 #include "ast.h"
 
 /**
- * increases the memory allocated for an AST node's leaf nodes by about 50% 
- */
-static void jep_resize_ast_node(jep_ast_node* node)
-{
-	int new_cap = node->capacity + node->capacity / 2;
-	jep_ast_node* new_leaves = malloc(new_cap * sizeof(jep_ast_node));
-
-	int i;
-	for(i = 0; i < node->leaf_count; i++)
-	{
-		new_leaves[i] = node->leaves[i];
-	}
-
-	free(node->leaves);
-
-	node->leaves = new_leaves;
-	node->capacity = new_cap;
-}
-
-/**
  * create an AST node
  */
 jep_ast_node* jep_create_ast_node()
 {
 	jep_ast_node* node = malloc(sizeof(jep_ast_node));
 	node->leaf_count = 0;
-	node->capacity = 10;
+	node->cap = 10;
 	node->leaves = NULL;
 	return node;
 }
@@ -40,12 +20,15 @@ void jep_add_leaf_node(jep_ast_node* root, jep_ast_node* leaf)
 
 	if(root->leaves == NULL)
 	{
-		root->leaves = malloc(root->capacity * sizeof(jep_ast_node));
+		root->leaves = malloc(root->cap * sizeof(jep_ast_node));
 	}
 
-	if(root->leaf_count == root->capacity)
+	if(root->leaf_count == root->cap)
 	{
-		jep_resize_ast_node(root);
+		int new_cap = root->cap + root->cap / 2;
+		int new_size = sizeof(jep_ast_node) * new_cap;
+		root->leaves = realloc(root->leaves, new_size);
+		root->cap = new_cap;
 	}
 	if(leaf != NULL)
 	{
@@ -62,7 +45,7 @@ void jep_print_ast(jep_ast_node root)
 
 	if(root.leaf_count > 0)
 	{
-		printf("%*s\n", indent, root.token.value->buffer);
+		printf("%*s\n", indent, root.token.val->buffer);
 		indent++;
 		int i;
 		for(i = 0; i < root.leaf_count; i++)
@@ -73,7 +56,7 @@ void jep_print_ast(jep_ast_node root)
 	}
 	else
 	{
-		printf("%*s\n", indent, root.token.value->buffer);
+		printf("%*s\n", indent, root.token.val->buffer);
 	}
 
 }
@@ -84,13 +67,13 @@ void jep_print_ast(jep_ast_node root)
 void jep_push(jep_stack* stack, jep_ast_node* node)
 {
 
-	if(stack->size == stack->capacity)
+	if(stack->size == stack->cap)
 	{
-		int new_cap = stack->capacity + stack->capacity / 2;
+		int new_cap = stack->cap + stack->cap / 2;
 		jep_ast_node** new_nodes = malloc(new_cap * sizeof(jep_ast_node*));
 
 		int i;
-		for(i = 0; i < stack->capacity; i++)
+		for(i = 0; i < stack->cap; i++)
 		{
 			new_nodes[i] = stack->nodes[i];
 		}
@@ -98,7 +81,7 @@ void jep_push(jep_stack* stack, jep_ast_node* node)
 		free(stack->nodes);
 
 		stack->nodes = new_nodes;
-		stack->capacity = new_cap;
+		stack->cap = new_cap;
 	}
 
 	stack->nodes[stack->size++] = node;

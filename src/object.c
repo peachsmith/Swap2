@@ -63,18 +63,18 @@ jep_obj* jep_number(const char* s)
 			*d_ptr = d;
 			val = (void*)d_ptr;
 			obj = malloc(sizeof(jep_obj));
-			obj->value = (void*)val;
+			obj->val = (void*)val;
 			obj->type = JEP_DOUBLE;
 		}
 	}
 	else if(l >= INT_MIN && l <= INT_MAX)
 	{
-		/* cast the value as an int if it will fit */
+		/* valcast the value as an int if it will fit */
 		int* l_ptr = malloc(sizeof(int));
 		*l_ptr = (int)l;
 		val = (void*)l_ptr;
 		obj = malloc(sizeof(jep_obj));
-		obj->value = (void*)val;
+		obj->val = (void*)val;
 		obj->type = JEP_INT;
 	}
 	else
@@ -83,7 +83,7 @@ jep_obj* jep_number(const char* s)
 		*l_ptr = l;
 		val = (void*)l_ptr;
 		obj = malloc(sizeof(jep_obj));
-		obj->value = (void*)val;
+		obj->val = (void*)val;
 		obj->type = JEP_LONG;
 	}
 
@@ -101,7 +101,7 @@ jep_obj* jep_character(const char* s)
 
 	if(s == NULL || s[0] == '\0')
 	{
-		obj->value = NULL;
+		obj->val = NULL;
 	}
 	else if(s[0] == '\\' && strlen(s) > 1)
 	{
@@ -161,7 +161,7 @@ jep_obj* jep_character(const char* s)
 
 		if(obj != NULL)
 		{
-			obj->value = (void*)c;
+			obj->val = (void*)c;
 		}
 	}
 	else if(strlen(s) > 1)
@@ -174,7 +174,7 @@ jep_obj* jep_character(const char* s)
 	else
 	{
 		*c = s[0];
-		obj->value = (void*)c;
+		obj->val = (void*)c;
 	}
 
 	return obj;
@@ -192,19 +192,19 @@ void jep_print_obj(jep_obj* obj)
 	{
 		if(obj->type == JEP_INT)
 		{
-			printf("int: %d\n", *((int*)(obj->value)));
+			printf("int: %d\n", *((int*)(obj->val)));
 		}
 		else if(obj->type == JEP_LONG)
 		{
-			printf("long: %ld\n", *((long*)(obj->value)));
+			printf("long: %ld\n", *((long*)(obj->val)));
 		}
 		else if(obj->type == JEP_DOUBLE)
 		{
-			printf("double: %.2lf\n", *((double*)(obj->value)));
+			printf("double: %.2lf\n", *((double*)(obj->val)));
 		}
 		else if(obj->type == JEP_CHARACTER)
 		{
-			printf("character: %c\n", *((char*)(obj->value)));
+			printf("character: %c\n", *((char*)(obj->val)));
 		}
 	}
 	else

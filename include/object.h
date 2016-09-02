@@ -15,7 +15,7 @@
 
 typedef struct Object
 {
-	void* value;
+	void* val;
 	int type;
 }jep_obj;
 

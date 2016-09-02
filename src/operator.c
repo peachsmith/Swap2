@@ -7,11 +7,11 @@ jep_obj* jep_evaluate(jep_ast_node ast)
 
 	if(ast.token.type == T_NUMBER)
 	{
-		return jep_number(ast.token.value->buffer);
+		return jep_number(ast.token.val->buffer);
 	}
 	else if(ast.token.type == T_CHARACTER)
 	{
-		return jep_character(ast.token.value->buffer);
+		return jep_character(ast.token.val->buffer);
 	}
 
 	switch(ast.token.token_code)
@@ -98,7 +98,7 @@ jep_obj* jep_evaluate(jep_ast_node ast)
 
 		default:
 			printf("unrecognized token: %s\n", 
-				ast.token.value->buffer);
+				ast.token.val->buffer);
 			break;
 	}
 
@@ -134,25 +134,25 @@ jep_obj* jep_add(jep_ast_node node)
 			if(l->type == JEP_INT)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(int*)(l->value)) + (*(int*)(r->value));
+				*n = (*(int*)(l->val)) + (*(int*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_LONG)
 			{
 				long *n = malloc(sizeof(int));
-				*n = (*(long*)(l->value)) + (*(long*)(r->value));
+				*n = (*(long*)(l->val)) + (*(long*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_LONG;
 			}
 			else if(l->type == JEP_DOUBLE)
 			{
 				double *n = malloc(sizeof(double));
-				*n = (*(double*)(l->value)) + (*(double*)(r->value));
+				*n = (*(double*)(l->val)) + (*(double*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_DOUBLE;
 			}
 		}
@@ -163,26 +163,26 @@ jep_obj* jep_add(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(double*)(l->value)) + (*(int*)(r->value));
+					*n = (*(double*)(l->val)) + (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(double*)(l->value)) + (*(long*)(r->value));
+					*n = (*(double*)(l->val)) + (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_DOUBLE)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) + (*(double*)(r->value));
+					*n = (*(int*)(l->val)) + (*(double*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) + (*(double*)(r->value));
+					*n = (*(long*)(l->val)) + (*(double*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_DOUBLE;
 		}
 		else if(l->type == JEP_LONG || r->type == JEP_LONG)
@@ -192,43 +192,43 @@ jep_obj* jep_add(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(long*)(l->value)) + (*(int*)(r->value));
+					*n = (*(long*)(l->val)) + (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) + (*(long*)(r->value));
+					*n = (*(long*)(l->val)) + (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_LONG)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) + (*(long*)(r->value));
+					*n = (*(int*)(l->val)) + (*(long*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) + (*(long*)(r->value));
+					*n = (*(long*)(l->val)) + (*(long*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_LONG;
 		}
 	}
 	else
 	{
-		printf("could not obtain both operand values\n");
+		printf("could not obtain both operand vals\n");
 	}
 
 	/* free the memory of the operands */
 	if(l != NULL)
 	{
-		free(l->value);
+		free(l->val);
 		free(l);
 	}
 	if(r != NULL)
 	{
-		free(r->value);
+		free(r->val);
 		free(r);
 	}
 
@@ -264,25 +264,25 @@ jep_obj* jep_sub(jep_ast_node node)
 		if(l->type == JEP_INT)
 		{
 			int *n = malloc(sizeof(int));
-			*n = 0 - (*(int*)(l->value));
+			*n = 0 - (*(int*)(l->val));
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 		else if(l->type == JEP_LONG)
 		{
 			long *n = malloc(sizeof(int));
-			*n = 0 - (*(long*)(l->value));
+			*n = 0 - (*(long*)(l->val));
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_LONG;
 		}
 		else if(l->type == JEP_DOUBLE)
 		{
 			double *n = malloc(sizeof(double));
-			*n = 0 - (*(double*)(l->value));
+			*n = 0 - (*(double*)(l->val));
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_DOUBLE;
 		}
 	}
@@ -299,25 +299,25 @@ jep_obj* jep_sub(jep_ast_node node)
 			if(l->type == JEP_INT)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(int*)(l->value)) - (*(int*)(r->value));
+				*n = (*(int*)(l->val)) - (*(int*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_LONG)
 			{
 				long *n = malloc(sizeof(int));
-				*n = (*(long*)(l->value)) - (*(long*)(r->value));
+				*n = (*(long*)(l->val)) - (*(long*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_LONG;
 			}
 			else if(l->type == JEP_DOUBLE)
 			{
 				double *n = malloc(sizeof(double));
-				*n = (*(double*)(l->value)) - (*(double*)(r->value));
+				*n = (*(double*)(l->val)) - (*(double*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_DOUBLE;
 			}
 		}
@@ -328,26 +328,26 @@ jep_obj* jep_sub(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(double*)(l->value)) - (*(int*)(r->value));
+					*n = (*(double*)(l->val)) - (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(double*)(l->value)) - (*(long*)(r->value));
+					*n = (*(double*)(l->val)) - (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_DOUBLE)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) - (*(double*)(r->value));
+					*n = (*(int*)(l->val)) - (*(double*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) - (*(double*)(r->value));
+					*n = (*(long*)(l->val)) - (*(double*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_DOUBLE;
 		}
 		else if(l->type == JEP_LONG || r->type == JEP_LONG)
@@ -357,43 +357,43 @@ jep_obj* jep_sub(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(long*)(l->value)) - (*(int*)(r->value));
+					*n = (*(long*)(l->val)) - (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) - (*(long*)(r->value));
+					*n = (*(long*)(l->val)) - (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_LONG)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) - (*(long*)(r->value));
+					*n = (*(int*)(l->val)) - (*(long*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) - (*(long*)(r->value));
+					*n = (*(long*)(l->val)) - (*(long*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_LONG;
 		}
 	}
 	else
 	{
-		printf("could not obtain both operand values\n");
+		printf("could not obtain both operand vals\n");
 	}
 
 	/* free the memory of the operands */
 	if(l != NULL)
 	{
-		free(l->value);
+		free(l->val);
 		free(l);
 	}
 	if(r != NULL)
 	{
-		free(r->value);
+		free(r->val);
 		free(r);
 	}
 
@@ -428,25 +428,25 @@ jep_obj* jep_mul(jep_ast_node node)
 			if(l->type == JEP_INT)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(int*)(l->value)) * (*(int*)(r->value));
+				*n = (*(int*)(l->val)) * (*(int*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_LONG)
 			{
 				long *n = malloc(sizeof(int));
-				*n = (*(long*)(l->value)) * (*(long*)(r->value));
+				*n = (*(long*)(l->val)) * (*(long*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_LONG;
 			}
 			else if(l->type == JEP_DOUBLE)
 			{
 				double *n = malloc(sizeof(double));
-				*n = (*(double*)(l->value)) * (*(double*)(r->value));
+				*n = (*(double*)(l->val)) * (*(double*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_DOUBLE;
 			}
 		}
@@ -457,26 +457,26 @@ jep_obj* jep_mul(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(double*)(l->value)) * (*(int*)(r->value));
+					*n = (*(double*)(l->val)) * (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(double*)(l->value)) * (*(long*)(r->value));
+					*n = (*(double*)(l->val)) * (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_DOUBLE)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) * (*(double*)(r->value));
+					*n = (*(int*)(l->val)) * (*(double*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) * (*(double*)(r->value));
+					*n = (*(long*)(l->val)) * (*(double*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_DOUBLE;
 		}
 		else if(l->type == JEP_LONG || r->type == JEP_LONG)
@@ -487,43 +487,43 @@ jep_obj* jep_mul(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(long*)(l->value)) * (*(int*)(r->value));
+					*n = (*(long*)(l->val)) * (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) * (*(long*)(r->value));
+					*n = (*(long*)(l->val)) * (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_LONG)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) * (*(long*)(r->value));
+					*n = (*(int*)(l->val)) * (*(long*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) * (*(long*)(r->value));
+					*n = (*(long*)(l->val)) * (*(long*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_LONG;
 		}
 	}
 	else
 	{
-		printf("could not obtain both operand values\n");
+		printf("could not obtain both operand vals\n");
 	}
 
 	/* free the memory of the operands */
 	if(l != NULL)
 	{
-		free(l->value);
+		free(l->val);
 		free(l);
 	}
 	if(r != NULL)
 	{
-		free(r->value);
+		free(r->val);
 		free(r);
 	}
 
@@ -558,25 +558,25 @@ jep_obj* jep_div(jep_ast_node node)
 			if(l->type == JEP_INT)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(int*)(l->value)) / (*(int*)(r->value));
+				*n = (*(int*)(l->val)) / (*(int*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_LONG)
 			{
 				long *n = malloc(sizeof(int));
-				*n = (*(long*)(l->value)) / (*(long*)(r->value));
+				*n = (*(long*)(l->val)) / (*(long*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_LONG;
 			}
 			else if(l->type == JEP_DOUBLE)
 			{
 				double *n = malloc(sizeof(double));
-				*n = (*(double*)(l->value)) / (*(double*)(r->value));
+				*n = (*(double*)(l->val)) / (*(double*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_DOUBLE;
 			}
 		}
@@ -587,26 +587,26 @@ jep_obj* jep_div(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(double*)(l->value)) / (*(int*)(r->value));
+					*n = (*(double*)(l->val)) / (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(double*)(l->value)) / (*(long*)(r->value));
+					*n = (*(double*)(l->val)) / (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_DOUBLE)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) / (*(double*)(r->value));
+					*n = (*(int*)(l->val)) / (*(double*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) / (*(double*)(r->value));
+					*n = (*(long*)(l->val)) / (*(double*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_DOUBLE;
 		}
 		else if(l->type == JEP_LONG || r->type == JEP_LONG)
@@ -616,43 +616,43 @@ jep_obj* jep_div(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(long*)(l->value)) / (*(int*)(r->value));
+					*n = (*(long*)(l->val)) / (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) / (*(long*)(r->value));
+					*n = (*(long*)(l->val)) / (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_LONG)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) / (*(long*)(r->value));
+					*n = (*(int*)(l->val)) / (*(long*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) / (*(long*)(r->value));
+					*n = (*(long*)(l->val)) / (*(long*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_LONG;
 		}
 	}
 	else
 	{
-		printf("could not obtain both operand values\n");
+		printf("could not obtain both operand vals\n");
 	}
 
 	/* free the memory of the operands */
 	if(l != NULL)
 	{
-		free(l->value);
+		free(l->val);
 		free(l);
 	}
 	if(r != NULL)
 	{
-		free(r->value);
+		free(r->val);
 		free(r);
 	}
 
@@ -687,25 +687,25 @@ jep_obj* jep_less(jep_ast_node node)
 			if(l->type == JEP_INT)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(int*)(l->value)) < (*(int*)(r->value));
+				*n = (*(int*)(l->val)) < (*(int*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_LONG)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(long*)(l->value)) < (*(long*)(r->value));
+				*n = (*(long*)(l->val)) < (*(long*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_DOUBLE)
 			{
 				int *n = malloc(sizeof(double));
-				*n = (*(double*)(l->value)) < (*(double*)(r->value));
+				*n = (*(double*)(l->val)) < (*(double*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 		}
@@ -716,26 +716,26 @@ jep_obj* jep_less(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(double*)(l->value)) < (*(int*)(r->value));
+					*n = (*(double*)(l->val)) < (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(double*)(l->value)) < (*(long*)(r->value));
+					*n = (*(double*)(l->val)) < (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_DOUBLE)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) < (*(double*)(r->value));
+					*n = (*(int*)(l->val)) < (*(double*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) < (*(double*)(r->value));
+					*n = (*(long*)(l->val)) < (*(double*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 		else if(l->type == JEP_LONG || r->type == JEP_LONG)
@@ -745,43 +745,43 @@ jep_obj* jep_less(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(long*)(l->value)) < (*(int*)(r->value));
+					*n = (*(long*)(l->val)) < (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) < (*(long*)(r->value));
+					*n = (*(long*)(l->val)) < (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_LONG)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) < (*(long*)(r->value));
+					*n = (*(int*)(l->val)) < (*(long*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) < (*(long*)(r->value));
+					*n = (*(long*)(l->val)) < (*(long*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 	}
 	else
 	{
-		printf("could not obtain both operand values\n");
+		printf("could not obtain both operand vals\n");
 	}
 
 	/* free the memory of the operands */
 	if(l != NULL)
 	{
-		free(l->value);
+		free(l->val);
 		free(l);
 	}
 	if(r != NULL)
 	{
-		free(r->value);
+		free(r->val);
 		free(r);
 	}
 
@@ -816,25 +816,25 @@ jep_obj* jep_greater(jep_ast_node node)
 			if(l->type == JEP_INT)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(int*)(l->value)) > (*(int*)(r->value));
+				*n = (*(int*)(l->val)) > (*(int*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_LONG)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(long*)(l->value)) > (*(long*)(r->value));
+				*n = (*(long*)(l->val)) > (*(long*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_DOUBLE)
 			{
 				int *n = malloc(sizeof(double));
-				*n = (*(double*)(l->value)) > (*(double*)(r->value));
+				*n = (*(double*)(l->val)) > (*(double*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 		}
@@ -845,26 +845,26 @@ jep_obj* jep_greater(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(double*)(l->value)) > (*(int*)(r->value));
+					*n = (*(double*)(l->val)) > (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(double*)(l->value)) > (*(long*)(r->value));
+					*n = (*(double*)(l->val)) > (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_DOUBLE)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) > (*(double*)(r->value));
+					*n = (*(int*)(l->val)) > (*(double*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) > (*(double*)(r->value));
+					*n = (*(long*)(l->val)) > (*(double*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 		else if(l->type == JEP_LONG || r->type == JEP_LONG)
@@ -874,43 +874,43 @@ jep_obj* jep_greater(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(long*)(l->value)) > (*(int*)(r->value));
+					*n = (*(long*)(l->val)) > (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) > (*(long*)(r->value));
+					*n = (*(long*)(l->val)) > (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_LONG)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) > (*(long*)(r->value));
+					*n = (*(int*)(l->val)) > (*(long*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) > (*(long*)(r->value));
+					*n = (*(long*)(l->val)) > (*(long*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 	}
 	else
 	{
-		printf("could not obtain both operand values\n");
+		printf("could not obtain both operand vals\n");
 	}
 
 	/* free the memory of the operands */
 	if(l != NULL)
 	{
-		free(l->value);
+		free(l->val);
 		free(l);
 	}
 	if(r != NULL)
 	{
-		free(r->value);
+		free(r->val);
 		free(r);
 	}
 
@@ -945,25 +945,25 @@ jep_obj* jep_lorequal(jep_ast_node node)
 			if(l->type == JEP_INT)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(int*)(l->value)) <= (*(int*)(r->value));
+				*n = (*(int*)(l->val)) <= (*(int*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_LONG)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(long*)(l->value)) <= (*(long*)(r->value));
+				*n = (*(long*)(l->val)) <= (*(long*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_DOUBLE)
 			{
 				int *n = malloc(sizeof(double));
-				*n = (*(double*)(l->value)) <= (*(double*)(r->value));
+				*n = (*(double*)(l->val)) <= (*(double*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 		}
@@ -974,26 +974,26 @@ jep_obj* jep_lorequal(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(double*)(l->value)) <= (*(int*)(r->value));
+					*n = (*(double*)(l->val)) <= (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(double*)(l->value)) <= (*(long*)(r->value));
+					*n = (*(double*)(l->val)) <= (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_DOUBLE)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) <= (*(double*)(r->value));
+					*n = (*(int*)(l->val)) <= (*(double*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) <= (*(double*)(r->value));
+					*n = (*(long*)(l->val)) <= (*(double*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 		else if(l->type == JEP_LONG || r->type == JEP_LONG)
@@ -1003,43 +1003,43 @@ jep_obj* jep_lorequal(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(long*)(l->value)) <= (*(int*)(r->value));
+					*n = (*(long*)(l->val)) <= (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) <= (*(long*)(r->value));
+					*n = (*(long*)(l->val)) <= (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_LONG)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) <= (*(long*)(r->value));
+					*n = (*(int*)(l->val)) <= (*(long*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) <= (*(long*)(r->value));
+					*n = (*(long*)(l->val)) <= (*(long*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 	}
 	else
 	{
-		printf("could not obtain both operand values\n");
+		printf("could not obtain both operand vals\n");
 	}
 
 	/* free the memory of the operands */
 	if(l != NULL)
 	{
-		free(l->value);
+		free(l->val);
 		free(l);
 	}
 	if(r != NULL)
 	{
-		free(r->value);
+		free(r->val);
 		free(r);
 	}
 
@@ -1074,25 +1074,25 @@ jep_obj* jep_gorequal(jep_ast_node node)
 			if(l->type == JEP_INT)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(int*)(l->value)) >= (*(int*)(r->value));
+				*n = (*(int*)(l->val)) >= (*(int*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_LONG)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(long*)(l->value)) >= (*(long*)(r->value));
+				*n = (*(long*)(l->val)) >= (*(long*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_DOUBLE)
 			{
 				int *n = malloc(sizeof(double));
-				*n = (*(double*)(l->value)) >= (*(double*)(r->value));
+				*n = (*(double*)(l->val)) >= (*(double*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 		}
@@ -1103,26 +1103,26 @@ jep_obj* jep_gorequal(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(double*)(l->value)) >= (*(int*)(r->value));
+					*n = (*(double*)(l->val)) >= (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(double*)(l->value)) >= (*(long*)(r->value));
+					*n = (*(double*)(l->val)) >= (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_DOUBLE)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) >= (*(double*)(r->value));
+					*n = (*(int*)(l->val)) >= (*(double*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) >= (*(double*)(r->value));
+					*n = (*(long*)(l->val)) >= (*(double*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 		else if(l->type == JEP_LONG || r->type == JEP_LONG)
@@ -1132,43 +1132,43 @@ jep_obj* jep_gorequal(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(long*)(l->value)) >= (*(int*)(r->value));
+					*n = (*(long*)(l->val)) >= (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) >= (*(long*)(r->value));
+					*n = (*(long*)(l->val)) >= (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_LONG)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) >= (*(long*)(r->value));
+					*n = (*(int*)(l->val)) >= (*(long*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) >= (*(long*)(r->value));
+					*n = (*(long*)(l->val)) >= (*(long*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 	}
 	else
 	{
-		printf("could not obtain both operand values\n");
+		printf("could not obtain both operand vals\n");
 	}
 
 	/* free the memory of the operands */
 	if(l != NULL)
 	{
-		free(l->value);
+		free(l->val);
 		free(l);
 	}
 	if(r != NULL)
 	{
-		free(r->value);
+		free(r->val);
 		free(r);
 	}
 
@@ -1203,25 +1203,25 @@ jep_obj* jep_equiv(jep_ast_node node)
 			if(l->type == JEP_INT)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(int*)(l->value)) == (*(int*)(r->value));
+				*n = (*(int*)(l->val)) == (*(int*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_LONG)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(long*)(l->value)) == (*(long*)(r->value));
+				*n = (*(long*)(l->val)) == (*(long*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_DOUBLE)
 			{
 				int *n = malloc(sizeof(double));
-				*n = (*(double*)(l->value)) == (*(double*)(r->value));
+				*n = (*(double*)(l->val)) == (*(double*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 		}
@@ -1232,26 +1232,26 @@ jep_obj* jep_equiv(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(double*)(l->value)) == (*(int*)(r->value));
+					*n = (*(double*)(l->val)) == (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(double*)(l->value)) == (*(long*)(r->value));
+					*n = (*(double*)(l->val)) == (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_DOUBLE)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) == (*(double*)(r->value));
+					*n = (*(int*)(l->val)) == (*(double*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) == (*(double*)(r->value));
+					*n = (*(long*)(l->val)) == (*(double*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 		else if(l->type == JEP_LONG || r->type == JEP_LONG)
@@ -1261,43 +1261,43 @@ jep_obj* jep_equiv(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(long*)(l->value)) == (*(int*)(r->value));
+					*n = (*(long*)(l->val)) == (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) == (*(long*)(r->value));
+					*n = (*(long*)(l->val)) == (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_LONG)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) == (*(long*)(r->value));
+					*n = (*(int*)(l->val)) == (*(long*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) == (*(long*)(r->value));
+					*n = (*(long*)(l->val)) == (*(long*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 	}
 	else
 	{
-		printf("could not obtain both operand values\n");
+		printf("could not obtain both operand vals\n");
 	}
 
 	/* free the memory of the operands */
 	if(l != NULL)
 	{
-		free(l->value);
+		free(l->val);
 		free(l);
 	}
 	if(r != NULL)
 	{
-		free(r->value);
+		free(r->val);
 		free(r);
 	}
 
@@ -1332,25 +1332,25 @@ jep_obj* jep_noteq(jep_ast_node node)
 			if(l->type == JEP_INT)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(int*)(l->value)) != (*(int*)(r->value));
+				*n = (*(int*)(l->val)) != (*(int*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_LONG)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(long*)(l->value)) != (*(long*)(r->value));
+				*n = (*(long*)(l->val)) != (*(long*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_DOUBLE)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(double*)(l->value)) != (*(double*)(r->value));
+				*n = (*(double*)(l->val)) != (*(double*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 		}
@@ -1361,26 +1361,26 @@ jep_obj* jep_noteq(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(double*)(l->value)) != (*(int*)(r->value));
+					*n = (*(double*)(l->val)) != (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(double*)(l->value)) != (*(long*)(r->value));
+					*n = (*(double*)(l->val)) != (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_DOUBLE)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) != (*(double*)(r->value));
+					*n = (*(int*)(l->val)) != (*(double*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) != (*(double*)(r->value));
+					*n = (*(long*)(l->val)) != (*(double*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 		else if(l->type == JEP_LONG || r->type != JEP_LONG)
@@ -1390,43 +1390,43 @@ jep_obj* jep_noteq(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(long*)(l->value)) != (*(int*)(r->value));
+					*n = (*(long*)(l->val)) != (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) != (*(long*)(r->value));
+					*n = (*(long*)(l->val)) != (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_LONG)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) != (*(long*)(r->value));
+					*n = (*(int*)(l->val)) != (*(long*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) != (*(long*)(r->value));
+					*n = (*(long*)(l->val)) != (*(long*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 	}
 	else
 	{
-		printf("could not obtain both operand values\n");
+		printf("could not obtain both operand vals\n");
 	}
 
 	/* free the memory of the operands */
 	if(l != NULL)
 	{
-		free(l->value);
+		free(l->val);
 		free(l);
 	}
 	if(r != NULL)
 	{
-		free(r->value);
+		free(r->val);
 		free(r);
 	}
 
@@ -1456,37 +1456,37 @@ jep_obj* jep_not(jep_ast_node node)
 		if(l->type == JEP_INT)
 		{
 			int *n = malloc(sizeof(int));
-			*n = !(*(int*)(l->value));
+			*n = !(*(int*)(l->val));
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 		else if(l->type == JEP_LONG)
 		{
 			int *n = malloc(sizeof(int));
-			*n = !(*(long*)(l->value));
+			*n = !(*(long*)(l->val));
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 		else if(l->type == JEP_DOUBLE)
 		{
 			int *n = malloc(sizeof(int));
-			*n = !(*(double*)(l->value));
+			*n = !(*(double*)(l->val));
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 	}
 	else
 	{
-		printf("could not obtain operand value\n");
+		printf("could not obtain operand val\n");
 	}
 
 	/* free the memory of the operands */
 	if(l != NULL)
 	{
-		free(l->value);
+		free(l->val);
 		free(l);
 	}
 
@@ -1521,25 +1521,25 @@ jep_obj* jep_and(jep_ast_node node)
 			if(l->type == JEP_INT)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(int*)(l->value)) && (*(int*)(r->value));
+				*n = (*(int*)(l->val)) && (*(int*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_LONG)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(long*)(l->value)) && (*(long*)(r->value));
+				*n = (*(long*)(l->val)) && (*(long*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_DOUBLE)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(double*)(l->value)) && (*(double*)(r->value));
+				*n = (*(double*)(l->val)) && (*(double*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 		}
@@ -1550,26 +1550,26 @@ jep_obj* jep_and(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(double*)(l->value)) && (*(int*)(r->value));
+					*n = (*(double*)(l->val)) && (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(double*)(l->value)) && (*(long*)(r->value));
+					*n = (*(double*)(l->val)) && (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_DOUBLE)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) && (*(double*)(r->value));
+					*n = (*(int*)(l->val)) && (*(double*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) && (*(double*)(r->value));
+					*n = (*(long*)(l->val)) && (*(double*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 		else if(l->type == JEP_LONG || r->type != JEP_LONG)
@@ -1579,43 +1579,43 @@ jep_obj* jep_and(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(long*)(l->value)) && (*(int*)(r->value));
+					*n = (*(long*)(l->val)) && (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) && (*(long*)(r->value));
+					*n = (*(long*)(l->val)) && (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_LONG)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) && (*(long*)(r->value));
+					*n = (*(int*)(l->val)) && (*(long*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) && (*(long*)(r->value));
+					*n = (*(long*)(l->val)) && (*(long*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 	}
 	else
 	{
-		printf("could not obtain both operand values\n");
+		printf("could not obtain both operand vals\n");
 	}
 
 	/* free the memory of the operands */
 	if(l != NULL)
 	{
-		free(l->value);
+		free(l->val);
 		free(l);
 	}
 	if(r != NULL)
 	{
-		free(r->value);
+		free(r->val);
 		free(r);
 	}
 
@@ -1650,25 +1650,25 @@ jep_obj* jep_or(jep_ast_node node)
 			if(l->type == JEP_INT)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(int*)(l->value)) || (*(int*)(r->value));
+				*n = (*(int*)(l->val)) || (*(int*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_LONG)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(long*)(l->value)) || (*(long*)(r->value));
+				*n = (*(long*)(l->val)) || (*(long*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_DOUBLE)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(double*)(l->value)) || (*(double*)(r->value));
+				*n = (*(double*)(l->val)) || (*(double*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 		}
@@ -1679,26 +1679,26 @@ jep_obj* jep_or(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(double*)(l->value)) || (*(int*)(r->value));
+					*n = (*(double*)(l->val)) || (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(double*)(l->value)) || (*(long*)(r->value));
+					*n = (*(double*)(l->val)) || (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_DOUBLE)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) || (*(double*)(r->value));
+					*n = (*(int*)(l->val)) || (*(double*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) || (*(double*)(r->value));
+					*n = (*(long*)(l->val)) || (*(double*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 		else if(l->type == JEP_LONG || r->type != JEP_LONG)
@@ -1708,43 +1708,43 @@ jep_obj* jep_or(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(long*)(l->value)) || (*(int*)(r->value));
+					*n = (*(long*)(l->val)) || (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) || (*(long*)(r->value));
+					*n = (*(long*)(l->val)) || (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_LONG)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) || (*(long*)(r->value));
+					*n = (*(int*)(l->val)) || (*(long*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) || (*(long*)(r->value));
+					*n = (*(long*)(l->val)) || (*(long*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 	}
 	else
 	{
-		printf("could not obtain both operand values\n");
+		printf("could not obtain both operand vals\n");
 	}
 
 	/* free the memory of the operands */
 	if(l != NULL)
 	{
-		free(l->value);
+		free(l->val);
 		free(l);
 	}
 	if(r != NULL)
 	{
-		free(r->value);
+		free(r->val);
 		free(r);
 	}
 
@@ -1779,17 +1779,17 @@ jep_obj* jep_bitand(jep_ast_node node)
 			if(l->type == JEP_INT)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(int*)(l->value)) & (*(int*)(r->value));
+				*n = (*(int*)(l->val)) & (*(int*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_LONG)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(long*)(l->value)) & (*(long*)(r->value));
+				*n = (*(long*)(l->val)) & (*(long*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 		}
@@ -1804,43 +1804,43 @@ jep_obj* jep_bitand(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(long*)(l->value)) & (*(int*)(r->value));
+					*n = (*(long*)(l->val)) & (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) & (*(long*)(r->value));
+					*n = (*(long*)(l->val)) & (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_LONG)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) & (*(long*)(r->value));
+					*n = (*(int*)(l->val)) & (*(long*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) & (*(long*)(r->value));
+					*n = (*(long*)(l->val)) & (*(long*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 	}
 	else
 	{
-		printf("could not obtain both operand values\n");
+		printf("could not obtain both operand vals\n");
 	}
 
 	/* free the memory of the operands */
 	if(l != NULL)
 	{
-		free(l->value);
+		free(l->val);
 		free(l);
 	}
 	if(r != NULL)
 	{
-		free(r->value);
+		free(r->val);
 		free(r);
 	}
 
@@ -1875,17 +1875,17 @@ jep_obj* jep_bitor(jep_ast_node node)
 			if(l->type == JEP_INT)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(int*)(l->value)) | (*(int*)(r->value));
+				*n = (*(int*)(l->val)) | (*(int*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_LONG)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(long*)(l->value)) | (*(long*)(r->value));
+				*n = (*(long*)(l->val)) | (*(long*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 		}
@@ -1900,43 +1900,43 @@ jep_obj* jep_bitor(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(long*)(l->value)) | (*(int*)(r->value));
+					*n = (*(long*)(l->val)) | (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) | (*(long*)(r->value));
+					*n = (*(long*)(l->val)) | (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_LONG)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) | (*(long*)(r->value));
+					*n = (*(int*)(l->val)) | (*(long*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) | (*(long*)(r->value));
+					*n = (*(long*)(l->val)) | (*(long*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 	}
 	else
 	{
-		printf("could not obtain both operand values\n");
+		printf("could not obtain both operand vals\n");
 	}
 
 	/* free the memory of the operands */
 	if(l != NULL)
 	{
-		free(l->value);
+		free(l->val);
 		free(l);
 	}
 	if(r != NULL)
 	{
-		free(r->value);
+		free(r->val);
 		free(r);
 	}
 
@@ -1971,17 +1971,17 @@ jep_obj* jep_bitxor(jep_ast_node node)
 			if(l->type == JEP_INT)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(int*)(l->value)) ^ (*(int*)(r->value));
+				*n = (*(int*)(l->val)) ^ (*(int*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_LONG)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(long*)(l->value)) ^ (*(long*)(r->value));
+				*n = (*(long*)(l->val)) ^ (*(long*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 		}
@@ -1996,43 +1996,43 @@ jep_obj* jep_bitxor(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(long*)(l->value)) ^ (*(int*)(r->value));
+					*n = (*(long*)(l->val)) ^ (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) ^ (*(long*)(r->value));
+					*n = (*(long*)(l->val)) ^ (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_LONG)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) ^ (*(long*)(r->value));
+					*n = (*(int*)(l->val)) ^ (*(long*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) ^ (*(long*)(r->value));
+					*n = (*(long*)(l->val)) ^ (*(long*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 	}
 	else
 	{
-		printf("could not obtain both operand values\n");
+		printf("could not obtain both operand vals\n");
 	}
 
 	/* free the memory of the operands */
 	if(l != NULL)
 	{
-		free(l->value);
+		free(l->val);
 		free(l);
 	}
 	if(r != NULL)
 	{
-		free(r->value);
+		free(r->val);
 		free(r);
 	}
 
@@ -2067,17 +2067,17 @@ jep_obj* jep_lshift(jep_ast_node node)
 			if(l->type == JEP_INT)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(int*)(l->value)) << (*(int*)(r->value));
+				*n = (*(int*)(l->val)) << (*(int*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_LONG)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(long*)(l->value)) << (*(long*)(r->value));
+				*n = (*(long*)(l->val)) << (*(long*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 		}
@@ -2092,43 +2092,43 @@ jep_obj* jep_lshift(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(long*)(l->value)) << (*(int*)(r->value));
+					*n = (*(long*)(l->val)) << (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) << (*(long*)(r->value));
+					*n = (*(long*)(l->val)) << (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_LONG)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) << (*(long*)(r->value));
+					*n = (*(int*)(l->val)) << (*(long*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) << (*(long*)(r->value));
+					*n = (*(long*)(l->val)) << (*(long*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 	}
 	else
 	{
-		printf("could not obtain both operand values\n");
+		printf("could not obtain both operand vals\n");
 	}
 
 	/* free the memory of the operands */
 	if(l != NULL)
 	{
-		free(l->value);
+		free(l->val);
 		free(l);
 	}
 	if(r != NULL)
 	{
-		free(r->value);
+		free(r->val);
 		free(r);
 	}
 
@@ -2163,17 +2163,17 @@ jep_obj* jep_rshift(jep_ast_node node)
 			if(l->type == JEP_INT)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(int*)(l->value)) >> (*(int*)(r->value));
+				*n = (*(int*)(l->val)) >> (*(int*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 			else if(l->type == JEP_LONG)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(long*)(l->value)) >> (*(long*)(r->value));
+				*n = (*(long*)(l->val)) >> (*(long*)(r->val));
 				result = malloc(sizeof(jep_obj));
-				result->value = (void*)n;
+				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
 		}
@@ -2188,43 +2188,43 @@ jep_obj* jep_rshift(jep_ast_node node)
 			{
 				if(r->type == JEP_INT)
 				{
-					*n = (*(long*)(l->value)) >> (*(int*)(r->value));
+					*n = (*(long*)(l->val)) >> (*(int*)(r->val));
 				}
 				else if(r->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) >> (*(long*)(r->value));
+					*n = (*(long*)(l->val)) >> (*(long*)(r->val));
 				}
 			}
 			else if(r->type == JEP_LONG)
 			{
 				if(l->type == JEP_INT)
 				{
-					*n = (*(int*)(l->value)) >> (*(long*)(r->value));
+					*n = (*(int*)(l->val)) >> (*(long*)(r->val));
 				}
 				else if(l->type == JEP_LONG)
 				{
-					*n = (*(long*)(l->value)) >> (*(long*)(r->value));
+					*n = (*(long*)(l->val)) >> (*(long*)(r->val));
 				}
 			}
 			result = malloc(sizeof(jep_obj));
-			result->value = (void*)n;
+			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
 	}
 	else
 	{
-		printf("could not obtain both operand values\n");
+		printf("could not obtain both operand vals\n");
 	}
 
 	/* free the memory of the operands */
 	if(l != NULL)
 	{
-		free(l->value);
+		free(l->val);
 		free(l);
 	}
 	if(r != NULL)
 	{
-		free(r->value);
+		free(r->val);
 		free(r);
 	}
 
@@ -2244,9 +2244,9 @@ jep_obj* jep_paren(jep_ast_node node)
 	int i;
 	for(i = 1; i < node.leaf_count; i++)
 	{
-		if(o->value != NULL)
+		if(o->val != NULL)
 		{
-			free(o->value);
+			free(o->val);
 		}
 		if(o != NULL)
 		{
@@ -2276,7 +2276,7 @@ void jep_brace(jep_ast_node node)
 		{
 			printf("%*s", indent, "");
 			jep_print_obj(o);
-			free(o->value);
+			free(o->val);
 			free(o);
 		}
 	}

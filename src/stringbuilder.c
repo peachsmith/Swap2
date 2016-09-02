@@ -1,36 +1,14 @@
 #include "stringbuilder.h"
 
 /**
- * increases a StringBuilder's capacity by approximately 50 percent
- */
-static void jep_resize_string_builder(jep_string_builder* sb)
-{
-	int new_capacity;
-	char* new_buffer;
-	int i;
-
-	new_capacity = sb->capacity + sb->capacity / 2;
-	new_buffer = malloc(new_capacity);
-
-	for(i = 0; i < sb->size; i++)
-	{
-		new_buffer[i] = sb->buffer[i];
-	}
-
-	free(sb->buffer);
-	sb->buffer = new_buffer;
-	sb->capacity = new_capacity;
-}
-
-/**
  * allocates memory for a StringBuilder
  */
 jep_string_builder* jep_create_string_builder()
 {
 	jep_string_builder* sb = malloc(sizeof(jep_string_builder));
 	sb->size = 0;
-	sb->capacity = 50;
-	sb->buffer = malloc(sb->capacity);
+	sb->cap = 50;
+	sb->buffer = malloc(sb->cap);
 	sb->buffer[0] = '\0';
 	return sb;
 }
@@ -50,8 +28,8 @@ void jep_destroy_string_builder(jep_string_builder* sb)
 void jep_init_string_builder(jep_string_builder* sb)
 {
 	sb->size = 0;
-	sb->capacity = 50;
-	sb->buffer = malloc(sb->capacity);
+	sb->cap = 50;
+	sb->buffer = malloc(sb->cap);
 	sb->buffer[0] = '\0';
 }
 
@@ -60,9 +38,11 @@ void jep_init_string_builder(jep_string_builder* sb)
  */
 void jep_append_char(jep_string_builder* sb, char c)
 {
-	if(sb->size >= sb->capacity - 1)
+	if(sb->size >= sb->cap - 1)
 	{
-		jep_resize_string_builder(sb);
+		int new_cap = sb->cap + sb->cap / 2;
+		sb->buffer = realloc(sb->buffer, new_cap);
+		sb->cap = new_cap;
 	}
 
 	sb->buffer[sb->size++] = c;
@@ -74,12 +54,9 @@ void jep_append_char(jep_string_builder* sb, char c)
  */
 void jep_append_string(jep_string_builder* sb, const char* str)
 {
-	int  i;
-	i = 0;
+	int i = 0;
 	while(str[i] != '\0')
-	{
 		jep_append_char(sb, str[i++]);
-	}
 }
 
 /**

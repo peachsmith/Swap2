@@ -2,27 +2,82 @@
 #include "parser.h"
 #include "operator.h"
 
+/* command line flag indices */
+#define JEP_TOKEN 0
+#define JEP_AST 1
+
+#define MAX_FLAGS 2
+
+const char *flags[] = 
+{
+	"-t", /* print tokens */
+	"-a"  /* print ast    */ 
+};
+
+int jep_check_flag(const char* arg)
+{
+	int i;
+	for(i = 0; i < 2; i++)
+	{
+		if(!strcmp(arg, flags[i]))
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
 int main(int argc, char** argv)
 {
 	jep_token_stream* ts = NULL;
 	jep_ast_node* nodes = NULL;
 	jep_ast_node* root = NULL;
-	
-	if(argc > 1)
+	int flags[MAX_FLAGS] = { 0, 0 };
+	int i;
+	char* file_name = NULL;
+
+	for(i = 1; i < argc; i++)
 	{
-		ts = jep_tokenize_file(argv[1]);
+		int f = jep_check_flag(argv[i]);
+		if(f == -1)
+		{
+			if(file_name == NULL)
+			{
+				file_name = argv[i];
+			}
+		}
+		else
+		{
+			if(!flags[f])
+			{
+				flags[f] = 1;
+			}
+			else
+			{
+				printf("unexpected flag: %s\n", argv[i]);
+				return 1;
+			}
+		}
+	}
+
+	if(file_name != NULL)
+	{
+		ts = jep_tokenize_file(file_name);
 	}
 	
 	if(ts != NULL)
 	{
-
-		// jep_print_tokens(ts, stdout);
+		if(flags[JEP_TOKEN])
+		{
+			jep_print_tokens(ts, stdout);	
+		}
+		
 		root = jep_parse(ts, &nodes);
 
 		if(root != NULL)
 		{
-			/* print the AST */
-			if(!root->error)
+			/* print the AST if the -a flag was passed in */
+			if(!root->error && flags[JEP_AST])
 			{
 				jep_print_ast(*root);
 			}
@@ -55,7 +110,6 @@ int main(int argc, char** argv)
 		if(nodes != NULL)
 		{
 			/* destroy all of the individual nodes */
-			int i;
 			for(i = 0; i < ts->size; i++)
 			{
 				if(nodes[i].leaves != NULL)

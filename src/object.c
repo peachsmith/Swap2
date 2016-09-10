@@ -21,6 +21,18 @@ static int jep_is_escape(char c)
 	return -1;
 }
 
+static jep_obj* jep_create_object()
+{
+	jep_obj* o = malloc(sizeof(jep_obj));
+	
+	o->val = NULL;
+	o->type = 0;
+	o->prev = NULL;
+	o->next = NULL;
+
+	return o;
+}
+
 jep_obj* jep_number(const char* s)
 {
 	char* endptr;
@@ -62,7 +74,7 @@ jep_obj* jep_number(const char* s)
 			double* d_ptr = malloc(sizeof(double));
 			*d_ptr = d;
 			val = (void*)d_ptr;
-			obj = malloc(sizeof(jep_obj));
+			obj = jep_create_object();
 			obj->val = (void*)val;
 			obj->type = JEP_DOUBLE;
 		}
@@ -73,7 +85,7 @@ jep_obj* jep_number(const char* s)
 		int* l_ptr = malloc(sizeof(int));
 		*l_ptr = (int)l;
 		val = (void*)l_ptr;
-		obj = malloc(sizeof(jep_obj));
+		obj = jep_create_object();
 		obj->val = (void*)val;
 		obj->type = JEP_INT;
 	}
@@ -82,7 +94,7 @@ jep_obj* jep_number(const char* s)
 		long int* l_ptr = malloc(sizeof(long int));
 		*l_ptr = l;
 		val = (void*)l_ptr;
-		obj = malloc(sizeof(jep_obj));
+		obj = jep_create_object();
 		obj->val = (void*)val;
 		obj->type = JEP_LONG;
 	}
@@ -96,7 +108,7 @@ jep_obj* jep_character(const char* s)
 	jep_obj* obj = NULL;
 	char* c = malloc(sizeof(char));
 
-	obj = malloc(sizeof(jep_obj));
+	obj = jep_create_object();
 	obj->type = JEP_CHARACTER;
 
 	if(s == NULL || s[0] == '\0')
@@ -185,7 +197,7 @@ jep_obj* jep_string(const char* s)
 {
 	jep_obj* obj = NULL;
 	int len = strlen(s);
-	obj = malloc(sizeof(jep_obj));
+	obj = jep_create_object();
 	obj->type = JEP_STRING;
 	obj->val = malloc(len + 1);
 	strcpy(obj->val, s);

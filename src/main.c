@@ -3,7 +3,7 @@
 #include "operator.h"
 
 /* command line flag indices */
-#define JEP_TOKEN 0
+#define TOK 0
 #define JEP_AST 1
 #define JEP_OBJ 2
 
@@ -12,14 +12,14 @@
 const char *flags[] = 
 {
 	"-t", /* print tokens  */
-	"-a"  /* print ast     */ 
+	"-a", /* print ast     */ 
 	"-o"  /* print objects */
 };
 
 int jep_check_flag(const char* arg)
 {
 	int i;
-	for(i = 0; i < 2; i++)
+	for(i = 0; i < MAX_FLAGS; i++)
 	{
 		if(!strcmp(arg, flags[i]))
 		{
@@ -69,7 +69,7 @@ int main(int argc, char** argv)
 	
 	if(ts != NULL)
 	{
-		if(flags[JEP_TOKEN])
+		if(flags[TOK])
 		{
 			jep_print_tokens(ts, stdout);	
 		}
@@ -83,7 +83,7 @@ int main(int argc, char** argv)
 			{
 				jep_print_ast(*root);
 			}
-			if(root->leaves != NULL && !root->error)
+			if(root->leaves != NULL && !root->error && flags[JEP_OBJ])
 			{
 				jep_obj* o;
 				int i;

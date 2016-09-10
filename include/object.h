@@ -17,8 +17,10 @@
 
 typedef struct Object
 {
-	void* val;    /* stored value   */
-	int type;     /* type of object */
+	void* val;           /* stored value    */
+	int type;            /* type of object  */
+	struct Object* prev; /* previous object */
+	struct Object* next; /* next object     */
 }jep_obj;
 
 /* converts a token into a number object */

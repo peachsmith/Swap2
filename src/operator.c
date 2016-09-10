@@ -13,6 +13,10 @@ jep_obj* jep_evaluate(jep_ast_node ast)
 	{
 		return jep_character(ast.token.val->buffer);
 	}
+	else if(ast.token.type == T_STRING)
+	{
+		return jep_string(ast.token.val->buffer);
+	}
 
 	switch(ast.token.token_code)
 	{

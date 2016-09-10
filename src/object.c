@@ -183,7 +183,14 @@ jep_obj* jep_character(const char* s)
 /* converts a token into a string object */
 jep_obj* jep_string(const char* s)
 {
-	return NULL;
+	jep_obj* obj = NULL;
+	int len = strlen(s);
+	obj = malloc(sizeof(jep_obj));
+	obj->type = JEP_STRING;
+	obj->val = malloc(len + 1);
+	strcpy(obj->val, s);
+
+	return obj;
 }
 
 void jep_print_obj(jep_obj* obj)
@@ -205,6 +212,10 @@ void jep_print_obj(jep_obj* obj)
 		else if(obj->type == JEP_CHARACTER)
 		{
 			printf("character: %c\n", *((char*)(obj->val)));
+		}
+		else if(obj->type == JEP_STRING)
+		{
+			printf("string: %s\n", (char*)(obj->val));
 		}
 	}
 	else

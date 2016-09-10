@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <limits.h>
+#include "ast.h"
 
 /* the primitive types */
 #define JEP_INT 1
@@ -12,11 +13,12 @@
 #define JEP_DOUBLE 3
 #define JEP_CHARACTER 4
 #define JEP_STRING 5
+#define JEP_FUNCTION 6
 
 typedef struct Object
 {
-	void* val;
-	int type;
+	void* val;    /* stored value   */
+	int type;     /* type of object */
 }jep_obj;
 
 /* converts a token into a number object */

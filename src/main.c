@@ -5,13 +5,15 @@
 /* command line flag indices */
 #define JEP_TOKEN 0
 #define JEP_AST 1
+#define JEP_OBJ 2
 
-#define MAX_FLAGS 2
+#define MAX_FLAGS 3
 
 const char *flags[] = 
 {
-	"-t", /* print tokens */
-	"-a"  /* print ast    */ 
+	"-t", /* print tokens  */
+	"-a"  /* print ast     */ 
+	"-o"  /* print objects */
 };
 
 int jep_check_flag(const char* arg)
@@ -32,7 +34,7 @@ int main(int argc, char** argv)
 	jep_token_stream* ts = NULL;
 	jep_ast_node* nodes = NULL;
 	jep_ast_node* root = NULL;
-	int flags[MAX_FLAGS] = { 0, 0 };
+	int flags[MAX_FLAGS] = { 0, 0, 0 };
 	int i;
 	char* file_name = NULL;
 
@@ -81,21 +83,21 @@ int main(int argc, char** argv)
 			{
 				jep_print_ast(*root);
 			}
-			// if(root->leaves != NULL && !root->error)
-			// {
-			// 	jep_obj* o;
-			// 	int i;
-			// 	for(i = 0; i < root->leaf_count; i++)
-			// 	{
-			// 		o = jep_evaluate(root->leaves[i]);
-			// 		if(o != NULL)
-			// 		{
-			// 			jep_print_obj(o);
-			// 			free(o->value);
-			// 			free(o);
-			// 		}
-			// 	}
-			// }
+			if(root->leaves != NULL && !root->error)
+			{
+				jep_obj* o;
+				int i;
+				for(i = 0; i < root->leaf_count; i++)
+				{
+					o = jep_evaluate(root->leaves[i]);
+					if(o != NULL)
+					{
+						jep_print_obj(o);
+						free(o->val);
+						free(o);
+					}
+				}
+			}
 			
 
 			/* destroy the AST */

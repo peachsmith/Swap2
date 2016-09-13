@@ -24,13 +24,56 @@ static int jep_is_escape(char c)
 static jep_obj* jep_create_object()
 {
 	jep_obj* o = malloc(sizeof(jep_obj));
-	
+
 	o->val = NULL;
+	o->ident = NULL;
 	o->type = 0;
 	o->prev = NULL;
 	o->next = NULL;
+	o->head = NULL;
+	o->tail = NULL;
 
 	return o;
+}
+
+/* adds an object to a list */
+void jep_add_obj(jep_obj* list, jep_obj* o)
+{
+	if(list->head == NULL && list->tail == NULL)
+	{
+		list->head = o;
+		list->tail = o;
+	}
+	else
+	{
+		list->tail->next = o;
+		o->prev = list->tail;
+		list->tail = o;
+		list->tail->next = list->head;
+		list->head->prev = list->tail;
+	}
+}
+
+/* retreives an object from a list */
+jep_obj* jep_get_obj(const char* ident, jep_obj* list)
+{
+	if(list == NULL || ident == NULL)
+	{
+		return NULL;
+	}
+
+	jep_obj* node = list->head;
+
+	while(node != NULL)
+	{
+		if(node->ident != NULL && !strcmp(ident, node->ident))
+		{
+			return node;
+		}
+		node = node->next;
+	}
+
+	return NULL;
 }
 
 jep_obj* jep_number(const char* s)

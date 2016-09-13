@@ -85,11 +85,16 @@ int main(int argc, char** argv)
 			}
 			if(root->leaves != NULL && !root->error && flags[JEP_OBJ])
 			{
+				jep_obj list = 
+				{
+					NULL, NULL, 0, NULL, NULL, NULL, NULL
+				};
 				jep_obj* o;
 				int i;
 				for(i = 0; i < root->leaf_count; i++)
 				{
-					o = jep_evaluate(root->leaves[i]);
+
+					o = jep_evaluate(root->leaves[i], &list);
 					if(o != NULL)
 					{
 						jep_print_obj(o);

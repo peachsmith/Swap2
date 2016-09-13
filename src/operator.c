@@ -1,7 +1,7 @@
 #include "operator.h"
 
 /* evaluates the nodes of an AST */
-jep_obj* jep_evaluate(jep_ast_node ast)
+jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 {
 	jep_obj* o = NULL;
 
@@ -21,83 +21,83 @@ jep_obj* jep_evaluate(jep_ast_node ast)
 	switch(ast.token.token_code)
 	{
 		case T_PLUS:
-			o = jep_add(ast);
+			o = jep_add(ast, list);
 			break;
 		
 		case T_MINUS:
-			o = jep_sub(ast);
+			o = jep_sub(ast, list);
 			break;
 
 		case T_STAR:
-			o = jep_mul(ast);
+			o = jep_mul(ast, list);
 			break;
 
 		case T_FSLASH:
-			o = jep_div(ast);
+			o = jep_div(ast, list);
 			break;
 
 		case T_LESS:
-			o = jep_less(ast);
+			o = jep_less(ast, list);
 			break;
 
 		case T_GREATER:
-			o = jep_greater(ast);
+			o = jep_greater(ast, list);
 			break;
 
 		case T_LOREQUAL:
-			o = jep_lorequal(ast);
+			o = jep_lorequal(ast, list);
 			break;
 
 		case T_GOREQUAL:
-			o = jep_gorequal(ast);
+			o = jep_gorequal(ast, list);
 			break;
 
 		case T_EQUIVALENT:
-			o = jep_equiv(ast);
+			o = jep_equiv(ast, list);
 			break;
 
 		case T_NOTEQUIVALENT:
-			o = jep_noteq(ast);
+			o = jep_noteq(ast, list);
 			break;
 
 		case T_NOT:
-			o = jep_not(ast);
+			o = jep_not(ast, list);
 			break;
 
 		case T_LOGAND:
-			o = jep_and(ast);
+			o = jep_and(ast, list);
 			break;
 
 		case T_LOGOR:
-			o = jep_or(ast);
+			o = jep_or(ast, list);
 			break;
 
 		case T_BITAND:
-			o = jep_bitand(ast);
+			o = jep_bitand(ast, list);
 			break;
 
 		case T_BITOR:
-			o = jep_bitor(ast);
+			o = jep_bitor(ast, list);
 			break;
 
 		case T_BITXOR:
-			o = jep_bitxor(ast);
+			o = jep_bitxor(ast, list);
 			break;
 
 		case T_LSHIFT:
-			o = jep_lshift(ast);
+			o = jep_lshift(ast, list);
 			break;
 
 		case T_RSHIFT:
-			o = jep_rshift(ast);
+			o = jep_rshift(ast, list);
 			break;
 
 		case T_LPAREN:
-			o = jep_paren(ast);
+			o = jep_paren(ast, list);
 			break;
 
 		case T_LBRACE:
-			jep_brace(ast);
+			jep_brace(ast, list);
 			break;
 
 		default:
@@ -110,7 +110,7 @@ jep_obj* jep_evaluate(jep_ast_node ast)
 }
 
 /* evaluates an addition expression */
-jep_obj* jep_add(jep_ast_node node)
+jep_obj* jep_add(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* l = NULL;       /* left operand  */
 	jep_obj* r = NULL;       /* right operand */
@@ -122,8 +122,8 @@ jep_obj* jep_add(jep_ast_node node)
 	}
 	
 
-	l = jep_evaluate(node.leaves[0]);
-	r = jep_evaluate(node.leaves[1]);
+	l = jep_evaluate(node.leaves[0], list);
+	r = jep_evaluate(node.leaves[1], list);
 
 	if(l != NULL && r != NULL)
 	{
@@ -240,7 +240,7 @@ jep_obj* jep_add(jep_ast_node node)
 }
 
 /* evaluates subtraction or negation */
-jep_obj* jep_sub(jep_ast_node node)
+jep_obj* jep_sub(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* l = NULL;       /* left operand  */
 	jep_obj* r = NULL;       /* right operand */
@@ -251,11 +251,11 @@ jep_obj* jep_sub(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(node.leaves[0]);
+	l = jep_evaluate(node.leaves[0], list);
 
 	if(node.leaf_count > 1)
 	{
-		r = jep_evaluate(node.leaves[1]);
+		r = jep_evaluate(node.leaves[1], list);
 	}
 
 	if(node.leaf_count == 1 && l != NULL)
@@ -405,7 +405,7 @@ jep_obj* jep_sub(jep_ast_node node)
 }
 
 /* evaluates a multiplication expression */
-jep_obj* jep_mul(jep_ast_node node)
+jep_obj* jep_mul(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* l = NULL;       /* left operand  */
 	jep_obj* r = NULL;       /* right operand */
@@ -416,8 +416,8 @@ jep_obj* jep_mul(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(node.leaves[0]);
-	r = jep_evaluate(node.leaves[1]);
+	l = jep_evaluate(node.leaves[0], list);
+	r = jep_evaluate(node.leaves[1], list);
 
 	if(l != NULL && r != NULL)
 	{
@@ -535,7 +535,7 @@ jep_obj* jep_mul(jep_ast_node node)
 }
 
 /* evaluates a division expression */
-jep_obj* jep_div(jep_ast_node node)
+jep_obj* jep_div(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* l = NULL;       /* left operand  */
 	jep_obj* r = NULL;       /* right operand */
@@ -546,8 +546,8 @@ jep_obj* jep_div(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(node.leaves[0]);
-	r = jep_evaluate(node.leaves[1]);
+	l = jep_evaluate(node.leaves[0], list);
+	r = jep_evaluate(node.leaves[1], list);
 
 	if(l != NULL && r != NULL)
 	{
@@ -664,7 +664,7 @@ jep_obj* jep_div(jep_ast_node node)
 }
 
 /* evaluates a less than expression */
-jep_obj* jep_less(jep_ast_node node)
+jep_obj* jep_less(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* l = NULL;       /* left operand  */
 	jep_obj* r = NULL;       /* right operand */
@@ -675,8 +675,8 @@ jep_obj* jep_less(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(node.leaves[0]);
-	r = jep_evaluate(node.leaves[1]);
+	l = jep_evaluate(node.leaves[0], list);
+	r = jep_evaluate(node.leaves[1], list);
 
 	if(l != NULL && r != NULL)
 	{
@@ -793,7 +793,7 @@ jep_obj* jep_less(jep_ast_node node)
 }
 
 /* evaluates a less than expression */
-jep_obj* jep_greater(jep_ast_node node)
+jep_obj* jep_greater(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* l = NULL;       /* left operand  */
 	jep_obj* r = NULL;       /* right operand */
@@ -804,8 +804,8 @@ jep_obj* jep_greater(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(node.leaves[0]);
-	r = jep_evaluate(node.leaves[1]);
+	l = jep_evaluate(node.leaves[0], list);
+	r = jep_evaluate(node.leaves[1], list);
 
 	if(l != NULL && r != NULL)
 	{
@@ -922,7 +922,7 @@ jep_obj* jep_greater(jep_ast_node node)
 }
 
 /* evaluates a less than or equal to expression */
-jep_obj* jep_lorequal(jep_ast_node node)
+jep_obj* jep_lorequal(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* l = NULL;       /* left operand  */
 	jep_obj* r = NULL;       /* right operand */
@@ -933,8 +933,8 @@ jep_obj* jep_lorequal(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(node.leaves[0]);
-	r = jep_evaluate(node.leaves[1]);
+	l = jep_evaluate(node.leaves[0], list);
+	r = jep_evaluate(node.leaves[1], list);
 
 	if(l != NULL && r != NULL)
 	{
@@ -1051,7 +1051,7 @@ jep_obj* jep_lorequal(jep_ast_node node)
 }
 
 /* evaluates a greater than or equal to expression */
-jep_obj* jep_gorequal(jep_ast_node node)
+jep_obj* jep_gorequal(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* l = NULL;       /* left operand  */
 	jep_obj* r = NULL;       /* right operand */
@@ -1062,8 +1062,8 @@ jep_obj* jep_gorequal(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(node.leaves[0]);
-	r = jep_evaluate(node.leaves[1]);
+	l = jep_evaluate(node.leaves[0], list);
+	r = jep_evaluate(node.leaves[1], list);
 
 	if(l != NULL && r != NULL)
 	{
@@ -1180,7 +1180,7 @@ jep_obj* jep_gorequal(jep_ast_node node)
 }
 
 /* evaluates an equivalence expression */
-jep_obj* jep_equiv(jep_ast_node node)
+jep_obj* jep_equiv(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* l = NULL;       /* left operand  */
 	jep_obj* r = NULL;       /* right operand */
@@ -1191,8 +1191,8 @@ jep_obj* jep_equiv(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(node.leaves[0]);
-	r = jep_evaluate(node.leaves[1]);
+	l = jep_evaluate(node.leaves[0], list);
+	r = jep_evaluate(node.leaves[1], list);
 
 	if(l != NULL && r != NULL)
 	{
@@ -1309,7 +1309,7 @@ jep_obj* jep_equiv(jep_ast_node node)
 }
 
 /* evaluates a not equivalence expression */
-jep_obj* jep_noteq(jep_ast_node node)
+jep_obj* jep_noteq(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* l = NULL;       /* left operand  */
 	jep_obj* r = NULL;       /* right operand */
@@ -1320,8 +1320,8 @@ jep_obj* jep_noteq(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(node.leaves[0]);
-	r = jep_evaluate(node.leaves[1]);
+	l = jep_evaluate(node.leaves[0], list);
+	r = jep_evaluate(node.leaves[1], list);
 
 	if(l != NULL && r != NULL)
 	{
@@ -1438,7 +1438,7 @@ jep_obj* jep_noteq(jep_ast_node node)
 }
 
 /* performs a not operation */
-jep_obj* jep_not(jep_ast_node node)
+jep_obj* jep_not(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* l = NULL;       /* operand  */
 	jep_obj* result = NULL;  /* result   */
@@ -1448,7 +1448,7 @@ jep_obj* jep_not(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(node.leaves[0]);
+	l = jep_evaluate(node.leaves[0], list);
 
 	if(l != NULL)
 	{
@@ -1498,7 +1498,7 @@ jep_obj* jep_not(jep_ast_node node)
 }
 
 /* performs a logical and operation */
-jep_obj* jep_and(jep_ast_node node)
+jep_obj* jep_and(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* l = NULL;       /* left operand  */
 	jep_obj* r = NULL;       /* right operand */
@@ -1509,8 +1509,8 @@ jep_obj* jep_and(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(node.leaves[0]);
-	r = jep_evaluate(node.leaves[1]);
+	l = jep_evaluate(node.leaves[0], list);
+	r = jep_evaluate(node.leaves[1], list);
 
 	if(l != NULL && r != NULL)
 	{
@@ -1627,7 +1627,7 @@ jep_obj* jep_and(jep_ast_node node)
 }
 
 /* performs a logical or operation */
-jep_obj* jep_or(jep_ast_node node)
+jep_obj* jep_or(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* l = NULL;       /* left operand  */
 	jep_obj* r = NULL;       /* right operand */
@@ -1638,8 +1638,8 @@ jep_obj* jep_or(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(node.leaves[0]);
-	r = jep_evaluate(node.leaves[1]);
+	l = jep_evaluate(node.leaves[0], list);
+	r = jep_evaluate(node.leaves[1], list);
 
 	if(l != NULL && r != NULL)
 	{
@@ -1756,7 +1756,7 @@ jep_obj* jep_or(jep_ast_node node)
 }
 
 /* performs a bitwise operation */
-jep_obj* jep_bitand(jep_ast_node node)
+jep_obj* jep_bitand(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* l = NULL;       /* left operand  */
 	jep_obj* r = NULL;       /* right operand */
@@ -1767,8 +1767,8 @@ jep_obj* jep_bitand(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(node.leaves[0]);
-	r = jep_evaluate(node.leaves[1]);
+	l = jep_evaluate(node.leaves[0], list);
+	r = jep_evaluate(node.leaves[1], list);
 
 	if(l != NULL && r != NULL)
 	{
@@ -1852,7 +1852,7 @@ jep_obj* jep_bitand(jep_ast_node node)
 }
 
 /* performs a bitwise or operation */
-jep_obj* jep_bitor(jep_ast_node node)
+jep_obj* jep_bitor(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* l = NULL;       /* left operand  */
 	jep_obj* r = NULL;       /* right operand */
@@ -1863,8 +1863,8 @@ jep_obj* jep_bitor(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(node.leaves[0]);
-	r = jep_evaluate(node.leaves[1]);
+	l = jep_evaluate(node.leaves[0], list);
+	r = jep_evaluate(node.leaves[1], list);
 
 	if(l != NULL && r != NULL)
 	{
@@ -1948,7 +1948,7 @@ jep_obj* jep_bitor(jep_ast_node node)
 }
 
 /* performs a bitwise xor operation */
-jep_obj* jep_bitxor(jep_ast_node node)
+jep_obj* jep_bitxor(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* l = NULL;       /* left operand  */
 	jep_obj* r = NULL;       /* right operand */
@@ -1959,8 +1959,8 @@ jep_obj* jep_bitxor(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(node.leaves[0]);
-	r = jep_evaluate(node.leaves[1]);
+	l = jep_evaluate(node.leaves[0], list);
+	r = jep_evaluate(node.leaves[1], list);
 
 	if(l != NULL && r != NULL)
 	{
@@ -2044,7 +2044,7 @@ jep_obj* jep_bitxor(jep_ast_node node)
 }
 
 /* performs a left bit shift operation */
-jep_obj* jep_lshift(jep_ast_node node)
+jep_obj* jep_lshift(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* l = NULL;       /* left operand  */
 	jep_obj* r = NULL;       /* right operand */
@@ -2055,8 +2055,8 @@ jep_obj* jep_lshift(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(node.leaves[0]);
-	r = jep_evaluate(node.leaves[1]);
+	l = jep_evaluate(node.leaves[0], list);
+	r = jep_evaluate(node.leaves[1], list);
 
 	if(l != NULL && r != NULL)
 	{
@@ -2140,7 +2140,7 @@ jep_obj* jep_lshift(jep_ast_node node)
 }
 
 /* performs a right bit shift operation */
-jep_obj* jep_rshift(jep_ast_node node)
+jep_obj* jep_rshift(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* l = NULL;       /* left operand  */
 	jep_obj* r = NULL;       /* right operand */
@@ -2151,8 +2151,8 @@ jep_obj* jep_rshift(jep_ast_node node)
 		return NULL;
 	}
 	
-	l = jep_evaluate(node.leaves[0]);
-	r = jep_evaluate(node.leaves[1]);
+	l = jep_evaluate(node.leaves[0], list);
+	r = jep_evaluate(node.leaves[1], list);
 
 	if(l != NULL && r != NULL)
 	{
@@ -2236,14 +2236,14 @@ jep_obj* jep_rshift(jep_ast_node node)
 }
 
 /* evaluates the contents of a set of parentheses */
-jep_obj* jep_paren(jep_ast_node node)
+jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 {
 	if(node.leaves == NULL)
 	{
 		return NULL;
 	}
 
-	jep_obj* o = jep_evaluate(node.leaves[0]);
+	jep_obj* o = jep_evaluate(node.leaves[0], list);
 
 	int i;
 	for(i = 1; i < node.leaf_count; i++)
@@ -2256,14 +2256,14 @@ jep_obj* jep_paren(jep_ast_node node)
 		{
 			free(o);
 		}
-		o = jep_evaluate(node.leaves[i]);
+		o = jep_evaluate(node.leaves[i], list);
 	}
 
 	return o;
 }
 
 /* evaluates a block of code in curly braces */
-void jep_brace(jep_ast_node node)
+void jep_brace(jep_ast_node node, jep_obj* list)
 {
 	static int indent = 0;
 	if(node.leaves == NULL)
@@ -2275,7 +2275,7 @@ void jep_brace(jep_ast_node node)
 	int i;
 	for(i = 0; i < node.leaf_count; i++)
 	{
-		jep_obj* o = jep_evaluate(node.leaves[i]);
+		jep_obj* o = jep_evaluate(node.leaves[i], list);
 		if(o != NULL)
 		{
 			printf("%*s", indent, "");

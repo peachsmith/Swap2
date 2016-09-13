@@ -13,15 +13,25 @@
 #define JEP_DOUBLE 3
 #define JEP_CHARACTER 4
 #define JEP_STRING 5
-#define JEP_FUNCTION 6
+#define JEP_ARRAY 6
+#define JEP_FUNCTION 7
 
 typedef struct Object
 {
-	void* val;           /* stored value    */
-	int type;            /* type of object  */
-	struct Object* prev; /* previous object */
-	struct Object* next; /* next object     */
+	char* ident;         /* identifier        */
+	void* val;           /* stored value      */
+	int type;            /* type of object    */
+	struct Object* prev; /* previous object   */
+	struct Object* next; /* next object       */
+	struct Object* head; /* beginning of list */
+	struct Object* tail; /* end of list       */
 }jep_obj;
+
+/* adds an object to a list */
+void jep_add_obj(jep_obj* list, jep_obj* o);
+
+/* retreives an object from a list */
+jep_obj* jep_get_obj(const char* ident, jep_obj* list);
 
 /* converts a token into a number object */
 jep_obj* jep_number(const char* s);
@@ -32,6 +42,7 @@ jep_obj* jep_character(const char* s);
 /* converts a token into a string object */
 jep_obj* jep_string(const char* s);
 
+/* prints an object to stdout */
 void jep_print_obj(jep_obj* obj);
 
 #endif

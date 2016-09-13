@@ -20,6 +20,12 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 	else if(ast.token.type == T_IDENTIFIER)
 	{
 		o = jep_create_object();
+		jep_obj* ex = jep_get_object(ast.token.val->buffer, list);
+		if(ex != NULL)
+		{
+			jep_copy_object(o, ex);
+		}
+		
 		o->ident = ast.token.val->buffer;
 		return o;
 	}

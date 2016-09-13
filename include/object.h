@@ -27,11 +27,20 @@ typedef struct Object
 	struct Object* tail; /* end of list       */
 }jep_obj;
 
+/* allocates memory for a new object */
+jep_obj* jep_create_object();
+
 /* adds an object to a list */
-void jep_add_obj(jep_obj* list, jep_obj* o);
+void jep_add_object(jep_obj* list, jep_obj* o);
 
 /* retreives an object from a list */
-jep_obj* jep_get_obj(const char* ident, jep_obj* list);
+jep_obj* jep_get_object(const char* ident, jep_obj* list);
+
+/* copies the value of one obect into another */
+void jep_copy_object(jep_obj* dest, jep_obj* src);
+
+/* frees the memory in a list of objects */
+void jep_destroy_list(jep_obj* list);
 
 /* converts a token into a number object */
 jep_obj* jep_number(const char* s);
@@ -44,5 +53,8 @@ jep_obj* jep_string(const char* s);
 
 /* prints an object to stdout */
 void jep_print_obj(jep_obj* obj);
+
+/* prints a list of objects to stdout */
+void jep_print_list(jep_obj* list);
 
 #endif

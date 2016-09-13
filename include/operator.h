@@ -60,6 +60,9 @@ jep_obj* jep_lshift(jep_ast_node node, jep_obj* list);
 /* performs a right bit shift operation */
 jep_obj* jep_rshift(jep_ast_node node, jep_obj* list);
 
+/* evaluates an assignment */
+jep_obj* jep_assign(jep_ast_node node, jep_obj* list);
+
 /* evaluates the contents of a set of parentheses */
 jep_obj* jep_paren(jep_ast_node node, jep_obj* list);
 

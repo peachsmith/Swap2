@@ -17,6 +17,12 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 	{
 		return jep_string(ast.token.val->buffer);
 	}
+	else if(ast.token.type == T_IDENTIFIER)
+	{
+		o = jep_create_object();
+		o->ident = ast.token.val->buffer;
+		return o;
+	}
 
 	switch(ast.token.token_code)
 	{
@@ -98,6 +104,10 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 
 		case T_LBRACE:
 			jep_brace(ast, list);
+			break;
+
+		case T_EQUALS:
+			jep_assign(ast, list);
 			break;
 
 		default:
@@ -221,7 +231,7 @@ jep_obj* jep_add(jep_ast_node node, jep_obj* list)
 	}
 	else
 	{
-		printf("could not obtain both operand vals\n");
+		printf("could not obtain both operand values\n");
 	}
 
 	/* free the memory of the operands */
@@ -386,7 +396,7 @@ jep_obj* jep_sub(jep_ast_node node, jep_obj* list)
 	}
 	else
 	{
-		printf("could not obtain both operand vals\n");
+		printf("could not obtain both operand values\n");
 	}
 
 	/* free the memory of the operands */
@@ -516,7 +526,7 @@ jep_obj* jep_mul(jep_ast_node node, jep_obj* list)
 	}
 	else
 	{
-		printf("could not obtain both operand vals\n");
+		printf("could not obtain both operand values\n");
 	}
 
 	/* free the memory of the operands */
@@ -645,7 +655,7 @@ jep_obj* jep_div(jep_ast_node node, jep_obj* list)
 	}
 	else
 	{
-		printf("could not obtain both operand vals\n");
+		printf("could not obtain both operand values\n");
 	}
 
 	/* free the memory of the operands */
@@ -774,7 +784,7 @@ jep_obj* jep_less(jep_ast_node node, jep_obj* list)
 	}
 	else
 	{
-		printf("could not obtain both operand vals\n");
+		printf("could not obtain both operand values\n");
 	}
 
 	/* free the memory of the operands */
@@ -903,7 +913,7 @@ jep_obj* jep_greater(jep_ast_node node, jep_obj* list)
 	}
 	else
 	{
-		printf("could not obtain both operand vals\n");
+		printf("could not obtain both operand values\n");
 	}
 
 	/* free the memory of the operands */
@@ -1032,7 +1042,7 @@ jep_obj* jep_lorequal(jep_ast_node node, jep_obj* list)
 	}
 	else
 	{
-		printf("could not obtain both operand vals\n");
+		printf("could not obtain both operand values\n");
 	}
 
 	/* free the memory of the operands */
@@ -1161,7 +1171,7 @@ jep_obj* jep_gorequal(jep_ast_node node, jep_obj* list)
 	}
 	else
 	{
-		printf("could not obtain both operand vals\n");
+		printf("could not obtain both operand values\n");
 	}
 
 	/* free the memory of the operands */
@@ -1290,7 +1300,7 @@ jep_obj* jep_equiv(jep_ast_node node, jep_obj* list)
 	}
 	else
 	{
-		printf("could not obtain both operand vals\n");
+		printf("could not obtain both operand values\n");
 	}
 
 	/* free the memory of the operands */
@@ -1419,7 +1429,7 @@ jep_obj* jep_noteq(jep_ast_node node, jep_obj* list)
 	}
 	else
 	{
-		printf("could not obtain both operand vals\n");
+		printf("could not obtain both operand values\n");
 	}
 
 	/* free the memory of the operands */
@@ -1608,7 +1618,7 @@ jep_obj* jep_and(jep_ast_node node, jep_obj* list)
 	}
 	else
 	{
-		printf("could not obtain both operand vals\n");
+		printf("could not obtain both operand values\n");
 	}
 
 	/* free the memory of the operands */
@@ -1737,7 +1747,7 @@ jep_obj* jep_or(jep_ast_node node, jep_obj* list)
 	}
 	else
 	{
-		printf("could not obtain both operand vals\n");
+		printf("could not obtain both operand values\n");
 	}
 
 	/* free the memory of the operands */
@@ -1833,7 +1843,7 @@ jep_obj* jep_bitand(jep_ast_node node, jep_obj* list)
 	}
 	else
 	{
-		printf("could not obtain both operand vals\n");
+		printf("could not obtain both operand values\n");
 	}
 
 	/* free the memory of the operands */
@@ -1929,7 +1939,7 @@ jep_obj* jep_bitor(jep_ast_node node, jep_obj* list)
 	}
 	else
 	{
-		printf("could not obtain both operand vals\n");
+		printf("could not obtain both operand values\n");
 	}
 
 	/* free the memory of the operands */
@@ -2025,7 +2035,7 @@ jep_obj* jep_bitxor(jep_ast_node node, jep_obj* list)
 	}
 	else
 	{
-		printf("could not obtain both operand vals\n");
+		printf("could not obtain both operand values\n");
 	}
 
 	/* free the memory of the operands */
@@ -2121,7 +2131,7 @@ jep_obj* jep_lshift(jep_ast_node node, jep_obj* list)
 	}
 	else
 	{
-		printf("could not obtain both operand vals\n");
+		printf("could not obtain both operand values\n");
 	}
 
 	/* free the memory of the operands */
@@ -2217,7 +2227,7 @@ jep_obj* jep_rshift(jep_ast_node node, jep_obj* list)
 	}
 	else
 	{
-		printf("could not obtain both operand vals\n");
+		printf("could not obtain both operand values\n");
 	}
 
 	/* free the memory of the operands */
@@ -2233,6 +2243,54 @@ jep_obj* jep_rshift(jep_ast_node node, jep_obj* list)
 	}
 
 	return result;
+}
+
+/* evaluates an assignment */
+jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
+{
+	jep_obj* o = NULL; /* the recipient of the assignment       */
+	jep_obj* l = NULL; /* left operand                          */
+	jep_obj* r = NULL; /* right oeprand                         */
+
+	if(node.leaf_count != 2)
+	{
+		return NULL;
+	}
+
+	l = jep_evaluate(node.leaves[0], list);
+	r = jep_evaluate(node.leaves[1], list);
+
+	if(l != NULL && r != NULL)
+	{
+		o = jep_get_object(l->ident, list);
+
+		if(o == NULL)
+		{
+			/* create the object if it doesn't exist */
+			o = jep_create_object();
+			jep_add_object(list, o);
+		}
+		else if(o->val != NULL)
+		{
+			/* free existing memory */
+			free(o->val);
+		}
+		o->ident = l->ident;
+		jep_copy_object(o, r);
+	}
+	else
+	{
+		printf("could not obtain both operand values\n");
+	}
+
+	/* free the memory of the operands */
+	if(l != NULL)
+	{
+		free(l->val);
+		free(l);
+	}
+
+	return r;
 }
 
 /* evaluates the contents of a set of parentheses */

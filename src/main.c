@@ -93,17 +93,16 @@ int main(int argc, char** argv)
 				int i;
 				for(i = 0; i < root->leaf_count; i++)
 				{
-
 					o = jep_evaluate(root->leaves[i], &list);
 					if(o != NULL)
 					{
-						jep_print_obj(o);
 						free(o->val);
 						free(o);
 					}
 				}
+				jep_print_list(&list);
+				jep_destroy_list(&list);
 			}
-			
 
 			/* destroy the AST */
 			jep_destroy_string_builder(root->token.val);

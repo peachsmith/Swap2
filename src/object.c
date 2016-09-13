@@ -21,7 +21,8 @@ static int jep_is_escape(char c)
 	return -1;
 }
 
-static jep_obj* jep_create_object()
+/* allocates memory for a new object */
+jep_obj* jep_create_object()
 {
 	jep_obj* o = malloc(sizeof(jep_obj));
 
@@ -37,7 +38,7 @@ static jep_obj* jep_create_object()
 }
 
 /* adds an object to a list */
-void jep_add_obj(jep_obj* list, jep_obj* o)
+void jep_add_object(jep_obj* list, jep_obj* o)
 {
 	if(list->head == NULL && list->tail == NULL)
 	{
@@ -49,13 +50,11 @@ void jep_add_obj(jep_obj* list, jep_obj* o)
 		list->tail->next = o;
 		o->prev = list->tail;
 		list->tail = o;
-		list->tail->next = list->head;
-		list->head->prev = list->tail;
 	}
 }
 
 /* retreives an object from a list */
-jep_obj* jep_get_obj(const char* ident, jep_obj* list)
+jep_obj* jep_get_object(const char* ident, jep_obj* list)
 {
 	if(list == NULL || ident == NULL)
 	{
@@ -63,17 +62,90 @@ jep_obj* jep_get_obj(const char* ident, jep_obj* list)
 	}
 
 	jep_obj* node = list->head;
+	// jep_obj* head = node;
 
-	while(node != NULL)
+	if(node == NULL)
+	{
+		return NULL;
+	}
+
+	do
 	{
 		if(node->ident != NULL && !strcmp(ident, node->ident))
 		{
 			return node;
 		}
 		node = node->next;
-	}
+	}while(node != NULL);
 
 	return NULL;
+}
+
+/* copies the value of one obect into another */
+void jep_copy_object(jep_obj* dest, jep_obj* src)
+{
+	if(dest == NULL || src == NULL)
+	{
+		return;
+	}
+
+	dest->type = src->type;
+
+	if(src->type == JEP_INT)
+	{
+		int* i = malloc(sizeof(int));
+		*i = *(int*)(src->val);
+		dest->val = (void*)i;
+	}
+	else if(src->type == JEP_LONG)
+	{
+		long* l = malloc(sizeof(long));
+		*l = *(long*)(src->val);
+		dest->val = (void*)l;
+	}
+	else if(src->type == JEP_DOUBLE)
+	{
+		double* d = malloc(sizeof(double));
+		*d = *(double*)(src->val);
+		dest->val = (void*)d;
+	}
+	else if(src->type == JEP_CHARACTER)
+	{
+		char* c = malloc(sizeof(char));
+		*c = *(char*)(src->val);
+		dest->val = (void*)c;
+	}
+	else if(src->type == JEP_STRING)
+	{
+		int len = strlen((char*)(src->val));
+		dest->val = malloc(len + 1);
+		strcpy(dest->val, (char*)(src->val));
+	}
+}
+
+/* frees the memory in a list of objects */
+void jep_destroy_list(jep_obj* list)
+{
+	if(list == NULL)
+	{
+		return;
+	}
+
+	jep_obj* node = list->head;
+	jep_obj* next = NULL;
+
+	if(node == NULL)
+	{
+		return;
+	}
+
+	do
+	{
+		next = node->next;
+		free(node->val);
+		free(node);
+		node = next;
+	}while(next != NULL);
 }
 
 jep_obj* jep_number(const char* s)
@@ -254,27 +326,50 @@ void jep_print_obj(jep_obj* obj)
 	{
 		if(obj->type == JEP_INT)
 		{
-			printf("int: %d\n", *((int*)(obj->val)));
+			printf("[int] %s: %d\n", obj->ident, *((int*)(obj->val)));
 		}
 		else if(obj->type == JEP_LONG)
 		{
-			printf("long: %ld\n", *((long*)(obj->val)));
+			printf("[long] %s: %ld\n", obj->ident, *((long*)(obj->val)));
 		}
 		else if(obj->type == JEP_DOUBLE)
 		{
-			printf("double: %.2lf\n", *((double*)(obj->val)));
+			printf("[double] %s: %.2lf\n", obj->ident, *((double*)(obj->val)));
 		}
 		else if(obj->type == JEP_CHARACTER)
 		{
-			printf("character: %c\n", *((char*)(obj->val)));
+			printf("[character] %s: %c\n", obj->ident, *((char*)(obj->val)));
 		}
 		else if(obj->type == JEP_STRING)
 		{
-			printf("string: %s\n", (char*)(obj->val));
+			printf("[string] %s: %s\n", obj->ident, (char*)(obj->val));
 		}
 	}
 	else
 	{
+		printf("this object is somehow NULL\n");
 		printf("NULL\n");
 	}
+}
+
+/* prints a list of objects to stdout */
+void jep_print_list(jep_obj* list)
+{
+	if(list == NULL)
+	{
+		return;
+	}
+
+	jep_obj* node = list->head;
+
+	if(node == NULL)
+	{
+		return;
+	}
+
+	do
+	{
+		jep_print_obj(node);
+		node = node->next;
+	}while(node != NULL);
 }

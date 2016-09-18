@@ -23,4 +23,5 @@ test:
 	@$(SWAP) -a ./tests/test3.txt > ./tests/result3.txt
 	@$(SWAP) -a ./tests/test4.txt > ./tests/result4.txt
 	@$(SWAP) -a ./tests/test5.txt > ./tests/result5.txt
+	@$(SWAP) -o ./tests/test6.txt > ./tests/result6.txt
 	@$(VERIFY)

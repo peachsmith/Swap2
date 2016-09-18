@@ -1,0 +1,5 @@
+[int] a: 1
+[character] b: c
+[string] c: words
+[int] e: 6
+[int] d: 6

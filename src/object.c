@@ -347,8 +347,7 @@ void jep_print_obj(jep_obj* obj)
 	}
 	else
 	{
-		printf("this object is somehow NULL\n");
-		printf("NULL\n");
+		printf("[null]\n");
 	}
 }
 

@@ -2,6 +2,7 @@
 #define JEP_OPERATOR_H
 
 #include "ast.h"
+#include "object.h"
 
 /* evaluates an AST node */
 jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list);
@@ -66,7 +67,7 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list);
 /* evaluates the contents of a set of parentheses */
 jep_obj* jep_paren(jep_ast_node node, jep_obj* list);
 
-/* evaluates a block of code in curly braces */
-void jep_brace(jep_ast_node node, jep_obj* list);
+/* evaluates the contents of a set of curly braces */
+jep_obj* jep_brace(jep_ast_node node, jep_obj* list);
 
 #endif

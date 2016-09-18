@@ -18,13 +18,14 @@
 
 typedef struct Object
 {
-	char* ident;         /* identifier        */
-	void* val;           /* stored value      */
-	int type;            /* type of object    */
-	struct Object* prev; /* previous object   */
-	struct Object* next; /* next object       */
-	struct Object* head; /* beginning of list */
-	struct Object* tail; /* end of list       */
+	char* ident;         /* identifier                    */
+	void* val;           /* stored value                  */
+	int type;            /* type of object                */
+	struct Object* prev; /* previous object               */
+	struct Object* next; /* next object                   */
+	struct Object* head; /* beginning of list             */
+	struct Object* tail; /* end of list                   */
+	int size;            /* number of objects in the list */
 }jep_obj;
 
 /* allocates memory for a new object */
@@ -50,6 +51,9 @@ jep_obj* jep_character(const char* s);
 
 /* converts a token into a string object */
 jep_obj* jep_string(const char* s);
+
+/* convertes an ast into an array */
+jep_obj* jep_array(jep_ast_node* ast);
 
 /* prints an object to stdout */
 void jep_print_obj(jep_obj* obj);

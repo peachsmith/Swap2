@@ -21,6 +21,49 @@ static int jep_is_escape(char c)
 	return -1;
 }
 
+static void jep_print_array(jep_obj* array)
+{
+	printf("{ ");
+	if(array != NULL && array->size > 0)
+	{
+		jep_obj* elem = array->tail;
+		while(elem != NULL)
+		{
+			if(elem->type == JEP_INT)
+			{
+				printf("[int] %d", *((int*)(elem->val)));
+			}
+			else if(elem->type == JEP_LONG)
+			{
+				printf("[long] %ld", *((long*)(elem->val)));
+			}
+			else if(elem->type == JEP_DOUBLE)
+			{
+				printf("[double] %.2lf", *((double*)(elem->val)));
+			}
+			else if(elem->type == JEP_CHARACTER)
+			{
+				printf("[character] %c", *((char*)(elem->val)));
+			}
+			else if(elem->type == JEP_STRING)
+			{
+				printf("[string] %s", (char*)(elem->val));
+			}
+			else if(elem->type == JEP_ARRAY)
+			{
+				printf("[array] ");
+				jep_print_array(elem);
+			}
+			if(elem->prev != NULL)
+			{
+				printf(", ");
+			}
+			elem = elem->prev;
+		}
+	}
+	printf(" }");
+}
+
 /* allocates memory for a new object */
 jep_obj* jep_create_object()
 {
@@ -33,6 +76,7 @@ jep_obj* jep_create_object()
 	o->next = NULL;
 	o->head = NULL;
 	o->tail = NULL;
+	o->size = 0;
 
 	return o;
 }
@@ -51,6 +95,8 @@ void jep_add_object(jep_obj* list, jep_obj* o)
 		o->prev = list->tail;
 		list->tail = o;
 	}
+
+	list->size++;
 }
 
 /* retreives an object from a list */
@@ -61,22 +107,22 @@ jep_obj* jep_get_object(const char* ident, jep_obj* list)
 		return NULL;
 	}
 
-	jep_obj* node = list->head;
+	jep_obj* obj = list->head;
 	// jep_obj* head = node;
 
-	if(node == NULL)
+	if(obj == NULL)
 	{
 		return NULL;
 	}
 
 	do
 	{
-		if(node->ident != NULL && !strcmp(ident, node->ident))
+		if(obj->ident != NULL && !strcmp(ident, obj->ident))
 		{
-			return node;
+			return obj;
 		}
-		node = node->next;
-	}while(node != NULL);
+		obj = obj->next;
+	}while(obj != NULL);
 
 	return NULL;
 }
@@ -139,10 +185,33 @@ void jep_destroy_list(jep_obj* list)
 		return;
 	}
 
+	/* keep track of what memory has been freed */
+	int cap = 10;
+	int size = 0;
+	void** memory = malloc(sizeof(void*) * cap);
+
 	do
 	{
 		next = node->next;
-		free(node->val);
+		int i;
+		int freed = 0;
+		for(i = 0; i < size; i++)
+		{
+			if(node->val == memory[i])
+			{
+				freed = 1;
+			}
+		}
+		if(!freed)
+		{
+			free(node->val);
+			if(size >= cap)
+			{
+				cap = cap + cap / 2;
+				memory = realloc(memory, sizeof(void*) * cap);
+			}
+			memory[size++] = node->val;
+		}
 		free(node);
 		node = next;
 	}while(next != NULL);
@@ -320,6 +389,14 @@ jep_obj* jep_string(const char* s)
 	return obj;
 }
 
+/* convertes an ast into an array */
+jep_obj* jep_array(jep_ast_node* ast)
+{
+	jep_obj* obj = jep_create_object();
+	obj->type = JEP_ARRAY;
+	return obj;
+}
+
 void jep_print_obj(jep_obj* obj)
 {
 	if(obj != NULL)
@@ -344,6 +421,17 @@ void jep_print_obj(jep_obj* obj)
 		{
 			printf("[string] %s: %s\n", obj->ident, (char*)(obj->val));
 		}
+		else if(obj->type == JEP_ARRAY)
+		{
+			printf("[array] %s: ", obj->ident);
+			jep_obj* array = (jep_obj*)(obj->val);
+			jep_print_array(array);
+			printf("\n");
+		}
+		else
+		{
+			printf("unrecognized type\n");
+		}
 	}
 	else
 	{
@@ -359,16 +447,16 @@ void jep_print_list(jep_obj* list)
 		return;
 	}
 
-	jep_obj* node = list->head;
+	jep_obj* obj = list->head;
 
-	if(node == NULL)
+	if(obj == NULL)
 	{
 		return;
 	}
 
 	do
 	{
-		jep_print_obj(node);
-		node = node->next;
-	}while(node != NULL);
+		jep_print_obj(obj);
+		obj = obj->next;
+	}while(obj != NULL);
 }

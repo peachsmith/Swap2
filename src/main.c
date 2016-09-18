@@ -87,20 +87,24 @@ int main(int argc, char** argv)
 			{
 				jep_obj list = 
 				{
-					NULL, NULL, 0, NULL, NULL, NULL, NULL
+					NULL, NULL, 0, NULL, NULL, NULL, NULL, 0
 				};
 				jep_obj* o;
 				int i;
 				for(i = 0; i < root->leaf_count; i++)
 				{
+					// printf("evaluating statements\n");
 					o = jep_evaluate(root->leaves[i], &list);
-					if(o != NULL)
+					if(o != NULL && o->ident == NULL)
 					{
+						printf("destroying unused object\n");
+						/* immediately destroy all unused objects */
 						free(o->val);
 						free(o);
 					}
 				}
 				jep_print_list(&list);
+				// printf("freeing objects\n");
 				jep_destroy_list(&list);
 			}
 

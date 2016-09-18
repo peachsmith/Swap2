@@ -615,6 +615,8 @@ jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node** nodes)
 		(*nodes)[i].cap = 10;
 		(*nodes)[i].leaves = NULL;
 		(*nodes)[i].token = ts->tok[i];
+		(*nodes)[i].error = 0;
+		(*nodes)[i].array = 0;
 	}
 
 	/* create the root of the AST */
@@ -631,6 +633,7 @@ jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node** nodes)
 	root->token.unary = 0;
 	root->token.postfix = 0;
 	root->error = 0;
+	root->array = 0;
 	jep_append_string(root->token.val, "root");
 
 	first = *nodes;
@@ -901,6 +904,7 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 				else if(cur->token_code == T_LBRACE && next->token_code != T_EOF)
 				{
 					jep_ast_node* l_brac = (*nodes)++;
+					l_brac->array = 1;
 					jep_ast_node* e = jep_expression(root, nodes);
 					prev = &(*nodes - 1)->token;
 					cur = &(*nodes)->token;

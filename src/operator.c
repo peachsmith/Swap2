@@ -19,15 +19,7 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 	}
 	else if(ast.token.type == T_IDENTIFIER)
 	{
-		o = jep_create_object();
-		jep_obj* ex = jep_get_object(ast.token.val->buffer, list);
-		if(ex != NULL)
-		{
-			jep_copy_object(o, ex);
-		}
-		
-		o->ident = ast.token.val->buffer;
-		return o;
+		return jep_get_object(ast.token.val->buffer, list);
 	}
 
 	switch(ast.token.token_code)
@@ -109,7 +101,7 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 			break;
 
 		case T_LBRACE:
-			jep_brace(ast, list);
+			o = jep_brace(ast, list);
 			break;
 
 		case T_EQUALS:
@@ -2254,6 +2246,7 @@ jep_obj* jep_rshift(jep_ast_node node, jep_obj* list)
 /* evaluates an assignment */
 jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 {
+	// printf("BEGIN assignment\n");
 	jep_obj* o = NULL; /* the recipient of the assignment */
 	jep_obj* l = NULL; /* left operand                    */
 	jep_obj* r = NULL; /* right oeprand                   */
@@ -2263,17 +2256,47 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 		return NULL;
 	}
 
+	// printf("evaluating left operand\n");
 	l = jep_evaluate(node.leaves[0], list);
+	// printf("evaluating right operand\n");
 	r = jep_evaluate(node.leaves[1], list);
+	// printf("evaluated both operands without segmentation fault\n");
 
-	if(l != NULL && r != NULL)
+	// if(l == NULL)
+	// {
+	// 	printf("left operand is NULL\n");
+	// }
+	// else
+	// {
+	// 	printf("left operand is not NULL\n");
+	// }
+
+	// if(r == NULL)
+	// {
+	// 	printf("right operand is NULL\n");
+	// }
+	// else
+	// {
+	// 	printf("right operand is not NULL\n");
+	// }
+
+	if((l != NULL || node.leaves[0].token.type == T_IDENTIFIER) 
+		&& (r != NULL || node.leaves[1].token.type == T_IDENTIFIER))
 	{
-		o = jep_get_object(l->ident, list);
+		if(l == NULL)
+		{
+			o = jep_get_object(node.leaves[0].token.val->buffer, list);
+		}
+		else
+		{
+			o = jep_get_object(l->ident, list);	
+		}
 
 		if(o == NULL)
 		{
 			/* create the object if it doesn't exist */
 			o = jep_create_object();
+			o->ident = node.leaves[0].token.val->buffer;
 			jep_add_object(list, o);
 		}
 		else if(o->val != NULL)
@@ -2281,16 +2304,29 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 			/* free existing memory */
 			free(o->val);
 		}
-		o->ident = l->ident;
-		jep_copy_object(o, r);
+		o->type = r->type;
+		if(r->type == JEP_ARRAY)
+		{
+			o->val = r;
+		}
+		else
+		{
+			o->val = r->val;
+		}
+		
+		/* all used objects must have identifiers */
+		if(r->ident == NULL)
+		{
+			r->ident = o->ident;
+		}
 	}
 	else
 	{
 		printf("could not obtain both operand values\n");
 	}
 
-	/* free the memory of the operands */
-	if(l != NULL)
+	/* free memory of unused left operands */
+	if(l != NULL && l->ident == NULL)
 	{
 		free(l->val);
 		free(l);
@@ -2327,26 +2363,47 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 }
 
 /* evaluates a block of code in curly braces */
-void jep_brace(jep_ast_node node, jep_obj* list)
+jep_obj* jep_brace(jep_ast_node node, jep_obj* list)
 {
-	static int indent = 0;
-	if(node.leaves == NULL)
+	jep_obj* o = NULL;
+	if(node.array)
 	{
-		return;
-	}
-
-	indent++;
-	int i;
-	for(i = 0; i < node.leaf_count; i++)
-	{
-		jep_obj* o = jep_evaluate(node.leaves[i], list);
-		if(o != NULL)
+		o = jep_create_object();
+		o->type = JEP_ARRAY;
+		if(node.leaf_count > 0 && node.leaves[0].token.token_code == T_COMMA)
 		{
-			printf("%*s", indent, "");
-			jep_print_obj(o);
-			free(o->val);
-			free(o);
+			jep_ast_node delim = node.leaves[0];
+			while(delim.token.token_code == T_COMMA)
+			{
+				jep_obj* e;
+				e = jep_evaluate(delim.leaves[1], list);
+				jep_add_object(o, e);
+				delim = delim.leaves[0];
+			}
+			jep_obj* e;
+			e = jep_evaluate(delim, list);
+			jep_add_object(o, e);
+		}
+		else if(node.leaf_count == 1)
+		{
+			jep_obj* e = jep_evaluate(node.leaves[0], list);
+			jep_add_object(o, e);
 		}
 	}
-	indent--;
+	else
+	{
+		int i;
+		for(i = 0; i < node.leaf_count; i++)
+		{
+			o = jep_evaluate(node.leaves[i], list);
+			if(o != NULL)
+			{
+				free(o->val);
+				free(o);
+			}
+		}
+		o = NULL;
+	}
+
+	return o;
 }

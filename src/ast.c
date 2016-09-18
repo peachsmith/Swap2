@@ -9,6 +9,7 @@ jep_ast_node* jep_create_ast_node()
 	node->leaf_count = 0;
 	node->cap = 10;
 	node->leaves = NULL;
+	node->array = 0;
 	return node;
 }
 

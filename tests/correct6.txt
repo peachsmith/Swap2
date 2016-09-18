@@ -3,3 +3,5 @@
 [string] c: words
 [int] e: 6
 [int] d: 6
+[array] f: { [int] 8, [character] n, [string] carrot }
+[array] g: {  }

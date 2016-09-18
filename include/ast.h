@@ -1,7 +1,7 @@
 #ifndef JEP_AST_H
 #define JEP_AST_H
 
-#include "object.h"
+// #include "object.h"
 #include "tokenizer.h"
 
 /* a node in an AST */
@@ -12,6 +12,7 @@ typedef struct ASTNode
 	int cap;
 	struct ASTNode* leaves;
 	int error;
+	int array;
 }jep_ast_node;
 
 /* a stack of nodes */

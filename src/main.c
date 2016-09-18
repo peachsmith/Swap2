@@ -78,22 +78,25 @@ int main(int argc, char** argv)
 
 		if(root != NULL)
 		{
-			/* print the AST if the -a flag was passed in */
 			if(!root->error && flags[JEP_AST])
 			{
 				jep_print_ast(*root);
 			}
+
 			if(root->leaves != NULL && !root->error && flags[JEP_OBJ])
 			{
 				jep_obj list = 
 				{
 					NULL, NULL, 0, NULL, NULL, NULL, NULL, 0
 				};
+				jep_mem mem = 
+				{
+					malloc(sizeof(void*) * 10), 10, 0
+				};
 				jep_obj* o;
 				int i;
 				for(i = 0; i < root->leaf_count; i++)
 				{
-					// printf("evaluating statements\n");
 					o = jep_evaluate(root->leaves[i], &list);
 					if(o != NULL && o->ident == NULL)
 					{
@@ -104,8 +107,8 @@ int main(int argc, char** argv)
 					}
 				}
 				jep_print_list(&list);
-				// printf("freeing objects\n");
-				jep_destroy_list(&list);
+				jep_destroy_list(&list, &mem);
+				free(mem.addr);
 			}
 
 			/* destroy the AST */

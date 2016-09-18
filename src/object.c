@@ -64,6 +64,64 @@ static void jep_print_array(jep_obj* array)
 	printf(" }");
 }
 
+static void jep_free_array(jep_obj* array, jep_mem* mem)
+{
+	if(array != NULL && array->size > 0)
+	{
+		jep_obj* elem = array->tail;
+		jep_obj* prev = NULL;
+		while(elem != NULL)
+		{
+			prev = elem->prev;
+			int i;
+			int freed = 0;
+			for(i = 0; i < mem->size; i++)
+			{
+				if((void*)(elem->val) == (void*)(mem->addr[i]))
+				{
+					freed = 1;
+				}
+			}
+			if(!freed)
+			{
+				if(elem->type == JEP_INT)
+				{
+					free(elem->val);
+				}
+				else if(elem->type == JEP_LONG)
+				{
+					free(elem->val);
+				}
+				else if(elem->type == JEP_DOUBLE)
+				{
+					free(elem->val);
+				}
+				else if(elem->type == JEP_CHARACTER)
+				{
+					free(elem->val);
+				}
+				else if(elem->type == JEP_STRING)
+				{
+					free(elem->val);
+				}
+				else if(elem->type == JEP_ARRAY)
+				{
+					jep_free_array(elem, mem);
+				}	
+
+				if(mem->size >= mem->cap)
+				{
+					mem->cap = mem->cap + mem->cap / 2;
+					mem->addr = realloc(mem->addr, sizeof(void*) * mem->cap);
+				}
+				mem->addr[mem->size++] = elem->val;
+			}
+			free(elem);
+			elem = prev;
+		}
+	}
+}
+
 /* allocates memory for a new object */
 jep_obj* jep_create_object()
 {
@@ -169,52 +227,167 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 	}
 }
 
-/* frees the memory in a list of objects */
-void jep_destroy_list(jep_obj* list)
+// /* frees the memory in a list of objects */
+// void jep_destroy_list(jep_obj* list, jep_mem* mem)
+// {
+// 	printf("BEGIN jep_destroy_list\n");
+// 	if(list == NULL)
+// 	{
+// 		printf("list is NULL\n");
+// 		return;
+// 	}
+
+// 	jep_obj* node = list->tail;
+// 	jep_obj* next = NULL;
+
+// 	if(node == NULL)
+// 	{
+// 		printf("list head is NULL\n");
+// 		return;
+// 	}
+
+// 	do
+// 	{
+// 		printf("freeing: ");
+// 		jep_print_obj(node);
+// 		next = node->prev;
+// 		int i;
+// 		int freed = 0;
+// 		for(i = 0; i < mem->size; i++)
+// 		{
+// 			if((void*)(node->val) == (void*)(mem->addr[i]))
+// 			{
+// 				freed = 1;
+// 			}
+// 		}
+// 		if(!freed)
+// 		{
+// 			if(node->type == JEP_ARRAY)
+// 			{
+// 				if(node == NULL)
+// 				{
+// 					printf("node is NULL\n");
+// 				}
+// 				else if(node->val == NULL)
+// 				{
+// 					printf("node's value is somehow already NULL\n");
+// 				}
+// 				jep_obj* array = (jep_obj*)(node->val);
+// 				jep_destroy_list(array, mem);
+// 			}
+// 			free(node->val);
+// 			if(mem->size >= mem->cap)
+// 			{
+// 				mem->cap = mem->cap + mem->cap / 2;
+// 				mem->addr = realloc(mem->addr, sizeof(void*) * mem->cap);
+// 			}
+// 			mem->addr[mem->size++] = node->val;
+// 		}
+// 		else
+// 		{
+// 			printf("this memory at %p has already been freed\n", node);
+// 		}
+// 		free(node);
+// 		node = next;
+// 	}while(node != NULL);
+
+// 	printf("END jep_destroy_list\n");
+// }
+
+static void jep_destroy_object(jep_obj* obj, jep_mem* mem)
 {
-	if(list == NULL)
+	if(obj != NULL)
 	{
-		return;
-	}
-
-	jep_obj* node = list->head;
-	jep_obj* next = NULL;
-
-	if(node == NULL)
-	{
-		return;
-	}
-
-	/* keep track of what memory has been freed */
-	int cap = 10;
-	int size = 0;
-	void** memory = malloc(sizeof(void*) * cap);
-
-	do
-	{
-		next = node->next;
 		int i;
 		int freed = 0;
-		for(i = 0; i < size; i++)
+		for(i = 0; i < mem->size; i++)
 		{
-			if(node->val == memory[i])
+			if((void*)(obj->val) == (void*)(mem->addr[i]))
 			{
 				freed = 1;
 			}
 		}
 		if(!freed)
 		{
-			free(node->val);
-			if(size >= cap)
+			if(obj != NULL)
 			{
-				cap = cap + cap / 2;
-				memory = realloc(memory, sizeof(void*) * cap);
+				if(obj->type == JEP_INT)
+				{
+					free(obj->val);
+				}
+				else if(obj->type == JEP_LONG)
+				{
+					free(obj->val);
+				}
+				else if(obj->type == JEP_DOUBLE)
+				{
+					free(obj->val);
+				}
+				else if(obj->type == JEP_CHARACTER)
+				{
+					free(obj->val);
+				}
+				else if(obj->type == JEP_STRING)
+				{
+					free(obj->val);
+				}
+				else if(obj->type == JEP_ARRAY)
+				{
+					jep_obj* array = (jep_obj*)(obj->val);
+					jep_free_array(array, mem);
+				}
+				else
+				{
+					printf("unrecognized type\n");
+				}
 			}
-			memory[size++] = node->val;
+			else
+			{
+				printf("[null]\n");
+			}
+			if(mem->size >= mem->cap)
+			{
+				mem->cap = mem->cap + mem->cap / 2;
+				mem->addr = realloc(mem->addr, sizeof(void*) * mem->cap);
+			}
+			mem->addr[mem->size++] = obj->val;
 		}
-		free(node);
-		node = next;
-	}while(next != NULL);
+		else
+		{
+			// printf("this memory at %p has already been freed\n", obj);
+		}
+		free(obj);
+	}
+	else
+	{
+		printf("obj is NULL\n");
+	}
+}
+
+/* frees the memory in a list of objects */
+void jep_destroy_list(jep_obj* list, jep_mem* mem)
+{
+	if(list == NULL)
+	{
+		printf("list is NULL\n");
+		return;
+	}
+
+	jep_obj* obj = list->head;
+	jep_obj* next = NULL;
+
+	if(obj == NULL)
+	{
+		printf("head is NULL\n");
+		return;
+	}
+
+	do
+	{
+		next = obj->next;
+		jep_destroy_object(obj, mem);
+		obj = next;
+	}while(obj != NULL);
 }
 
 jep_obj* jep_number(const char* s)
@@ -447,7 +620,9 @@ void jep_print_list(jep_obj* list)
 		return;
 	}
 
-	jep_obj* obj = list->head;
+	jep_obj* obj = NULL; 
+
+	obj = list->head;
 
 	if(obj == NULL)
 	{
@@ -456,7 +631,7 @@ void jep_print_list(jep_obj* list)
 
 	do
 	{
-		jep_print_obj(obj);
+		jep_print_obj(obj);	
 		obj = obj->next;
 	}while(obj != NULL);
 }

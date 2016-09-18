@@ -28,6 +28,13 @@ typedef struct Object
 	int size;            /* number of objects in the list */
 }jep_obj;
 
+typedef struct Memory
+{
+	void** addr; /* pointers that have been freed           */
+	int cap;     /* capacity of pointer array               */
+	int size;    /* amount of pointers that have been freed */
+}jep_mem;
+
 /* allocates memory for a new object */
 jep_obj* jep_create_object();
 
@@ -41,7 +48,7 @@ jep_obj* jep_get_object(const char* ident, jep_obj* list);
 void jep_copy_object(jep_obj* dest, jep_obj* src);
 
 /* frees the memory in a list of objects */
-void jep_destroy_list(jep_obj* list);
+void jep_destroy_list(jep_obj* list, jep_mem* mem);
 
 /* converts a token into a number object */
 jep_obj* jep_number(const char* s);

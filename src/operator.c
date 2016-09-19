@@ -233,12 +233,12 @@ jep_obj* jep_add(jep_ast_node node, jep_obj* list)
 	}
 
 	/* free the memory of the operands */
-	if(l != NULL)
+	if(l != NULL && l->ident == NULL)
 	{
 		free(l->val);
 		free(l);
 	}
-	if(r != NULL)
+	if(r != NULL && r->ident == NULL)
 	{
 		free(r->val);
 		free(r);
@@ -398,12 +398,12 @@ jep_obj* jep_sub(jep_ast_node node, jep_obj* list)
 	}
 
 	/* free the memory of the operands */
-	if(l != NULL)
+	if(l != NULL && l->ident == NULL)
 	{
 		free(l->val);
 		free(l);
 	}
-	if(r != NULL)
+	if(r != NULL && r->ident == NULL)
 	{
 		free(r->val);
 		free(r);
@@ -528,12 +528,12 @@ jep_obj* jep_mul(jep_ast_node node, jep_obj* list)
 	}
 
 	/* free the memory of the operands */
-	if(l != NULL)
+	if(l != NULL && l->ident == NULL)
 	{
 		free(l->val);
 		free(l);
 	}
-	if(r != NULL)
+	if(r != NULL && r->ident == NULL)
 	{
 		free(r->val);
 		free(r);
@@ -657,12 +657,12 @@ jep_obj* jep_div(jep_ast_node node, jep_obj* list)
 	}
 
 	/* free the memory of the operands */
-	if(l != NULL)
+	if(l != NULL && l->ident == NULL)
 	{
 		free(l->val);
 		free(l);
 	}
-	if(r != NULL)
+	if(r != NULL && r->ident == NULL)
 	{
 		free(r->val);
 		free(r);
@@ -786,12 +786,12 @@ jep_obj* jep_less(jep_ast_node node, jep_obj* list)
 	}
 
 	/* free the memory of the operands */
-	if(l != NULL)
+	if(l != NULL && l->ident == NULL)
 	{
 		free(l->val);
 		free(l);
 	}
-	if(r != NULL)
+	if(r != NULL && r->ident == NULL)
 	{
 		free(r->val);
 		free(r);
@@ -915,12 +915,12 @@ jep_obj* jep_greater(jep_ast_node node, jep_obj* list)
 	}
 
 	/* free the memory of the operands */
-	if(l != NULL)
+	if(l != NULL && l->ident == NULL)
 	{
 		free(l->val);
 		free(l);
 	}
-	if(r != NULL)
+	if(r != NULL && r->ident == NULL)
 	{
 		free(r->val);
 		free(r);
@@ -1044,12 +1044,12 @@ jep_obj* jep_lorequal(jep_ast_node node, jep_obj* list)
 	}
 
 	/* free the memory of the operands */
-	if(l != NULL)
+	if(l != NULL && l->ident == NULL)
 	{
 		free(l->val);
 		free(l);
 	}
-	if(r != NULL)
+	if(r != NULL && r->ident == NULL)
 	{
 		free(r->val);
 		free(r);
@@ -1431,12 +1431,12 @@ jep_obj* jep_noteq(jep_ast_node node, jep_obj* list)
 	}
 
 	/* free the memory of the operands */
-	if(l != NULL)
+	if(l != NULL && l->ident == NULL)
 	{
 		free(l->val);
 		free(l);
 	}
-	if(r != NULL)
+	if(r != NULL && r->ident == NULL)
 	{
 		free(r->val);
 		free(r);
@@ -1496,7 +1496,7 @@ jep_obj* jep_not(jep_ast_node node, jep_obj* list)
 	}
 
 	/* free the memory of the operands */
-	if(l != NULL)
+	if(l != NULL && l->ident == NULL)
 	{
 		free(l->val);
 		free(l);
@@ -1620,12 +1620,12 @@ jep_obj* jep_and(jep_ast_node node, jep_obj* list)
 	}
 
 	/* free the memory of the operands */
-	if(l != NULL)
+	if(l != NULL && l->ident == NULL)
 	{
 		free(l->val);
 		free(l);
 	}
-	if(r != NULL)
+	if(r != NULL && r->ident == NULL)
 	{
 		free(r->val);
 		free(r);
@@ -1749,12 +1749,12 @@ jep_obj* jep_or(jep_ast_node node, jep_obj* list)
 	}
 
 	/* free the memory of the operands */
-	if(l != NULL)
+	if(l != NULL && l->ident == NULL)
 	{
 		free(l->val);
 		free(l);
 	}
-	if(r != NULL)
+	if(r != NULL && r->ident == NULL)
 	{
 		free(r->val);
 		free(r);
@@ -1845,12 +1845,12 @@ jep_obj* jep_bitand(jep_ast_node node, jep_obj* list)
 	}
 
 	/* free the memory of the operands */
-	if(l != NULL)
+	if(l != NULL && l->ident == NULL)
 	{
 		free(l->val);
 		free(l);
 	}
-	if(r != NULL)
+	if(r != NULL && r->ident == NULL)
 	{
 		free(r->val);
 		free(r);
@@ -1941,12 +1941,12 @@ jep_obj* jep_bitor(jep_ast_node node, jep_obj* list)
 	}
 
 	/* free the memory of the operands */
-	if(l != NULL)
+	if(l != NULL && l->ident == NULL)
 	{
 		free(l->val);
 		free(l);
 	}
-	if(r != NULL)
+	if(r != NULL && r->ident == NULL)
 	{
 		free(r->val);
 		free(r);
@@ -2037,12 +2037,12 @@ jep_obj* jep_bitxor(jep_ast_node node, jep_obj* list)
 	}
 
 	/* free the memory of the operands */
-	if(l != NULL)
+	if(l != NULL && l->ident == NULL)
 	{
 		free(l->val);
 		free(l);
 	}
-	if(r != NULL)
+	if(r != NULL && r->ident == NULL)
 	{
 		free(r->val);
 		free(r);
@@ -2133,12 +2133,12 @@ jep_obj* jep_lshift(jep_ast_node node, jep_obj* list)
 	}
 
 	/* free the memory of the operands */
-	if(l != NULL)
+	if(l != NULL && l->ident == NULL)
 	{
 		free(l->val);
 		free(l);
 	}
-	if(r != NULL)
+	if(r != NULL && r->ident == NULL)
 	{
 		free(r->val);
 		free(r);
@@ -2229,12 +2229,12 @@ jep_obj* jep_rshift(jep_ast_node node, jep_obj* list)
 	}
 
 	/* free the memory of the operands */
-	if(l != NULL)
+	if(l != NULL && l->ident == NULL)
 	{
 		free(l->val);
 		free(l);
 	}
-	if(r != NULL)
+	if(r != NULL && r->ident == NULL)
 	{
 		free(r->val);
 		free(r);

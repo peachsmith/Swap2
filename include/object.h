@@ -15,6 +15,7 @@
 #define JEP_STRING 5
 #define JEP_ARRAY 6
 #define JEP_FUNCTION 7
+#define JEP_ARGUMENT 8
 
 typedef struct Object
 {
@@ -44,6 +45,9 @@ void jep_destroy_object(jep_obj* obj);
 /* frees the memory used by an array */
 void jep_free_array(jep_obj* array);
 
+/* frees the memory used by a function */
+void jep_free_function(jep_obj* func);
+
 /* adds an object to a list */
 void jep_add_object(jep_obj* list, jep_obj* o);
 
@@ -54,7 +58,7 @@ jep_obj* jep_get_object(const char* ident, jep_obj* list);
 void jep_copy_object(jep_obj* dest, jep_obj* src);
 
 /* frees the memory in a list of objects */
-void jep_destroy_list(jep_obj* list, jep_mem* mem);
+void jep_destroy_list(jep_obj* list);
 
 /* converts a token into a number object */
 jep_obj* jep_number(const char* s);

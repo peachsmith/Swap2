@@ -106,6 +106,16 @@ void jep_free_array(jep_obj* array)
 	}
 }
 
+/* frees the memory used by a function */
+void jep_free_function(jep_obj* func)
+{
+	jep_obj* args = func->head;
+	jep_obj* body = args->next;
+	jep_destroy_list(args);
+	free(args);
+	free(body);
+}
+
 /* allocates memory for a new object */
 jep_obj* jep_create_object()
 {
@@ -178,8 +188,16 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 			/* frees the memory used by an array */
 			jep_free_array((jep_obj*)(dest->val));
 			dest->size = 0;
+			free(dest->val);
 		}
-		free(dest->val);
+		else if(dest->type == JEP_FUNCTION)
+		{
+			jep_free_function(dest);
+		}
+		else
+		{
+			free(dest->val);
+		}
 	}
 	
 	dest->type = src->type;
@@ -232,6 +250,29 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 		dest->size = src->size;
 		dest->val = dest_array;
 	}
+	else if(src->type == JEP_FUNCTION)
+	{
+		jep_ast_node* n = jep_create_ast_node();
+		jep_obj* args = jep_create_object();
+		jep_obj* body = jep_create_object();	
+
+		jep_obj* src_args = src->head;
+		jep_obj* a = src_args->head;
+		while(a != NULL)
+		{
+			jep_obj* arg = jep_create_object();
+			arg->type = JEP_ARGUMENT;
+			arg->ident = a->ident;
+			jep_add_object(args, arg);
+			a = a->next;
+		}
+
+		*n = *((jep_ast_node*)(src_args->next->val));
+		body->val = n;
+
+		jep_add_object(dest, args);
+		jep_add_object(dest, body);
+	}
 }
 
 /* frees the memory used by an object */
@@ -261,9 +302,16 @@ void jep_destroy_object(jep_obj* obj)
 		}
 		else if(obj->type == JEP_ARRAY)
 		{
-			
-			/* frees the memory used by an array */jep_obj* array = (jep_obj*)(obj->val);
+			jep_obj* array = (jep_obj*)(obj->val);
 			jep_free_array(array);
+		}
+		else if(obj->type == JEP_FUNCTION)
+		{
+			jep_free_function(obj);
+		}
+		else if(obj->type == JEP_ARGUMENT)
+		{
+			/* arguments have no value */
 		}
 		else
 		{
@@ -274,11 +322,10 @@ void jep_destroy_object(jep_obj* obj)
 }
 
 /* frees the memory in a list of objects */
-void jep_destroy_list(jep_obj* list, jep_mem* mem)
+void jep_destroy_list(jep_obj* list)
 {
 	if(list == NULL)
 	{
-		printf("list is NULL\n");
 		return;
 	}
 
@@ -287,7 +334,6 @@ void jep_destroy_list(jep_obj* list, jep_mem* mem)
 
 	if(obj == NULL)
 	{
-		printf("head is NULL\n");
 		return;
 	}
 
@@ -509,6 +555,22 @@ void jep_print_object(jep_obj* obj)
 			jep_obj* array = (jep_obj*)(obj->val);
 			jep_print_array(array);
 			printf("\n");
+		}
+		else if(obj->type == JEP_FUNCTION)
+		{
+			printf("[function] %s (", obj->ident);
+			jep_obj* arg = obj->head->head;
+			while(arg != NULL)
+			{
+				printf("%s", arg->ident);
+				if(arg->next != NULL)
+				{
+					printf(", ");
+				}
+				arg = arg->next;
+			}
+			printf(")\n");
+			jep_print_ast(*(jep_ast_node*)(obj->head->next->val));
 		}
 		else
 		{

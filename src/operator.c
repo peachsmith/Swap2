@@ -28,6 +28,13 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 		}
 		return o;
 	}
+	else if(ast.token.type == T_KEYWORD)
+	{
+		if(ast.token.token_code == T_FUNCTION)
+		{
+			return jep_function(ast, list);
+		}
+	}
 
 	switch(ast.token.token_code)
 	{
@@ -2489,4 +2496,38 @@ jep_obj* jep_subscript(jep_ast_node node, jep_obj* list)
 	jep_destroy_object(array);
 
 	return o;
+}
+
+/* evaluates a function definition */
+jep_obj* jep_function(jep_ast_node node, jep_obj* list)
+{
+	jep_obj* copy = jep_create_object();
+	jep_obj* func = jep_create_object();
+	func->type = JEP_FUNCTION;
+	func->ident = node.leaves[0].token.val->buffer;
+	jep_obj* args = jep_create_object();
+	jep_obj* body = jep_create_object();
+
+	/* function arguments */
+	int i;
+	for(i = 0; i < node.leaves[1].leaf_count; i++)
+	{
+		jep_obj* a = jep_create_object();
+		a->type = JEP_ARGUMENT;
+		a->ident = node.leaves[1].leaves[i].token.val->buffer;
+		jep_add_object(args, a);
+	}
+
+	/* function body */
+	jep_ast_node* n = jep_create_ast_node();
+	*n = node.leaves[2];
+	body->val = n;
+
+	jep_add_object(func, args);
+	jep_add_object(func, body);
+
+	jep_add_object(list, func);
+	jep_copy_object(copy, func);
+
+	return copy;
 }

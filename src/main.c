@@ -89,10 +89,6 @@ int main(int argc, char** argv)
 				{
 					NULL, NULL, 0, NULL, NULL, NULL, NULL, 0
 				};
-				jep_mem mem = 
-				{
-					malloc(sizeof(void*) * 10), 10, 0
-				};
 				jep_obj* o;
 				int i;
 				for(i = 0; i < root->leaf_count; i++)
@@ -105,8 +101,7 @@ int main(int argc, char** argv)
 					}
 				}
 				jep_print_list(&list);
-				jep_destroy_list(&list, &mem);
-				free(mem.addr);
+				jep_destroy_list(&list);
 			}
 
 			/* destroy the AST */

@@ -13,6 +13,7 @@
 #define ERR_IDENTIFIER 2
 #define ERR_UNEXPECTED 3
 #define ERR_EXPECTED 4
+#define ERR_UNIQUE 5
 
 /**
  * constructs an AST from a stream of tokens

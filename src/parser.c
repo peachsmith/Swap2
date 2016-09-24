@@ -41,6 +41,11 @@ static void jep_err(int err, jep_token tok, jep_ast_node* root, char* val)
 		printf("expected '%s' at %d,%d but found '%s'\n", 
 			val, tok.row, tok.column, tok.val->buffer);
 	}
+	else if(err == ERR_UNIQUE)
+	{
+		printf("expected unique argument at %d,%d but found '%s'\n", 
+			tok.row, tok.column, tok.val->buffer);
+	}
 }
 
 /**
@@ -523,6 +528,9 @@ static jep_ast_node* jep_function(jep_ast_node* root, jep_ast_node** nodes)
 	jep_ast_node* ident;   /* the function identifier                */ 
 	jep_ast_node* args;    /* the function arguments                 */
 	jep_ast_node* body;    /* the function body                      */
+	char** arg_names;      /* argument identifier buffer             */
+	int cap = 10;          /* capacity of argument identifier buffer */
+	int size = 0;          /* size of argument identifier buffer     */
 
 	fn_node = (*nodes)++;
 
@@ -542,9 +550,11 @@ static jep_ast_node* jep_function(jep_ast_node* root, jep_ast_node** nodes)
 
 	jep_add_leaf_node(fn_node, ident);
 
+	/* aprse the function arguments */
 	args = (*nodes)++;
 	if(!jep_accept(T_RPAREN, nodes))
 	{
+		arg_names = malloc(sizeof(char*) * cap);
 		do
 		{
 			if((*nodes)->token.type != T_IDENTIFIER)
@@ -552,6 +562,22 @@ static jep_ast_node* jep_function(jep_ast_node* root, jep_ast_node** nodes)
 				jep_err(ERR_IDENTIFIER, (*nodes)->token, root, NULL);
 				return NULL;
 			}
+			char* arg_ident = (*nodes)->token.val->buffer;
+			int i;
+			for(i = 0; i < size; i++)
+			{
+				if(!strcmp(arg_ident, arg_names[i]))
+				{
+					jep_err(ERR_UNIQUE, (*nodes)->token, root, ")");
+					return NULL;		
+				}
+			}
+			if(size >= cap)
+			{
+				cap = cap + cap / 2;
+				arg_names = realloc(arg_names, sizeof(char*) * cap);
+			}
+			arg_names[size++] = arg_ident;
 			jep_add_leaf_node(args, (*nodes)++);
 		}while(jep_accept(T_COMMA, nodes));
 		if(!jep_accept(T_RPAREN, nodes))
@@ -569,6 +595,7 @@ static jep_ast_node* jep_function(jep_ast_node* root, jep_ast_node** nodes)
 		return NULL;
 	}
 
+	/* parse the function body */
 	body = (*nodes)++;
 	body->error = 0;
 	jep_block(body, nodes);

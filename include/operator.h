@@ -1,7 +1,6 @@
 #ifndef JEP_OPERATOR_H
 #define JEP_OPERATOR_H
 
-#include "ast.h"
 #include "object.h"
 
 /* evaluates an AST node */

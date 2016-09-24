@@ -98,12 +98,10 @@ int main(int argc, char** argv)
 				for(i = 0; i < root->leaf_count; i++)
 				{
 					o = jep_evaluate(root->leaves[i], &list);
-					if(o != NULL && o->ident == NULL)
+					if(o != NULL)
 					{
-						printf("destroying unused object\n");
-						/* immediately destroy all unused objects */
-						free(o->val);
-						free(o);
+						/* destroy unused objects */
+						jep_destroy_object(o);
 					}
 				}
 				jep_print_list(&list);

@@ -38,6 +38,12 @@ typedef struct Memory
 /* allocates memory for a new object */
 jep_obj* jep_create_object();
 
+/* frees the memory used by an object */
+void jep_destroy_object(jep_obj* obj);
+
+/* frees the memory used by an array */
+void jep_free_array(jep_obj* array);
+
 /* adds an object to a list */
 void jep_add_object(jep_obj* list, jep_obj* o);
 
@@ -63,7 +69,7 @@ jep_obj* jep_string(const char* s);
 jep_obj* jep_array(jep_ast_node* ast);
 
 /* prints an object to stdout */
-void jep_print_obj(jep_obj* obj);
+void jep_print_object(jep_obj* obj);
 
 /* prints a list of objects to stdout */
 void jep_print_list(jep_obj* list);

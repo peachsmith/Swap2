@@ -69,4 +69,7 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list);
 /* evaluates the contents of a set of curly braces */
 jep_obj* jep_brace(jep_ast_node node, jep_obj* list);
 
+/* evaluates an array subscript */
+jep_obj* jep_subscript(jep_ast_node node, jep_obj* list);
+
 #endif

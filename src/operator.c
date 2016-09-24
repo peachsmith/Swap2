@@ -111,6 +111,10 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 			o = jep_brace(ast, list);
 			break;
 
+		case T_LSQUARE:
+			o = jep_subscript(ast, list);
+			break;
+
 		case T_EQUALS:
 			o = jep_assign(ast, list);
 			break;
@@ -2335,6 +2339,7 @@ jep_obj* jep_brace(jep_ast_node node, jep_obj* list)
 		o = jep_create_object();
 		o->type = JEP_ARRAY;
 		o->val = array;
+		int size = 0;
 		if(node.leaf_count > 0 && node.leaves[0].token.token_code == T_COMMA)
 		{
 			jep_ast_node delim = node.leaves[0];
@@ -2344,16 +2349,20 @@ jep_obj* jep_brace(jep_ast_node node, jep_obj* list)
 				e = jep_evaluate(delim.leaves[0], list);
 				jep_add_object(array, e);
 				delim = delim.leaves[1];
+				size++;
 			}
 			jep_obj* e;
 			e = jep_evaluate(delim, list);
 			jep_add_object(array, e);
+			size++;
 		}
 		else if(node.leaf_count == 1)
 		{
 			jep_obj* e = jep_evaluate(node.leaves[0], list);
 			jep_add_object(array, e);
+			size++;
 		}
+		o->size = size;
 	}
 	else
 	{
@@ -2364,6 +2373,65 @@ jep_obj* jep_brace(jep_ast_node node, jep_obj* list)
 			jep_destroy_object(o);
 		}
 	}
+
+	return o;
+}
+
+/* evaluates an array subscript */
+jep_obj* jep_subscript(jep_ast_node node, jep_obj* list)
+{
+	jep_obj* o = NULL;
+	if(node.leaf_count != 2)
+	{
+		printf("invalid leaf count for ast node\n");
+	}
+
+	jep_obj* index = jep_evaluate(node.leaves[0], list);
+	jep_obj* array = jep_evaluate(node.leaves[1], list);
+
+	if(index != NULL && array != NULL)
+	{
+		if(index->type != JEP_INT)
+		{
+			printf("array subscript must be an integer\n");
+		}
+		else if(array->type != JEP_ARRAY)
+		{
+			printf("cannot access index of non array object\n");
+		}
+		else if(array->size > 0)
+		{
+			jep_obj* contents = (jep_obj*)(array->val);
+			jep_obj* elem = contents->head;
+			int target = *(int*)(index->val);
+			int i;
+			for(i = 0; elem != NULL; i++)
+			{
+				if(i == target)
+				{
+					o = jep_create_object();
+					jep_copy_object(o, elem);
+				}
+				elem = elem->next;
+			}
+			if(o == NULL)
+			{
+				printf("array index out of bounds\n");
+			}
+		}
+		else
+		{
+			printf("cannot access an element in an empty array\n");
+		}
+
+	}
+	else
+	{
+		printf("could not evaluate either the array or index\n");
+	}
+
+	jep_destroy_object(index);
+	jep_destroy_object(array);
 
 	return o;
 }

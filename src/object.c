@@ -177,6 +177,7 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 		{
 			/* frees the memory used by an array */
 			jep_free_array((jep_obj*)(dest->val));
+			dest->size = 0;
 		}
 		free(dest->val);
 	}
@@ -228,6 +229,7 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 				orig = orig->next;
 			}
 		}
+		dest->size = src->size;
 		dest->val = dest_array;
 	}
 }

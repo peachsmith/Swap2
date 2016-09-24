@@ -18,6 +18,9 @@ jep_obj* jep_mul(jep_ast_node node, jep_obj* list);
 /* evaluates a division expression */
 jep_obj* jep_div(jep_ast_node node, jep_obj* list);
 
+/* evaluates a modulus expression */
+jep_obj* jep_modulus(jep_ast_node node, jep_obj* list);
+
 /* evaluates a less than expression */
 jep_obj* jep_less(jep_ast_node node, jep_obj* list);
 

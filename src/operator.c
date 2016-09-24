@@ -47,6 +47,10 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 			o = jep_div(ast, list);
 			break;
 
+		case T_MODULUS:
+			o = jep_modulus(ast, list);
+			break;
+
 		case T_LESS:
 			o = jep_less(ast, list);
 			break;
@@ -661,6 +665,57 @@ jep_obj* jep_div(jep_ast_node node, jep_obj* list)
 			result->val = (void*)n;
 			result->type = JEP_LONG;
 		}
+	}
+	else
+	{
+		printf("could not obtain both operand values\n");
+	}
+
+	/* free the memory of the operands */
+	if(l != NULL)
+	{
+		free(l->val);
+		free(l);
+	}
+	if(r != NULL)
+	{
+		free(r->val);
+		free(r);
+	}
+
+	return result;
+}
+
+/* evaluates a modulus expression */
+jep_obj* jep_modulus(jep_ast_node node, jep_obj* list)
+{
+	jep_obj* l = NULL;       /* left operand  */
+	jep_obj* r = NULL;       /* right operand */
+	jep_obj* result = NULL;  /* result        */
+
+	if(node.leaf_count != 2)
+	{
+		return NULL;
+	}
+	
+	l = jep_evaluate(node.leaves[0], list);
+	r = jep_evaluate(node.leaves[1], list);
+
+	if(l != NULL && r != NULL)
+	{
+		if(l->type == r->type && l->type == JEP_INT)
+		{
+			int *n = malloc(sizeof(int));
+			*n = (*(int*)(l->val)) % (*(int*)(r->val));
+			result = malloc(sizeof(jep_obj));
+			result->val = (void*)n;
+			result->type = JEP_INT;
+		}
+		else
+		{
+			printf("invalid operand types for %% operator\n");
+		}
+		
 	}
 	else
 	{

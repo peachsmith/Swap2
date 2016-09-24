@@ -85,6 +85,7 @@ static int jep_associativity(jep_ast_node* node)
 		case T_LSHIFTASSIGN:
 		case T_RSHIFTASSIGN:
 		case T_NOT:
+		case T_COMMA:
 			return JEP_RIGHT_ASSOC;
 
 		case T_MINUS:

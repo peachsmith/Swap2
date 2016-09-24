@@ -26,7 +26,7 @@ static void jep_print_array(jep_obj* array)
 	printf("{ ");
 	if(array != NULL && array->size > 0)
 	{
-		jep_obj* elem = array->tail;
+		jep_obj* elem = array->head;
 		while(elem != NULL)
 		{
 			if(elem->type == JEP_INT)
@@ -54,11 +54,11 @@ static void jep_print_array(jep_obj* array)
 				printf("[array] ");
 				jep_print_array((jep_obj*)(elem->val));
 			}
-			if(elem->prev != NULL)
+			if(elem->next != NULL)
 			{
 				printf(", ");
 			}
-			elem = elem->prev;
+			elem = elem->next;
 		}
 	}
 	printf(" }");

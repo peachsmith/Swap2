@@ -2352,9 +2352,9 @@ jep_obj* jep_brace(jep_ast_node node, jep_obj* list)
 			while(delim.token.token_code == T_COMMA)
 			{
 				jep_obj* e;
-				e = jep_evaluate(delim.leaves[1], list);
+				e = jep_evaluate(delim.leaves[0], list);
 				jep_add_object(array, e);
-				delim = delim.leaves[0];
+				delim = delim.leaves[1];
 			}
 			jep_obj* e;
 			e = jep_evaluate(delim, list);

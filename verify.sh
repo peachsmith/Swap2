@@ -7,6 +7,7 @@ cor3=$(<./tests/correct3.txt)
 cor4=$(<./tests/correct4.txt)
 cor5=$(<./tests/correct5.txt)
 cor6=$(<./tests/correct6.txt)
+cor7=$(<./tests/correct7.txt)
 
 # get the actual results
 res1=$(<./tests/result1.txt)
@@ -15,9 +16,10 @@ res3=$(<./tests/result3.txt)
 res4=$(<./tests/result4.txt)
 res5=$(<./tests/result5.txt)
 res6=$(<./tests/result6.txt)
+res7=$(<./tests/result7.txt)
 
 # the total number of test cases
-cases=6
+cases=7
 
 # the number of test cases that passed
 passed=0
@@ -63,6 +65,13 @@ if [ "$res6" == "$cor6" ]; then
 	let "passed++"
 else
 	echo Test 6: fail
+fi
+
+if [ "$res7" == "$cor7" ]; then
+	echo Test 7: pass
+	let "passed++"
+else
+	echo Test 7: fail
 fi
 
 echo ============================================

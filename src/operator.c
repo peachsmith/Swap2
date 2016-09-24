@@ -24,6 +24,7 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 		{
 			o = jep_create_object();
 			jep_copy_object(o, e);
+			o->ident = e->ident;
 		}
 		return o;
 	}
@@ -2273,7 +2274,7 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 		}
 		else
 		{
-			o = jep_get_object(l->ident, list);	
+			o = jep_get_object(l->ident, list);
 		}
 
 		if(o == NULL)
@@ -2282,18 +2283,6 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 			o = jep_create_object();
 			o->ident = node.leaves[0].token.val->buffer;
 			jep_add_object(list, o);
-		}
-		else if(o->val != NULL)
-		{
-			/* free existing memory */
-			if(o->type == JEP_ARRAY)
-			{
-				jep_free_array((jep_obj*)(o->val));
-			}
-			else
-			{
-				free(o->val);	
-			}
 		}
 
 		jep_copy_object(o, r);

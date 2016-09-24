@@ -150,21 +150,15 @@ jep_obj* jep_get_object(const char* ident, jep_obj* list)
 	}
 
 	jep_obj* obj = list->head;
-	// jep_obj* head = node;
 
-	if(obj == NULL)
-	{
-		return NULL;
-	}
-
-	do
+	while(obj != NULL)
 	{
 		if(obj->ident != NULL && !strcmp(ident, obj->ident))
 		{
 			return obj;
 		}
 		obj = obj->next;
-	}while(obj != NULL);
+	}
 
 	return NULL;
 }

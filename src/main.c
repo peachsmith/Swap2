@@ -87,7 +87,7 @@ int main(int argc, char** argv)
 			{
 				jep_obj list = 
 				{
-					NULL, NULL, 0, NULL, NULL, NULL, NULL, 0
+					NULL, NULL, 0, NULL, NULL, NULL, NULL, 0, 0
 				};
 				jep_obj* o;
 				int i;
@@ -96,7 +96,6 @@ int main(int argc, char** argv)
 					o = jep_evaluate(root->leaves[i], &list);
 					if(o != NULL)
 					{
-						/* destroy unused objects */
 						jep_destroy_object(o);
 					}
 				}

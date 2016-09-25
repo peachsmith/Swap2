@@ -34,6 +34,10 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 		{
 			return jep_function(ast, list);
 		}
+		else if(ast.token.token_code == T_RETURN)
+		{
+			return jep_return(ast, list);
+		}
 	}
 
 	switch(ast.token.token_code)
@@ -169,7 +173,7 @@ jep_obj* jep_add(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(int*)(l->val)) + (*(int*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -177,7 +181,7 @@ jep_obj* jep_add(jep_ast_node node, jep_obj* list)
 			{
 				long *n = malloc(sizeof(int));
 				*n = (*(long*)(l->val)) + (*(long*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_LONG;
 			}
@@ -185,7 +189,7 @@ jep_obj* jep_add(jep_ast_node node, jep_obj* list)
 			{
 				double *n = malloc(sizeof(double));
 				*n = (*(double*)(l->val)) + (*(double*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_DOUBLE;
 			}
@@ -215,7 +219,7 @@ jep_obj* jep_add(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) + (*(double*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_DOUBLE;
 		}
@@ -244,7 +248,7 @@ jep_obj* jep_add(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) + (*(long*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_LONG;
 		}
@@ -299,7 +303,7 @@ jep_obj* jep_sub(jep_ast_node node, jep_obj* list)
 		{
 			int *n = malloc(sizeof(int));
 			*n = 0 - (*(int*)(l->val));
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -307,7 +311,7 @@ jep_obj* jep_sub(jep_ast_node node, jep_obj* list)
 		{
 			long *n = malloc(sizeof(int));
 			*n = 0 - (*(long*)(l->val));
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_LONG;
 		}
@@ -315,7 +319,7 @@ jep_obj* jep_sub(jep_ast_node node, jep_obj* list)
 		{
 			double *n = malloc(sizeof(double));
 			*n = 0 - (*(double*)(l->val));
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_DOUBLE;
 		}
@@ -334,7 +338,7 @@ jep_obj* jep_sub(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(int*)(l->val)) - (*(int*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -342,7 +346,7 @@ jep_obj* jep_sub(jep_ast_node node, jep_obj* list)
 			{
 				long *n = malloc(sizeof(int));
 				*n = (*(long*)(l->val)) - (*(long*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_LONG;
 			}
@@ -350,7 +354,7 @@ jep_obj* jep_sub(jep_ast_node node, jep_obj* list)
 			{
 				double *n = malloc(sizeof(double));
 				*n = (*(double*)(l->val)) - (*(double*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_DOUBLE;
 			}
@@ -380,7 +384,7 @@ jep_obj* jep_sub(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) - (*(double*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_DOUBLE;
 		}
@@ -409,7 +413,7 @@ jep_obj* jep_sub(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) - (*(long*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_LONG;
 		}
@@ -463,7 +467,7 @@ jep_obj* jep_mul(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(int*)(l->val)) * (*(int*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -471,7 +475,7 @@ jep_obj* jep_mul(jep_ast_node node, jep_obj* list)
 			{
 				long *n = malloc(sizeof(int));
 				*n = (*(long*)(l->val)) * (*(long*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_LONG;
 			}
@@ -479,7 +483,7 @@ jep_obj* jep_mul(jep_ast_node node, jep_obj* list)
 			{
 				double *n = malloc(sizeof(double));
 				*n = (*(double*)(l->val)) * (*(double*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_DOUBLE;
 			}
@@ -509,7 +513,7 @@ jep_obj* jep_mul(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) * (*(double*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_DOUBLE;
 		}
@@ -539,7 +543,7 @@ jep_obj* jep_mul(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) * (*(long*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_LONG;
 		}
@@ -593,7 +597,7 @@ jep_obj* jep_div(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(int*)(l->val)) / (*(int*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -601,7 +605,7 @@ jep_obj* jep_div(jep_ast_node node, jep_obj* list)
 			{
 				long *n = malloc(sizeof(int));
 				*n = (*(long*)(l->val)) / (*(long*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_LONG;
 			}
@@ -609,7 +613,7 @@ jep_obj* jep_div(jep_ast_node node, jep_obj* list)
 			{
 				double *n = malloc(sizeof(double));
 				*n = (*(double*)(l->val)) / (*(double*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_DOUBLE;
 			}
@@ -639,7 +643,7 @@ jep_obj* jep_div(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) / (*(double*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_DOUBLE;
 		}
@@ -668,7 +672,7 @@ jep_obj* jep_div(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) / (*(long*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_LONG;
 		}
@@ -714,7 +718,7 @@ jep_obj* jep_modulus(jep_ast_node node, jep_obj* list)
 		{
 			int *n = malloc(sizeof(int));
 			*n = (*(int*)(l->val)) % (*(int*)(r->val));
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -773,7 +777,7 @@ jep_obj* jep_less(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(int*)(l->val)) < (*(int*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -781,7 +785,7 @@ jep_obj* jep_less(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(long*)(l->val)) < (*(long*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -789,7 +793,7 @@ jep_obj* jep_less(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(double));
 				*n = (*(double*)(l->val)) < (*(double*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -819,7 +823,7 @@ jep_obj* jep_less(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) < (*(double*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -848,7 +852,7 @@ jep_obj* jep_less(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) < (*(long*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -902,7 +906,7 @@ jep_obj* jep_greater(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(int*)(l->val)) > (*(int*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -910,7 +914,7 @@ jep_obj* jep_greater(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(long*)(l->val)) > (*(long*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -918,7 +922,7 @@ jep_obj* jep_greater(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(double));
 				*n = (*(double*)(l->val)) > (*(double*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -948,7 +952,7 @@ jep_obj* jep_greater(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) > (*(double*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -977,7 +981,7 @@ jep_obj* jep_greater(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) > (*(long*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -1031,7 +1035,7 @@ jep_obj* jep_lorequal(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(int*)(l->val)) <= (*(int*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1039,7 +1043,7 @@ jep_obj* jep_lorequal(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(long*)(l->val)) <= (*(long*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1047,7 +1051,7 @@ jep_obj* jep_lorequal(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(double));
 				*n = (*(double*)(l->val)) <= (*(double*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1077,7 +1081,7 @@ jep_obj* jep_lorequal(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) <= (*(double*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -1106,7 +1110,7 @@ jep_obj* jep_lorequal(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) <= (*(long*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -1160,7 +1164,7 @@ jep_obj* jep_gorequal(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(int*)(l->val)) >= (*(int*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1168,7 +1172,7 @@ jep_obj* jep_gorequal(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(long*)(l->val)) >= (*(long*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1176,7 +1180,7 @@ jep_obj* jep_gorequal(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(double));
 				*n = (*(double*)(l->val)) >= (*(double*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1206,7 +1210,7 @@ jep_obj* jep_gorequal(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) >= (*(double*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -1235,7 +1239,7 @@ jep_obj* jep_gorequal(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) >= (*(long*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -1289,7 +1293,7 @@ jep_obj* jep_equiv(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(int*)(l->val)) == (*(int*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1297,7 +1301,7 @@ jep_obj* jep_equiv(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(long*)(l->val)) == (*(long*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1305,7 +1309,7 @@ jep_obj* jep_equiv(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(double));
 				*n = (*(double*)(l->val)) == (*(double*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1335,7 +1339,7 @@ jep_obj* jep_equiv(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) == (*(double*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -1364,7 +1368,7 @@ jep_obj* jep_equiv(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) == (*(long*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -1418,7 +1422,7 @@ jep_obj* jep_noteq(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(int*)(l->val)) != (*(int*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1426,7 +1430,7 @@ jep_obj* jep_noteq(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(long*)(l->val)) != (*(long*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1434,7 +1438,7 @@ jep_obj* jep_noteq(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(double*)(l->val)) != (*(double*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1464,7 +1468,7 @@ jep_obj* jep_noteq(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) != (*(double*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -1493,7 +1497,7 @@ jep_obj* jep_noteq(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) != (*(long*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -1542,7 +1546,7 @@ jep_obj* jep_not(jep_ast_node node, jep_obj* list)
 		{
 			int *n = malloc(sizeof(int));
 			*n = !(*(int*)(l->val));
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -1550,7 +1554,7 @@ jep_obj* jep_not(jep_ast_node node, jep_obj* list)
 		{
 			int *n = malloc(sizeof(int));
 			*n = !(*(long*)(l->val));
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -1558,7 +1562,7 @@ jep_obj* jep_not(jep_ast_node node, jep_obj* list)
 		{
 			int *n = malloc(sizeof(int));
 			*n = !(*(double*)(l->val));
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -1607,7 +1611,7 @@ jep_obj* jep_and(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(int*)(l->val)) && (*(int*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1615,7 +1619,7 @@ jep_obj* jep_and(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(long*)(l->val)) && (*(long*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1623,7 +1627,7 @@ jep_obj* jep_and(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(double*)(l->val)) && (*(double*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1653,7 +1657,7 @@ jep_obj* jep_and(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) && (*(double*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -1682,7 +1686,7 @@ jep_obj* jep_and(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) && (*(long*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -1736,7 +1740,7 @@ jep_obj* jep_or(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(int*)(l->val)) || (*(int*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1744,7 +1748,7 @@ jep_obj* jep_or(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(long*)(l->val)) || (*(long*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1752,7 +1756,7 @@ jep_obj* jep_or(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(double*)(l->val)) || (*(double*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1782,7 +1786,7 @@ jep_obj* jep_or(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) || (*(double*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -1811,7 +1815,7 @@ jep_obj* jep_or(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) || (*(long*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -1865,7 +1869,7 @@ jep_obj* jep_bitand(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(int*)(l->val)) & (*(int*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1873,7 +1877,7 @@ jep_obj* jep_bitand(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(long*)(l->val)) & (*(long*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1907,7 +1911,7 @@ jep_obj* jep_bitand(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) & (*(long*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -1961,7 +1965,7 @@ jep_obj* jep_bitor(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(int*)(l->val)) | (*(int*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -1969,7 +1973,7 @@ jep_obj* jep_bitor(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(long*)(l->val)) | (*(long*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -2003,7 +2007,7 @@ jep_obj* jep_bitor(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) | (*(long*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -2057,7 +2061,7 @@ jep_obj* jep_bitxor(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(int*)(l->val)) ^ (*(int*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -2065,7 +2069,7 @@ jep_obj* jep_bitxor(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(long*)(l->val)) ^ (*(long*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -2099,7 +2103,7 @@ jep_obj* jep_bitxor(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) ^ (*(long*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -2153,7 +2157,7 @@ jep_obj* jep_lshift(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(int*)(l->val)) << (*(int*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -2161,7 +2165,7 @@ jep_obj* jep_lshift(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(long*)(l->val)) << (*(long*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -2195,7 +2199,7 @@ jep_obj* jep_lshift(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) << (*(long*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -2249,7 +2253,7 @@ jep_obj* jep_rshift(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(int*)(l->val)) >> (*(int*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -2257,7 +2261,7 @@ jep_obj* jep_rshift(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(long*)(l->val)) >> (*(long*)(r->val));
-				result = malloc(sizeof(jep_obj));
+				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
 			}
@@ -2291,7 +2295,7 @@ jep_obj* jep_rshift(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) >> (*(long*)(r->val));
 				}
 			}
-			result = malloc(sizeof(jep_obj));
+			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
@@ -2349,6 +2353,7 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 			o = jep_create_object();
 			o->ident = node.leaves[0].token.val->buffer;
 			jep_add_object(list, o);
+
 		}
 
 		jep_copy_object(o, r);
@@ -2367,26 +2372,106 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 /* evaluates the contents of a set of parentheses */
 jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 {
-	if(node.leaves == NULL)
+	if(!node.token.unary)
+	{
+		if(node.leaf_count == 1)
+		{
+			return jep_evaluate(node.leaves[0], list);
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
+	jep_obj* o;        /* function return value    */
+	jep_ast_node args; /* incoming arguments       */
+	jep_obj* func;     /* function being called    */
+	jep_obj* arg_list; /* list of argument objects */
+
+	if(node.leaf_count == 0)
 	{
 		return NULL;
 	}
 
-	jep_obj* o = jep_evaluate(node.leaves[0], list);
+	o = NULL;
+	func = NULL;
+	arg_list = NULL;
 
-	int i;
-	for(i = 1; i < node.leaf_count; i++)
+	/* collection the function arguments as objects */
+	if(node.leaf_count == 2)
 	{
-		if(o->val != NULL)
+		func = jep_get_object(node.leaves[1].token.val->buffer, list);
+		args = node.leaves[0];
+		arg_list = jep_create_object();
+		arg_list->type = JEP_LIST;
+		if(args.leaf_count > 1)
 		{
-			free(o->val);
+			jep_ast_node delim = node.leaves[0];
+			while(delim.token.token_code == T_COMMA)
+			{
+				jep_obj* a;
+				a = jep_evaluate(delim.leaves[0], list);
+				jep_add_object(arg_list, a);
+				delim = delim.leaves[1];
+				arg_list->size++;
+			}
+			jep_obj* a;
+			a = jep_evaluate(delim, list);
+			jep_add_object(arg_list, a);
+			arg_list->size++;
 		}
-		if(o != NULL)
+		else if(args.leaf_count == 0)
 		{
-			free(o);
+			jep_obj* a = jep_evaluate(node.leaves[0], list);
+			jep_add_object(arg_list, a);
+			arg_list->size++;	
 		}
-		o = jep_evaluate(node.leaves[i], list);
 	}
+	else if(node.leaf_count == 1)
+	{
+		func = jep_get_object(node.leaves[0].token.val->buffer, list);	
+	}
+
+	if(func != NULL)
+	{
+		jep_obj* fargs = func->head;
+		jep_ast_node body = *((jep_ast_node*)(func->head->next->val));
+		if(arg_list != NULL)
+		{
+			jep_obj* arg = arg_list->head;
+			jep_obj* farg = fargs->head;
+			while(arg != NULL && farg != NULL)
+			{
+				arg->ident = farg->ident;
+				farg = farg->next;
+				arg = arg->next;
+			}
+			if(arg != NULL || farg != NULL)
+			{
+				printf("woops, apparently there weren't the right amount of arguments!\n");
+			}
+			else
+			{
+
+				jep_add_object(list, arg_list);
+
+				o = jep_evaluate(body, list);
+
+				/* remove the argument list from the main list */
+				list->tail = list->tail->prev;
+				list->tail->next = NULL;
+				list->size--;
+			}
+		}
+	}
+	else
+	{
+		printf("couldn't find a function with the specified identifer\n");
+	}
+
+	jep_destroy_list(arg_list);
+	free(arg_list);
 
 	return o;
 }
@@ -2432,6 +2517,10 @@ jep_obj* jep_brace(jep_ast_node node, jep_obj* list)
 		for(i = 0; i < node.leaf_count; i++)
 		{
 			o = jep_evaluate(node.leaves[i], list);
+			if(o != NULL && o->ret)
+			{
+				return o;
+			}
 			jep_destroy_object(o);
 		}
 	}
@@ -2530,4 +2619,18 @@ jep_obj* jep_function(jep_ast_node node, jep_obj* list)
 	jep_copy_object(copy, func);
 
 	return copy;
+}
+
+/* returns from a function */
+jep_obj* jep_return(jep_ast_node node, jep_obj* list)
+{
+	jep_obj* o = NULL;
+
+	if(node.leaf_count == 1)
+	{
+		o = jep_evaluate(node.leaves[0], list);
+		o->ret = 1;
+	}
+
+	return o;
 }

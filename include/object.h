@@ -16,6 +16,7 @@
 #define JEP_ARRAY 6
 #define JEP_FUNCTION 7
 #define JEP_ARGUMENT 8
+#define JEP_LIST 9
 
 typedef struct Object
 {
@@ -27,6 +28,7 @@ typedef struct Object
 	struct Object* head; /* beginning of list             */
 	struct Object* tail; /* end of list                   */
 	int size;            /* number of objects in the list */
+	int ret;             /* return flag                   */
 }jep_obj;
 
 typedef struct Memory

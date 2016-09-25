@@ -78,4 +78,7 @@ jep_obj* jep_subscript(jep_ast_node node, jep_obj* list);
 /* evaluates a function definition */
 jep_obj* jep_function(jep_ast_node node, jep_obj* list);
 
+/* returns from a function */
+jep_obj* jep_return(jep_ast_node node, jep_obj* list);
+
 #endif

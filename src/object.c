@@ -129,6 +129,7 @@ jep_obj* jep_create_object()
 	o->head = NULL;
 	o->tail = NULL;
 	o->size = 0;
+	o->ret = 0;
 
 	return o;
 }
@@ -159,18 +160,23 @@ jep_obj* jep_get_object(const char* ident, jep_obj* list)
 		return NULL;
 	}
 
+	jep_obj* o = NULL;
 	jep_obj* obj = list->head;
 
 	while(obj != NULL)
 	{
 		if(obj->ident != NULL && !strcmp(ident, obj->ident))
 		{
-			return obj;
+			o = obj;
+		}
+		if(obj->type == JEP_LIST)
+		{
+			o = jep_get_object(ident, obj);
 		}
 		obj = obj->next;
 	}
 
-	return NULL;
+	return o;
 }
 
 /* copies the value of one obect into another */
@@ -318,6 +324,7 @@ void jep_destroy_object(jep_obj* obj)
 			printf("unrecognized type\n");
 		}
 		free(obj);
+		obj = NULL;
 	}
 }
 
@@ -334,6 +341,7 @@ void jep_destroy_list(jep_obj* list)
 
 	if(obj == NULL)
 	{
+		printf("obj is NULL\n");
 		return;
 	}
 
@@ -572,6 +580,10 @@ void jep_print_object(jep_obj* obj)
 			printf(")\n");
 			jep_print_ast(*(jep_ast_node*)(obj->head->next->val));
 		}
+		else if(obj->type == JEP_LIST)
+		{
+			printf("[list]\n");
+		}
 		else
 		{
 			printf("unrecognized type\n");
@@ -602,7 +614,7 @@ void jep_print_list(jep_obj* list)
 
 	do
 	{
-		jep_print_object(obj);	
+		jep_print_object(obj);
 		obj = obj->next;
 	}while(obj != NULL);
 }

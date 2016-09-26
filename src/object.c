@@ -578,7 +578,6 @@ void jep_print_object(jep_obj* obj)
 				arg = arg->next;
 			}
 			printf(")\n");
-			jep_print_ast(*(jep_ast_node*)(obj->head->next->val));
 		}
 		else if(obj->type == JEP_LIST)
 		{

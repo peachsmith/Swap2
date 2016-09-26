@@ -142,6 +142,10 @@ void jep_add_object(jep_obj* list, jep_obj* o)
 		list->head = o;
 		list->tail = o;
 	}
+	else if(list->tail->type == JEP_LIST)
+	{
+		jep_add_object(list->tail, o);
+	}
 	else
 	{
 		list->tail->next = o;

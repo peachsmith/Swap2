@@ -5,8 +5,8 @@
 #include "ast.h"
 
 /* associativity */
-#define JEP_LEFT_ASSOC 1
-#define JEP_RIGHT_ASSOC 2
+#define JEP_LEFT_ASSOC 1  /* left to right */
+#define JEP_RIGHT_ASSOC 2 /* right to left */
 
 /* error codes */
 #define ERR_EXPRESSION 1

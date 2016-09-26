@@ -134,6 +134,10 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 			o = jep_assign(ast, list);
 			break;
 
+		case T_COMMA:
+			o = jep_comma(ast, list);
+			break;
+
 		default:
 			printf("unrecognized token: %s\n", 
 				ast.token.val->buffer);
@@ -2407,25 +2411,20 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 		arg_list->type = JEP_LIST;
 		if(args.leaf_count > 1)
 		{
-			jep_ast_node delim = node.leaves[0];
-			while(delim.token.token_code == T_COMMA)
+			if(node.leaves[0].token.token_code == T_COMMA)
 			{
-				jep_obj* a;
-				a = jep_evaluate(delim.leaves[0], list);
-				jep_add_object(arg_list, a);
-				delim = delim.leaves[1];
-				arg_list->size++;
+				jep_sequence(node.leaves[0], list, arg_list);
 			}
-			jep_obj* a;
-			a = jep_evaluate(delim, list);
-			jep_add_object(arg_list, a);
-			arg_list->size++;
+			else
+			{
+				jep_obj* a = jep_evaluate(node.leaves[0], list);
+				jep_add_object(arg_list, a);
+			}
 		}
 		else if(args.leaf_count == 0)
 		{
 			jep_obj* a = jep_evaluate(node.leaves[0], list);
-			jep_add_object(arg_list, a);
-			arg_list->size++;	
+			jep_add_object(arg_list, a);	
 		}
 	}
 	else if(node.leaf_count == 1)
@@ -2453,7 +2452,6 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 			}
 			else
 			{
-
 				jep_add_object(list, arg_list);
 
 				o = jep_evaluate(body, list);
@@ -2483,33 +2481,20 @@ jep_obj* jep_brace(jep_ast_node node, jep_obj* list)
 	if(node.array)
 	{
 		jep_obj* array = jep_create_object();
+		array->type = JEP_LIST;
 		o = jep_create_object();
 		o->type = JEP_ARRAY;
 		o->val = array;
-		int size = 0;
 		if(node.leaf_count > 0 && node.leaves[0].token.token_code == T_COMMA)
 		{
-			jep_ast_node delim = node.leaves[0];
-			while(delim.token.token_code == T_COMMA)
-			{
-				jep_obj* e;
-				e = jep_evaluate(delim.leaves[0], list);
-				jep_add_object(array, e);
-				delim = delim.leaves[1];
-				size++;
-			}
-			jep_obj* e;
-			e = jep_evaluate(delim, list);
-			jep_add_object(array, e);
-			size++;
+			jep_sequence(node.leaves[0], list, array);
 		}
 		else if(node.leaf_count == 1)
 		{
 			jep_obj* e = jep_evaluate(node.leaves[0], list);
 			jep_add_object(array, e);
-			size++;
 		}
-		o->size = size;
+		o->size = array->size;
 	}
 	else
 	{
@@ -2633,4 +2618,64 @@ jep_obj* jep_return(jep_ast_node node, jep_obj* list)
 	}
 
 	return o;
+}
+
+/* evaluates a comma tree */
+jep_obj* jep_comma(jep_ast_node node, jep_obj* list)
+{
+	jep_ast_node l = node.leaves[0]; /* left operand  */
+	jep_ast_node r = node.leaves[1]; /* right operand */
+	jep_obj* lo = NULL;              /* left object   */
+	jep_obj* ro = NULL;              /* right object  */
+
+	if(l.token.token_code == T_COMMA)
+	{
+		lo = jep_comma(l, list);
+		jep_destroy_object(lo);
+	}
+	else
+	{
+		lo = jep_evaluate(l, list);
+		jep_destroy_object(lo);
+	}
+
+	if(r.token.token_code == T_COMMA)
+	{
+		ro = jep_comma(r, list);
+	}
+	else
+	{
+		ro = jep_evaluate(r, list);
+	}
+
+	return ro;
+}
+
+/* evaluates a comma-delimited sequence of objects */
+void jep_sequence(jep_ast_node node, jep_obj* list, jep_obj* seq)
+{
+	jep_ast_node l = node.leaves[0]; /* left operand  */
+	jep_ast_node r = node.leaves[1]; /* right operand */
+	jep_obj* lo = NULL;              /* left object   */
+	jep_obj* ro = NULL;              /* right object  */
+
+	if(l.token.token_code == T_COMMA)
+	{
+		jep_sequence(l, list, seq);
+	}
+	else
+	{
+		lo = jep_evaluate(l, list);
+		jep_add_object(seq, lo);
+	}
+
+	if(r.token.token_code == T_COMMA)
+	{
+		jep_sequence(r, list, seq);
+	}
+	else
+	{
+		ro = jep_evaluate(r, list);
+		jep_add_object(seq, ro);
+	}
 }

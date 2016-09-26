@@ -90,7 +90,6 @@ static int jep_associativity(jep_ast_node* node)
 		case T_LSHIFTASSIGN:
 		case T_RSHIFTASSIGN:
 		case T_NOT:
-		case T_COMMA:
 			return JEP_RIGHT_ASSOC;
 
 		case T_MINUS:
@@ -188,7 +187,7 @@ static int jep_priority(jep_ast_node* node)
  */
 static int jep_prioritize(jep_ast_node* cur, jep_ast_node* top)
 {
-	if(jep_associativity(top) == JEP_LEFT_ASSOC)
+	if(jep_associativity(cur) == JEP_LEFT_ASSOC)
 	{
 		if(jep_priority(cur) <= jep_priority(top))
 		{
@@ -196,9 +195,9 @@ static int jep_prioritize(jep_ast_node* cur, jep_ast_node* top)
 		}
 		return 0;
 	}
-	else if(jep_associativity(top) == JEP_RIGHT_ASSOC)
+	else if(jep_associativity(cur) == JEP_RIGHT_ASSOC)
 	{
-		if(jep_priority(cur) < jep_priority(top) && jep_associativity(cur) == JEP_LEFT_ASSOC)
+		if(jep_priority(cur) < jep_priority(top))// && jep_associativity(cur) == JEP_LEFT_ASSOC)
 		{
 			return 1;
 		}

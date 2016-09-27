@@ -2435,11 +2435,11 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 	if(func != NULL)
 	{
 		jep_obj* fargs = func->head;
+		jep_obj* farg = fargs->head;
 		jep_ast_node body = *((jep_ast_node*)(func->head->next->val));
 		if(arg_list != NULL)
 		{
 			jep_obj* arg = arg_list->head;
-			jep_obj* farg = fargs->head;
 			while(arg != NULL && farg != NULL)
 			{
 				arg->ident = farg->ident;
@@ -2452,6 +2452,26 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 			}
 			else
 			{
+				jep_add_object(list, arg_list);
+
+				o = jep_evaluate(body, list);
+
+				/* remove the argument list from the main list */
+				list->tail = list->tail->prev;
+				list->tail->next = NULL;
+				list->size--;
+			}
+		}
+		else
+		{
+			if(farg != NULL)
+			{
+				printf("woops, apparently there weren't the right amount of arguments!\n");
+			}
+			else
+			{
+				arg_list = jep_create_object();
+				arg_list->type = JEP_LIST;
 				jep_add_object(list, arg_list);
 
 				o = jep_evaluate(body, list);

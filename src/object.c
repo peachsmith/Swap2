@@ -345,7 +345,6 @@ void jep_destroy_list(jep_obj* list)
 
 	if(obj == NULL)
 	{
-		printf("obj is NULL\n");
 		return;
 	}
 

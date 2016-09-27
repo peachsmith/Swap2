@@ -2461,9 +2461,7 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 				o = jep_evaluate(body, list);
 
 				/* remove the argument list from the main list */
-				list->tail = list->tail->prev;
-				list->tail->next = NULL;
-				list->size--;
+				jep_remove_scope(list);
 			}
 		}
 		else
@@ -2482,9 +2480,7 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 				o = jep_evaluate(body, list);
 
 				/* remove the argument list from the main list */
-				list->tail = list->tail->prev;
-				list->tail->next = NULL;
-				list->size--;
+				jep_remove_scope(list);
 			}
 		}
 	}
@@ -2494,7 +2490,6 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 	}
 
 	jep_destroy_list(arg_list);
-
 	free(arg_list);
 
 	return o;
@@ -2739,9 +2734,7 @@ jep_obj* jep_if(jep_ast_node node, jep_obj* list)
 			o = jep_evaluate(body, list);
 
 			/* remove the argument list from the main list */
-			list->tail = list->tail->prev;
-			list->tail->next = NULL;
-			list->size--;
+			jep_remove_scope(list);
 		}
 		else if(node.leaf_count == 3)
 		{
@@ -2760,9 +2753,7 @@ jep_obj* jep_if(jep_ast_node node, jep_obj* list)
 				o = jep_evaluate(els.leaves[0], list);
 
 				/* remove the argument list from the main list */
-				list->tail = list->tail->prev;
-				list->tail->next = NULL;
-				list->size--;
+				jep_remove_scope(list);
 			}
 		}
 		jep_destroy_object(c);

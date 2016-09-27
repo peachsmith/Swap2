@@ -630,3 +630,36 @@ void jep_print_list(jep_obj* list)
 		obj = obj->next;
 	}while(obj != NULL);
 }
+
+/* removes the scope list off the tail of a list */
+void jep_remove_scope(jep_obj* list)
+{
+	if(list == NULL)
+	{
+		return;
+	}
+	else if(list->tail == NULL)
+	{
+		return;
+	}
+	else if(list->tail->type != JEP_LIST)
+	{
+		return;
+	}
+
+	jep_obj* tail = list->tail;
+	
+	if(tail->tail != NULL && tail->tail->type == JEP_LIST)
+	{
+		jep_remove_scope(tail);
+	}
+	else
+	{
+		list->tail = list->tail->prev;
+		if(list->tail != NULL)
+		{
+			list->tail->next = NULL;	
+		}
+		list->size--;
+	}
+}

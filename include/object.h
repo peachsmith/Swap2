@@ -80,4 +80,7 @@ void jep_print_object(jep_obj* obj);
 /* prints a list of objects to stdout */
 void jep_print_list(jep_obj* list);
 
+/* removes the scope list off the tail of a list */
+void jep_remove_scope(jep_obj* list);
+
 #endif

@@ -175,7 +175,16 @@ jep_obj* jep_get_object(const char* ident, jep_obj* list)
 		}
 		if(obj->type == JEP_LIST)
 		{
+			jep_obj* temp = NULL;
+			if(o != NULL)
+			{
+				temp = o;
+			}
 			o = jep_get_object(ident, obj);
+			if(o == NULL && temp != NULL)
+			{
+				o = temp;
+			}
 		}
 		obj = obj->next;
 	}
@@ -290,27 +299,27 @@ void jep_destroy_object(jep_obj* obj)
 {
 	if(obj != NULL)
 	{
-		if(obj->type == JEP_INT)
+		if(obj->type == JEP_INT && obj->val != NULL)
 		{
 			free(obj->val);
 		}
-		else if(obj->type == JEP_LONG)
+		else if(obj->type == JEP_LONG && obj->val != NULL)
 		{
 			free(obj->val);
 		}
-		else if(obj->type == JEP_DOUBLE)
+		else if(obj->type == JEP_DOUBLE && obj->val != NULL)
 		{
 			free(obj->val);
 		}
-		else if(obj->type == JEP_CHARACTER)
+		else if(obj->type == JEP_CHARACTER && obj->val != NULL)
 		{
 			free(obj->val);
 		}
-		else if(obj->type == JEP_STRING)
+		else if(obj->type == JEP_STRING && obj->val != NULL)
 		{
 			free(obj->val);
 		}
-		else if(obj->type == JEP_ARRAY)
+		else if(obj->type == JEP_ARRAY && obj->val != NULL)
 		{
 			jep_obj* array = (jep_obj*)(obj->val);
 			jep_free_array(array);
@@ -327,8 +336,9 @@ void jep_destroy_object(jep_obj* obj)
 		{
 			printf("unrecognized type\n");
 		}
+
+		obj->val = NULL;
 		free(obj);
-		obj = NULL;
 	}
 }
 

@@ -97,6 +97,7 @@ int main(int argc, char** argv)
 					if(o != NULL)
 					{
 						jep_destroy_object(o);
+						o = NULL;
 					}
 				}
 				jep_print_list(&list);

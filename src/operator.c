@@ -2357,10 +2357,10 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 			o = jep_create_object();
 			o->ident = node.leaves[0].token.val->buffer;
 			jep_add_object(list, o);
-
 		}
 
 		jep_copy_object(o, r);
+
 	}
 	else
 	{
@@ -2472,6 +2472,7 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 			{
 				arg_list = jep_create_object();
 				arg_list->type = JEP_LIST;
+
 				jep_add_object(list, arg_list);
 
 				o = jep_evaluate(body, list);
@@ -2489,6 +2490,7 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 	}
 
 	jep_destroy_list(arg_list);
+
 	free(arg_list);
 
 	return o;
@@ -2526,7 +2528,9 @@ jep_obj* jep_brace(jep_ast_node node, jep_obj* list)
 			{
 				return o;
 			}
+
 			jep_destroy_object(o);
+			o = NULL;
 		}
 	}
 

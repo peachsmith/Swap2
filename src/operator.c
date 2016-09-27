@@ -38,6 +38,10 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 		{
 			return jep_return(ast, list);
 		}
+		else if(ast.token.token_code == T_IF)
+		{
+			return jep_if(ast, list);
+		}
 	}
 
 	switch(ast.token.token_code)
@@ -2702,4 +2706,67 @@ void jep_sequence(jep_ast_node node, jep_obj* list, jep_obj* seq)
 		ro = jep_evaluate(r, list);
 		jep_add_object(seq, ro);
 	}
+}
+
+/* evaluates an if statement */
+jep_obj* jep_if(jep_ast_node node, jep_obj* list)
+{
+	jep_obj* o = NULL;
+	jep_ast_node cond; /* condition        */
+	jep_ast_node body; /* body             */
+	jep_ast_node els;  /* else and else if */
+
+	if(node.leaf_count < 2)
+	{
+		return o;
+	}
+
+	cond = node.leaves[0];
+	body = node.leaves[1];
+
+	jep_obj* c = jep_evaluate(cond, list);
+
+	if(c != NULL && c->type == JEP_INT)
+	{
+		int val = *((int*)(c->val));
+		if(val)
+		{
+			/* add a list for scope */
+			jep_obj* scope = jep_create_object();
+			scope->type = JEP_LIST;
+			jep_add_object(list, scope);
+
+			o = jep_evaluate(body, list);
+
+			/* remove the argument list from the main list */
+			list->tail = list->tail->prev;
+			list->tail->next = NULL;
+			list->size--;
+		}
+		else if(node.leaf_count == 3)
+		{
+			els = node.leaves[2];
+			if(els.token.token_code == T_IF)
+			{
+				o = jep_if(els, list);
+			}
+			else if(els.token.token_code == T_ELSE && els.leaf_count == 1)
+			{
+				/* add a list for scope */
+				jep_obj* scope = jep_create_object();
+				scope->type = JEP_LIST;
+				jep_add_object(list, scope);
+
+				o = jep_evaluate(els.leaves[0], list);
+
+				/* remove the argument list from the main list */
+				list->tail = list->tail->prev;
+				list->tail->next = NULL;
+				list->size--;
+			}
+		}
+		jep_destroy_object(c);
+	}
+
+	return o;
 }

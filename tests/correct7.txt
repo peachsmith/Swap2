@@ -1,5 +1,8 @@
-[int] a: 3
+[int] a: 4
 [int] b: 5
 [int] c: 8
 [array] d: { [int] 1, [int] 14, [int] 3 }
 [array] e: { [array] { [int] 1, [int] 14, [int] 3 }, [int] 8, [int] 3 }
+[function] f (a, b)
+[function] g ()
+[int] h: 3

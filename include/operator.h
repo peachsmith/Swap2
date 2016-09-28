@@ -66,6 +66,9 @@ jep_obj* jep_rshift(jep_ast_node node, jep_obj* list);
 /* performs an increment on an integer */
 jep_obj* jep_inc(jep_ast_node node, jep_obj* list);
 
+/* performs a decrement on an integer */
+jep_obj* jep_dec(jep_ast_node node, jep_obj* list);
+
 /* evaluates an assignment */
 jep_obj* jep_assign(jep_ast_node node, jep_obj* list);
 

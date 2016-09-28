@@ -126,6 +126,10 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 			o = jep_inc(ast, list);
 			break;
 
+		case T_DECREMENT:
+			o = jep_dec(ast, list);
+			break;
+
 		case T_LPAREN:
 			o = jep_paren(ast, list);
 			break;
@@ -2357,6 +2361,45 @@ jep_obj* jep_inc(jep_ast_node node, jep_obj* list)
 			
 			int cur_val = *(int*)(actual->val);
 			int new_val = cur_val + 1;
+			*(int*)(actual->val) = new_val;
+
+			jep_copy_object(o, actual);
+
+			if(node.token.postfix)
+			{
+				*(int*)(o->val) = cur_val;;
+			}
+		}
+	}
+
+	return o;
+}
+
+/* performs a decrement on an integer */
+jep_obj* jep_dec(jep_ast_node node, jep_obj* list)
+{
+	if(node.leaf_count != 1)
+	{
+		return NULL;
+	}
+
+	jep_obj* o = NULL;
+	jep_obj* obj = jep_evaluate(node.leaves[0], list);
+
+	if(obj != NULL)
+	{
+		if(obj->ident == NULL || obj->type != JEP_INT || obj->val == NULL)
+		{
+			printf("invalid operand\n");
+			return NULL;
+		}
+		else
+		{
+			jep_obj* actual = jep_get_object(obj->ident, list);
+			o = jep_create_object();
+			
+			int cur_val = *(int*)(actual->val);
+			int new_val = cur_val - 1;
 			*(int*)(actual->val) = new_val;
 
 			jep_copy_object(o, actual);

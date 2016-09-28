@@ -141,6 +141,7 @@ void jep_add_object(jep_obj* list, jep_obj* o)
 	{
 		list->head = o;
 		list->tail = o;
+		list->size++;
 	}
 	else if(list->tail->type == JEP_LIST)
 	{
@@ -151,9 +152,8 @@ void jep_add_object(jep_obj* list, jep_obj* o)
 		list->tail->next = o;
 		o->prev = list->tail;
 		list->tail = o;
+		list->size++;
 	}
-
-	list->size++;
 }
 
 /* retreives an object from a list */
@@ -334,7 +334,7 @@ void jep_destroy_object(jep_obj* obj)
 		}
 		else
 		{
-			printf("unrecognized type\n");
+			printf("unrecognized type %d\n", obj->type);
 		}
 
 		obj->val = NULL;
@@ -594,7 +594,7 @@ void jep_print_object(jep_obj* obj)
 		}
 		else if(obj->type == JEP_LIST)
 		{
-			printf("[list]\n");
+			jep_print_list(obj);
 		}
 		else
 		{

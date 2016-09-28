@@ -42,6 +42,10 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 		{
 			return jep_if(ast, list);
 		}
+		else if(ast.token.token_code == T_FOR)
+		{
+			return jep_for(ast, list);
+		}
 	}
 
 	switch(ast.token.token_code)
@@ -2613,12 +2617,11 @@ jep_obj* jep_brace(jep_ast_node node, jep_obj* list)
 			{
 				return o;
 			}
-
 			jep_destroy_object(o);
 			o = NULL;
 		}
 	}
-
+	
 	return o;
 }
 
@@ -2821,6 +2824,7 @@ jep_obj* jep_if(jep_ast_node node, jep_obj* list)
 
 			/* remove the argument list from the main list */
 			jep_remove_scope(list);
+			jep_destroy_list(scope);
 		}
 		else if(node.leaf_count == 3)
 		{
@@ -2840,10 +2844,132 @@ jep_obj* jep_if(jep_ast_node node, jep_obj* list)
 
 				/* remove the argument list from the main list */
 				jep_remove_scope(list);
+				jep_destroy_list(scope);
 			}
 		}
 		jep_destroy_object(c);
 	}
+
+	return o;
+}
+
+/* evaluates an for loop */
+jep_obj* jep_for(jep_ast_node node, jep_obj* list)
+{
+	jep_obj* o = NULL;
+	jep_obj* scope = jep_create_object();
+	scope->type = JEP_LIST;
+
+	jep_add_object(list, scope);
+
+	jep_ast_node head = node.leaves[0];
+	jep_obj* cond = NULL;
+	jep_ast_node index_node;
+	jep_ast_node cond_node;
+	jep_ast_node change_node;
+
+	if(node.loop & JEP_INDEX)
+	{
+		index_node = head.leaves[0];
+		jep_evaluate(index_node, list);
+	}
+
+	if(node.loop & JEP_CONDITION)
+	{
+		if(node.loop & JEP_INDEX)
+		{
+			cond_node = head.leaves[1];
+		}
+		else
+		{
+			cond_node = head.leaves[0];
+		}
+	}
+
+	if(node.loop & JEP_CHANGE)
+	{
+		if(node.loop & JEP_INDEX && node.loop & JEP_CONDITION)
+		{
+			change_node = head.leaves[2];
+		}
+		else if(node.loop & JEP_INDEX || node.loop & JEP_CONDITION)
+		{
+			change_node = head.leaves[1];
+		}
+		else
+		{
+			change_node = head.leaves[0];
+		}
+	}
+
+	if(node.loop & JEP_CONDITION)
+	{
+		cond = jep_evaluate(cond_node, list);
+		if(cond != NULL && cond->type == JEP_INT)
+		{
+			int val = 0;
+			if(cond != NULL && cond->val != NULL)
+			{
+				val = *((int*)(cond->val));
+			}
+			while(val)
+			{
+				if(node.leaf_count == 2)
+				{
+					o = jep_evaluate(node.leaves[1], list);
+					if(o != NULL && o->ret)
+					{
+						jep_remove_scope(list);
+						jep_destroy_list(scope);
+						return o;
+					}
+					else if(o != NULL)
+					{
+						jep_destroy_object(o);
+						o = NULL;
+					}
+				}
+				if(node.loop & JEP_CHANGE)
+				{
+					jep_evaluate(change_node, list);
+				}
+
+				cond = jep_evaluate(cond_node, list);
+				if(cond != NULL && cond->val != NULL)
+				{
+					val = *((int*)(cond->val));
+				}
+			}
+		}
+	}
+	else
+	{
+		while(1)
+		{
+			if(node.leaf_count == 2)
+			{
+				o = jep_evaluate(node.leaves[1], list);
+				if(o != NULL && o->ret)
+				{
+					jep_remove_scope(list);
+					jep_destroy_list(scope);
+					return o;
+				}
+				else if(o != NULL)
+				{
+					jep_destroy_object(o);
+					o = NULL;
+				}
+			}
+			if(node.loop & JEP_CHANGE)
+			{
+				jep_evaluate(change_node, list);
+			}
+		}
+	}
+
+	jep_remove_scope(list);
+	jep_destroy_list(scope);
 
 	return o;
 }

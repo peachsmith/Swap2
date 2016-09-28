@@ -96,4 +96,7 @@ void jep_sequence(jep_ast_node node, jep_obj* list, jep_obj* seq);
 /* evaluates an if statement */
 jep_obj* jep_if(jep_ast_node node, jep_obj* list);
 
+/* evaluates an for loop */
+jep_obj* jep_for(jep_ast_node node, jep_obj* list);
+
 #endif

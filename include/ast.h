@@ -1,8 +1,12 @@
 #ifndef JEP_AST_H
 #define JEP_AST_H
 
-// #include "object.h"
 #include "tokenizer.h"
+
+/* for loop components */
+#define JEP_INDEX 1
+#define JEP_CONDITION 2
+#define JEP_CHANGE 4
 
 /* a node in an AST */
 typedef struct ASTNode
@@ -13,6 +17,7 @@ typedef struct ASTNode
 	struct ASTNode* leaves;
 	int error;
 	int array;
+	int loop;
 }jep_ast_node;
 
 /* a stack of nodes */

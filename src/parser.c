@@ -477,16 +477,19 @@ static jep_ast_node* jep_for(jep_ast_node* root, jep_ast_node** nodes)
  	if(ind != NULL && !root->error)
 	{
 		jep_add_leaf_node(head, ind);
+		fo_node->loop |= JEP_INDEX;
 	}
 
  	if(con != NULL && !root->error)
 	{
 		jep_add_leaf_node(head, con);
+		fo_node->loop |= JEP_CONDITION;
 	}
 
  	if(chg != NULL && !root->error)
 	{
 		jep_add_leaf_node(head, chg);
+		fo_node->loop |= JEP_CHANGE;
 	}
 
 	jep_add_leaf_node(fo_node, head);
@@ -644,6 +647,7 @@ jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node** nodes)
 		(*nodes)[i].token = ts->tok[i];
 		(*nodes)[i].error = 0;
 		(*nodes)[i].array = 0;
+		(*nodes)[i].loop = 0;
 	}
 
 	/* create the root of the AST */
@@ -661,6 +665,7 @@ jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node** nodes)
 	root->token.postfix = 0;
 	root->error = 0;
 	root->array = 0;
+	root->loop = 0;
 	jep_append_string(root->token.val, "root");
 
 	first = *nodes;

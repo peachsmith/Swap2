@@ -114,10 +114,16 @@ void jep_free_array(jep_obj* array)
 void jep_free_function(jep_obj* func)
 {
 	jep_obj* args = func->head;
-	jep_obj* body = args->next;
+
+	/* destroy the body of non-native functions */
+	if(func->size == 2)
+	{
+		jep_obj* body = args->next;
+		free(body);	
+	}
+
 	jep_destroy_list(args);
 	free(args);
-	free(body);
 }
 
 /* allocates memory for a new object */
@@ -280,7 +286,7 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 	{
 		jep_ast_node* n = jep_create_ast_node();
 		jep_obj* args = jep_create_object();
-		jep_obj* body = jep_create_object();	
+		jep_obj* body = NULL;
 
 		jep_obj* src_args = src->head;
 		jep_obj* a = src_args->head;
@@ -293,11 +299,19 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 			a = a->next;
 		}
 
-		*n = *((jep_ast_node*)(src_args->next->val));
-		body->val = n;
-
+		if(src->size == 2)
+		{
+			body = jep_create_object();
+			*n = *((jep_ast_node*)(src_args->next->val));
+			body->val = n;	
+		}
+		
 		jep_add_object(dest, args);
-		jep_add_object(dest, body);
+
+		if(src->size == 2)
+		{
+			jep_add_object(dest, body);	
+		}
 	}
 }
 

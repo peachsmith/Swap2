@@ -2532,7 +2532,7 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 	func = NULL;
 	arg_list = NULL;
 
-	/* collection the function arguments as objects */
+	/* collect the function arguments as objects */
 	if(node.leaf_count == 2)
 	{
 		func = jep_get_object(node.leaves[1].token.val->buffer, list);
@@ -2548,13 +2548,27 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 			else
 			{
 				jep_obj* a = jep_evaluate(node.leaves[0], list);
-				jep_add_object(arg_list, a);
+				if(a != NULL)
+				{
+					jep_add_object(arg_list, a);	
+				}
+				else
+				{
+					printf("could nto evaluate argument\n");
+				}
 			}
 		}
 		else if(args.leaf_count == 0)
 		{
 			jep_obj* a = jep_evaluate(node.leaves[0], list);
-			jep_add_object(arg_list, a);	
+			if(a != NULL)
+			{
+				jep_add_object(arg_list, a);		
+			}
+			else
+			{
+				printf("could nto evaluate argument\n");
+			}
 		}
 	}
 	else if(node.leaf_count == 1)
@@ -2566,6 +2580,13 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 	{
 		jep_obj* fargs = func->head;
 		jep_obj* farg = fargs->head;
+
+		/* native function call */
+		if(func->size == 1)
+		{
+			return jep_call_native(func->ident, arg_list);
+		}
+
 		jep_ast_node body = *((jep_ast_node*)(func->head->next->val));
 		if(arg_list != NULL)
 		{
@@ -2792,13 +2813,20 @@ jep_obj* jep_function(jep_ast_node node, jep_obj* list)
 		jep_add_object(args, a);
 	}
 
-	/* function body */
-	jep_ast_node* n = jep_create_ast_node();
-	*n = node.leaves[2];
-	body->val = n;
+	if(node.leaf_count == 3)
+	{
+		/* function body */
+		jep_ast_node* n = jep_create_ast_node();
+		*n = node.leaves[2];
+		body->val = n;
+	}
 
 	jep_add_object(func, args);
-	jep_add_object(func, body);
+
+	if(node.leaf_count == 3)
+	{
+		jep_add_object(func, body);	
+	}
 
 	jep_add_object(list, func);
 	jep_copy_object(copy, func);

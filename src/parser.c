@@ -593,8 +593,8 @@ static jep_ast_node* jep_function(jep_ast_node* root, jep_ast_node** nodes)
 
 	if((*nodes)->token.token_code != T_LBRACE)
 	{
-		jep_err(ERR_EXPECTED, (*nodes)->token, root, "{");
-		return NULL;
+		// jep_err(ERR_EXPECTED, (*nodes)->token, root, "{");
+		return fn_node;
 	}
 
 	/* parse the function body */

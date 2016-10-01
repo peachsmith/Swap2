@@ -3,7 +3,7 @@
 #include "operator.h"
 
 /* command line flag indices */
-#define TOK 0
+#define JEP_TOK 0
 #define JEP_AST 1
 #define JEP_OBJ 2
 
@@ -69,7 +69,7 @@ int main(int argc, char** argv)
 	
 	if(ts != NULL)
 	{
-		if(flags[TOK])
+		if(flags[JEP_TOK])
 		{
 			jep_print_tokens(ts, stdout);	
 		}
@@ -83,13 +83,11 @@ int main(int argc, char** argv)
 				jep_print_ast(*root);
 			}
 
-			if(root->leaves != NULL && !root->error && flags[JEP_OBJ])
+			if(root->leaves != NULL && !root->error 
+				&& !flags[JEP_AST] && !flags[JEP_TOK])
 			{
 				jep_obj* list = jep_create_object();
 				list->type = JEP_LIST;
-				// {
-				// 	NULL, NULL, 0, NULL, NULL, NULL, NULL, 0, 0
-				// };
 				jep_obj* o;
 				int i;
 				for(i = 0; i < root->leaf_count; i++)
@@ -101,7 +99,10 @@ int main(int argc, char** argv)
 						o = NULL;
 					}
 				}
-				jep_print_list(list);
+				if(flags[JEP_OBJ])
+				{
+					jep_print_list(list);
+				}
 				jep_destroy_list(list);
 			}
 

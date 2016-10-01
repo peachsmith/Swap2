@@ -1,7 +1,7 @@
 #ifndef JEP_OPERATOR_H
 #define JEP_OPERATOR_H
 
-#include "object.h"
+#include "native.h"
 
 /* evaluates an AST node */
 jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list);

@@ -2446,7 +2446,25 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 		}
 		else
 		{
-			o = jep_get_object(l->ident, list);
+			if(l->index == -1)
+			{
+				o = jep_get_object(l->ident, list);
+			}
+			else
+			{
+				jep_obj* array = jep_get_object(l->array_ident, list);
+				int i = 0;
+				jep_obj* elem = ((jep_obj*)(array->val))->head;
+				while(elem != NULL && i != l->index)
+				{
+					i++;
+					elem = elem->next;
+				}
+				if(elem != NULL && i == l->index)
+				{
+					o = elem;
+				}
+			}
 		}
 
 		if(o == NULL)
@@ -2457,7 +2475,21 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 			jep_add_object(list, o);
 		}
 
-		jep_copy_object(o, r);
+
+		jep_copy_object(o, r);	
+
+
+		if(r->type == JEP_ARRAY)
+		{
+			int i = 0;
+			jep_obj* head = ((jep_obj*)(o->val))->head;
+			while(head != NULL)
+			{
+				head->array_ident = o->ident;
+				head->index = i++;
+				head = head->next;
+			}
+		}
 
 	}
 	else
@@ -2603,10 +2635,18 @@ jep_obj* jep_brace(jep_ast_node node, jep_obj* list)
 		if(node.leaf_count > 0 && node.leaves[0].token.token_code == T_COMMA)
 		{
 			jep_sequence(node.leaves[0], list, array);
+			int i = 0;
+			jep_obj* elem = array->head;
+			while(elem != NULL)
+			{
+				elem->index = i++;
+				elem = elem->next;
+			}
 		}
 		else if(node.leaf_count == 1)
 		{
 			jep_obj* e = jep_evaluate(node.leaves[0], list);
+			e->index = 0;
 			jep_add_object(array, e);
 		}
 		o->size = array->size;
@@ -2669,6 +2709,7 @@ jep_obj* jep_subscript(jep_ast_node node, jep_obj* list)
 		{
 			jep_obj* elem = jep_create_object();
 			elem->type = JEP_ARGUMENT;
+			elem->index = i;
 			jep_add_object(array, elem);
 		}
 
@@ -2676,6 +2717,8 @@ jep_obj* jep_subscript(jep_ast_node node, jep_obj* list)
 
 		return o;
 	}
+
+	/* array index access */
 
 	jep_obj* index = jep_evaluate(node.leaves[0], list);
 	jep_obj* array = jep_evaluate(node.leaves[1], list);
@@ -2702,6 +2745,8 @@ jep_obj* jep_subscript(jep_ast_node node, jep_obj* list)
 				{
 					o = jep_create_object();
 					jep_copy_object(o, elem);
+					o->array_ident = elem->array_ident;
+					o->index = elem->index;
 				}
 				elem = elem->next;
 			}

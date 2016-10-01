@@ -29,6 +29,8 @@ typedef struct Object
 	struct Object* tail; /* end of list                   */
 	int size;            /* number of objects in the list */
 	int ret;             /* return flag                   */
+	int index;           /* index in an array             */
+	char* array_ident;   /* array identifier              */
 }jep_obj;
 
 typedef struct Memory

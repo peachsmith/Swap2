@@ -134,6 +134,7 @@ jep_obj* jep_create_object()
 	o->tail = NULL;
 	o->size = 0;
 	o->ret = 0;
+	o->index = -1;
 
 	return o;
 }
@@ -265,6 +266,8 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 			while(orig != NULL)
 			{
 				jep_obj* copy = jep_create_object();
+				copy->index = orig->index;
+				copy->array_ident = orig->array_ident;
 				jep_copy_object(copy, orig);
 				jep_add_object(dest_array, copy);
 				orig = orig->next;

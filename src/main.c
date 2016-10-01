@@ -85,23 +85,24 @@ int main(int argc, char** argv)
 
 			if(root->leaves != NULL && !root->error && flags[JEP_OBJ])
 			{
-				jep_obj list = 
-				{
-					NULL, NULL, 0, NULL, NULL, NULL, NULL, 0, 0
-				};
+				jep_obj* list = jep_create_object();
+				list->type = JEP_LIST;
+				// {
+				// 	NULL, NULL, 0, NULL, NULL, NULL, NULL, 0, 0
+				// };
 				jep_obj* o;
 				int i;
 				for(i = 0; i < root->leaf_count; i++)
 				{
-					o = jep_evaluate(root->leaves[i], &list);
+					o = jep_evaluate(root->leaves[i], list);
 					if(o != NULL)
 					{
 						jep_destroy_object(o);
 						o = NULL;
 					}
 				}
-				jep_print_list(&list);
-				jep_destroy_list(&list);
+				jep_print_list(list);
+				jep_destroy_list(list);
 			}
 
 			/* destroy the AST */

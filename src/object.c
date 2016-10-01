@@ -332,9 +332,13 @@ void jep_destroy_object(jep_obj* obj)
 		{
 			/* arguments have no value */
 		}
+		else if(obj->type == JEP_LIST)
+		{
+			jep_destroy_list(obj);
+		}
 		else
 		{
-			printf("unrecognized type %d\n", obj->type);
+			printf("unrecognized type while destroying object %d\n", obj->type);
 		}
 
 		obj->val = NULL;
@@ -548,6 +552,7 @@ jep_obj* jep_array(jep_ast_node* ast)
 
 void jep_print_object(jep_obj* obj)
 {
+	static int inner_list = 0;
 	if(obj != NULL)
 	{
 		if(obj->type == JEP_INT)
@@ -594,11 +599,14 @@ void jep_print_object(jep_obj* obj)
 		}
 		else if(obj->type == JEP_LIST)
 		{
+			inner_list++;
+			printf("inner list %d\n", inner_list);
 			jep_print_list(obj);
+			inner_list--;
 		}
 		else
 		{
-			printf("unrecognized type\n");
+			printf("unrecognized type while printing object %d\n", obj->type);
 		}
 	}
 	else
@@ -653,7 +661,7 @@ void jep_remove_scope(jep_obj* list)
 	{
 		jep_remove_scope(tail);
 	}
-	else
+	else if(list->tail != NULL)
 	{
 		list->tail = list->tail->prev;
 		if(list->tail != NULL)
@@ -661,5 +669,9 @@ void jep_remove_scope(jep_obj* list)
 			list->tail->next = NULL;	
 		}
 		list->size--;
+		if(list->size == 0)
+		{
+			list->head = NULL;
+		}
 	}
 }

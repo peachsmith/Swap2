@@ -99,4 +99,7 @@ jep_obj* jep_if(jep_ast_node node, jep_obj* list);
 /* evaluates an for loop */
 jep_obj* jep_for(jep_ast_node node, jep_obj* list);
 
+/* evaluates a while loop */
+jep_obj* jep_while(jep_ast_node node, jep_obj* list);
+
 #endif

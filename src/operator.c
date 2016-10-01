@@ -46,6 +46,10 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 		{
 			return jep_for(ast, list);
 		}
+		else if(ast.token.token_code == T_WHILE)
+		{
+			return jep_while(ast, list);
+		}
 	}
 
 	switch(ast.token.token_code)
@@ -2945,6 +2949,10 @@ jep_obj* jep_for(jep_ast_node node, jep_obj* list)
 				}
 			}
 		}
+		else
+		{
+			printf("invalid loop condition expression\n");
+		}
 	}
 	else
 	{
@@ -2971,6 +2979,67 @@ jep_obj* jep_for(jep_ast_node node, jep_obj* list)
 				jep_evaluate(change_node, list);
 			}
 		}
+	}
+
+	jep_remove_scope(list);
+	jep_destroy_list(scope);
+	free(scope);
+
+	return o;
+}
+
+/* evaluates a while loop */
+jep_obj* jep_while(jep_ast_node node, jep_obj* list)
+{
+	jep_obj* o = NULL;
+	jep_obj* scope = jep_create_object();
+	scope->type = JEP_LIST;
+
+	jep_add_object(list, scope);
+
+	jep_ast_node head = node.leaves[0];
+	jep_obj* cond = NULL;
+	jep_ast_node cond_node;
+
+	cond_node = head.leaves[0];
+
+	cond = jep_evaluate(cond_node, list);
+	if(cond != NULL && cond->type == JEP_INT)
+	{
+		int val = 0;
+		if(cond != NULL && cond->val != NULL)
+		{
+			val = *((int*)(cond->val));
+		}
+		while(val)
+		{
+			if(node.leaf_count == 2)
+			{
+				o = jep_evaluate(node.leaves[1], list);
+				if(o != NULL && o->ret)
+				{
+					jep_remove_scope(list);
+					jep_destroy_list(scope);
+					free(scope);
+					return o;
+				}
+				else if(o != NULL)
+				{
+					jep_destroy_object(o);
+					o = NULL;
+				}
+			}
+
+			cond = jep_evaluate(cond_node, list);
+			if(cond != NULL && cond->val != NULL)
+			{
+				val = *((int*)(cond->val));
+			}
+		}
+	}
+	else
+	{
+		printf("invalid loop condition expression\n");
 	}
 
 	jep_remove_scope(list);

@@ -54,6 +54,10 @@ static void jep_print_array(jep_obj* array)
 				printf("[array] ");
 				jep_print_array((jep_obj*)(elem->val));
 			}
+			else if(elem->type == JEP_ARGUMENT)
+			{
+				printf("[null]");
+			}
 			if(elem->next != NULL)
 			{
 				printf(", ");

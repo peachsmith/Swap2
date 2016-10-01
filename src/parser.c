@@ -197,7 +197,7 @@ static int jep_prioritize(jep_ast_node* cur, jep_ast_node* top)
 	}
 	else if(jep_associativity(cur) == JEP_RIGHT_ASSOC)
 	{
-		if(jep_priority(cur) < jep_priority(top))// && jep_associativity(cur) == JEP_LEFT_ASSOC)
+		if(jep_priority(cur) < jep_priority(top))
 		{
 			return 1;
 		}
@@ -927,11 +927,18 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 						return NULL;
 					}
 
-					if(jep_prioritize(l_brac, opr.top))
+					if(l_brac->token.postfix)
 					{
-						jep_attach(&exp, &opr, root, nodes);
+						if(jep_prioritize(l_brac, opr.top))
+						{
+							jep_attach(&exp, &opr, root, nodes);
+						}
+						jep_push(&opr, l_brac);
 					}
-					jep_push(&opr, l_brac);
+					else
+					{
+						jep_push(&exp, l_brac);
+					}
 				}
 				else if(cur->token_code == T_LBRACE && next->token_code != T_EOF)
 				{

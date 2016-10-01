@@ -2633,9 +2633,48 @@ jep_obj* jep_brace(jep_ast_node node, jep_obj* list)
 jep_obj* jep_subscript(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* o = NULL;
-	if(node.leaf_count != 2)
+	if(node.leaf_count != 2 && node.leaf_count != 1)
 	{
 		printf("invalid leaf count for ast node\n");
+	}
+
+	/* array initialization */
+	if(node.leaf_count == 1)
+	{
+		o = jep_create_object();
+		o->type = JEP_ARRAY;
+		jep_obj* array = jep_create_object();
+		array->type = JEP_LIST;
+		o->val = array;
+
+		jep_obj* size = jep_evaluate(node.leaves[0], list);
+
+		if(size == NULL || size->type != JEP_INT || size->val == NULL)
+		{
+			if(size != NULL)
+			{
+				jep_destroy_object(size);
+			}
+			printf("invalid array size\n");
+			jep_destroy_object(o);
+			jep_destroy_object(array);
+			o = NULL;
+			return o;
+		}
+
+		int s = *((int*)(size->val));
+		
+		int i;
+		for(i = 0; i < s; i++)
+		{
+			jep_obj* elem = jep_create_object();
+			elem->type = JEP_ARGUMENT;
+			jep_add_object(array, elem);
+		}
+
+		o->size = array->size;
+
+		return o;
 	}
 
 	jep_obj* index = jep_evaluate(node.leaves[0], list);

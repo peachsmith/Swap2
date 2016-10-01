@@ -307,7 +307,7 @@ jep_token_stream* jep_tokenize_file(const char* file_name)
 		}
 
 		/* skip line comments */
-		if(s[i] == '/' && s[i+1] == '/')
+		if((s[i] == '/' && s[i+1] == '/') || s[i] == '#')
 		{
 			i += 2;
 			col += 2;

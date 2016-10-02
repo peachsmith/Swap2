@@ -2554,7 +2554,7 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 				}
 				else
 				{
-					printf("could nto evaluate argument\n");
+					printf("could not evaluate argument\n");
 				}
 			}
 		}
@@ -2567,7 +2567,7 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 			}
 			else
 			{
-				printf("could nto evaluate argument\n");
+				printf("could not evaluate argument\n");
 			}
 		}
 	}

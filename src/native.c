@@ -5,13 +5,13 @@
 /* native function identifiers */
 const char *natives[] = 
 {
-	"print", "println", "scanln"
+	"write", "writeln", "readln"
 };
 
 /* native function forward declarations */
-static jep_obj* jep_print(const char*);
-static jep_obj* jep_println(const char*);
-static jep_obj* jep_scanln();
+static jep_obj* jep_write(const char*);
+static jep_obj* jep_writeln(const char*);
+static jep_obj* jep_readln();
 
 /* calls a native function */
 jep_obj* jep_call_native(const char* ident, jep_obj* args)
@@ -53,11 +53,11 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 
 		if(native == 0)
 		{
-			o = jep_print(str);	
+			o = jep_write(str);	
 		}
 		else
 		{
-			o = jep_println(str);
+			o = jep_writeln(str);
 		}
 	}
 	else if(native == 2)
@@ -67,7 +67,7 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 			printf("invalid number of arguments\n");
 			return o;
 		}
-		o = jep_scanln();
+		o = jep_readln();
 	}
 	else
 	{
@@ -78,21 +78,21 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 }
 
 /* writes a string to standard out */
-static jep_obj* jep_print(const char* buffer)
+static jep_obj* jep_write(const char* buffer)
 {
 	fputs(buffer, stdout);
 	return NULL;
 }
 
 /* writes a string to standard out appended by a newline */
-static jep_obj* jep_println(const char* buffer)
+static jep_obj* jep_writeln(const char* buffer)
 {
 	puts(buffer);
 	return NULL;
 }
 
 /* reads a string from standard in */
-static jep_obj* jep_scanln()
+static jep_obj* jep_readln()
 {
 	jep_obj* o = NULL;
 

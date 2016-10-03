@@ -185,6 +185,38 @@ jep_obj* jep_add(jep_ast_node node, jep_obj* list)
 
 	if(l != NULL && r != NULL)
 	{
+		/* string concatenation */
+		{
+			if(l->type == JEP_STRING || r->type == JEP_STRING)
+			{
+				char* l_str = jep_to_string(l);
+				char* r_str = jep_to_string(r);
+
+				if(l_str != NULL && r_str != NULL)
+				{
+					result = jep_create_object();
+					result->type = JEP_STRING;
+
+					char* str = malloc(strlen(l_str) + strlen(r_str));
+					strcpy(str, l_str);
+					strcat(str, r_str);
+					result->val = (void*)(str);
+				}
+
+				if(l_str != NULL)
+				{
+					free(l_str);
+				}
+
+				if(r_str != NULL)
+				{
+					free(r_str);
+				}
+
+				return result;
+			}
+		}
+
 		if(l->type != JEP_INT && l->type != JEP_LONG
 			&& l->type != JEP_DOUBLE && r->type != JEP_INT
 			&& r->type != JEP_LONG && r->type != JEP_DOUBLE)

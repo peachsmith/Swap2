@@ -68,6 +68,81 @@ static void jep_print_array(jep_obj* array)
 	printf(" }");
 }
 
+/* creates a string representation of an object */
+char* jep_to_string(jep_obj* o)
+{
+	char* str = NULL;
+
+	if(o == NULL)
+	{
+		return str;
+	}
+
+	if(o->type == JEP_STRING)
+	{
+		char* s = (char*)(o->val);
+		int len = strlen(s);
+		str = malloc(len);
+		strcpy(str, s);
+	}
+	else if(o->type == JEP_CHARACTER)
+	{
+		char* c = (char*)(o->val);
+		str = malloc(2);
+		str[0] = *c;
+		str[1] = '\0';
+	}
+	else if(o->type == JEP_INT)
+	{
+		int i = *(int*)(o->val);
+		char s[100];
+
+		int n = sprintf(s, "%d", i);
+	
+		if(n > 0)
+		{
+			if(n >= 100)
+			{
+				s[99] = '\0';
+			}
+			str = malloc(strlen(s));
+			strcpy(str, s);
+		}
+	}
+	else if(o->type == JEP_DOUBLE)
+	{
+		double d = *(double*)(o->val);
+		char s[100];
+
+		int n = sprintf(s, "%.4f", d);
+	
+		if(n > 0)
+		{
+			if(n >= 100)
+			{
+				s[99] = '\0';
+			}
+			str = malloc(strlen(s));
+			strcpy(str, s);
+		}
+	}
+	else if(o->type == JEP_ARRAY)
+	{
+		char* array = "[array]";
+		str = malloc(strlen(array) + 1);
+		strcpy(str, array);
+	}
+	else if(o->type == JEP_FUNCTION)
+	{
+		str = malloc(strlen(o->ident) + 18);
+		strcpy(str, "function: ");
+		strcat(str, o->ident);
+		strcat(str, "(...)");
+	}
+
+	return str;
+}
+
 /* frees the memory used by an array */
 void jep_free_array(jep_obj* array)
 {

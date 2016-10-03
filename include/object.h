@@ -47,6 +47,9 @@ jep_obj* jep_create_object();
 /* frees the memory used by an object */
 void jep_destroy_object(jep_obj* obj);
 
+/* creates a string representation of an object */
+char* jep_to_string(jep_obj* o);
+
 /* frees the memory used by an array */
 void jep_free_array(jep_obj* array);
 

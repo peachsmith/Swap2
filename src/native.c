@@ -43,13 +43,7 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 
 		jep_obj* data = args->head;
 
-		if(data->type != JEP_STRING)
-		{
-			printf("invalid argument type\n");
-			return o;
-		}
-
-		char* str = (char*)(data->val);
+		char* str = jep_to_string(data);
 
 		if(native == 0)
 		{
@@ -58,6 +52,11 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 		else
 		{
 			o = jep_writeln(str);
+		}
+
+		if(str != NULL)
+		{
+			free(str);
 		}
 	}
 	else if(native == 2)
@@ -80,14 +79,20 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 /* writes a string to standard out */
 static jep_obj* jep_write(const char* buffer)
 {
-	fputs(buffer, stdout);
+	if(buffer != NULL)
+	{
+		fputs(buffer, stdout);	
+	}
 	return NULL;
 }
 
 /* writes a string to standard out appended by a newline */
 static jep_obj* jep_writeln(const char* buffer)
 {
-	puts(buffer);
+	if(buffer != NULL)
+	{
+		puts(buffer);	
+	}
 	return NULL;
 }
 

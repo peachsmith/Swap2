@@ -375,7 +375,7 @@ jep_token_stream* jep_tokenize_file(const char* file_name)
 			};
 			i++;
 			col++;
-			do
+			while(s[i] != '"' && i < sb->size)
 			{
 				jep_append_char(str.val, s[i]);
 				/* check for escape sequences */
@@ -387,7 +387,7 @@ jep_token_stream* jep_tokenize_file(const char* file_name)
 				}
 				i++;
 				col++;
-			}while(s[i] != '"' && i < sb->size);
+			}
 			jep_append_token(ts, str);
 		}
 		

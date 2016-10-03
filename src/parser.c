@@ -191,6 +191,14 @@ static int jep_prioritize(jep_ast_node* cur, jep_ast_node* top)
 	{
 		if(jep_priority(cur) <= jep_priority(top))
 		{
+			if(cur->token.postfix)
+			{
+				if(top->token.postfix)
+				{
+					return 0;
+				}
+				return 1;
+			}
 			return 1;
 		}
 		return 0;
@@ -199,6 +207,14 @@ static int jep_prioritize(jep_ast_node* cur, jep_ast_node* top)
 	{
 		if(jep_priority(cur) < jep_priority(top))
 		{
+			if(cur->token.postfix)
+			{
+				if(top->token.postfix)
+				{
+					return 0;
+				}
+				return 1;
+			}
 			return 1;
 		}
 		return 0;

@@ -2,6 +2,11 @@
 solution without a problem
 
 ```javascript
-var str = 'test text';
+/** standard out */
+function writeln(data);
+
+a = 4;
+
+writeln("a: " + a);
 ```
 

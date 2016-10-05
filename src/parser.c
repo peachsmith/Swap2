@@ -904,8 +904,17 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 						if(jep_prioritize(l_brac, opr.top))
 						{
 							jep_attach(&exp, &opr, root, nodes);
+							jep_push(&opr, l_brac);
 						}
-						jep_push(&opr, l_brac);
+						else
+						{
+							jep_ast_node* e = jep_pop(&exp);
+							if(e != NULL)
+							{
+								jep_add_leaf_node(l_brac, e);
+								jep_push(&exp, l_brac);
+							}
+						}
 					}
 					else
 					{
@@ -948,8 +957,17 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 						if(jep_prioritize(l_brac, opr.top))
 						{
 							jep_attach(&exp, &opr, root, nodes);
+							jep_push(&opr, l_brac);
 						}
-						jep_push(&opr, l_brac);
+						else
+						{
+							jep_ast_node* e = jep_pop(&exp);
+							if(e != NULL)
+							{
+								jep_add_leaf_node(l_brac, e);
+								jep_push(&exp, l_brac);
+							}
+						}
 					}
 					else
 					{

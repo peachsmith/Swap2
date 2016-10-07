@@ -82,8 +82,9 @@ char* jep_to_string(jep_obj* o)
 	{
 		char* s = (char*)(o->val);
 		int len = strlen(s);
-		str = malloc(len);
+		str = malloc(len + 1);
 		strcpy(str, s);
+		str[len] = '\0';
 	}
 	else if(o->type == JEP_CHARACTER)
 	{
@@ -105,8 +106,14 @@ char* jep_to_string(jep_obj* o)
 			{
 				s[99] = '\0';
 			}
-			str = malloc(strlen(s));
+			else
+			{
+				s[n] = '\0';
+			}
+			int len = strlen(s);
+			str = malloc(len + 1);
 			strcpy(str, s);
+			str[len] = '\0';
 		}
 	}
 	else if(o->type == JEP_DOUBLE)
@@ -122,8 +129,14 @@ char* jep_to_string(jep_obj* o)
 			{
 				s[99] = '\0';
 			}
-			str = malloc(strlen(s));
+			else
+			{
+				s[n] = '\0';
+			}
+			int len = strlen(s);
+			str = malloc(len + 1);
 			strcpy(str, s);
+			str[len] = '\0';
 		}
 	}
 	else if(o->type == JEP_ARRAY)

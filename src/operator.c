@@ -3288,7 +3288,7 @@ jep_obj* jep_modifier(jep_ast_node node, jep_obj* list)
 	jep_obj* o = NULL;
 	int mod = node.mod;
 	jep_ast_node exp;
-	jep_obj* seq;       /* modified expression */
+	// jep_obj* seq;       /* modified expression */
 
 	if(node.leaf_count < 1)
 	{
@@ -3297,21 +3297,21 @@ jep_obj* jep_modifier(jep_ast_node node, jep_obj* list)
 
 	exp = node.leaves[node.leaf_count - 1];
 
-	seq = jep_create_object();
-	seq->type = JEP_LIST;
+	// seq = jep_create_object();
+	// seq->type = JEP_LIST;
 
-	jep_mod_sequence(exp, list, seq, mod);
+	jep_mod_sequence(exp, list, mod);
 
 	return o;
 }
 
 /* evaluates a comma-delimited sequence of modified expressions */
-void jep_mod_sequence(jep_ast_node node, jep_obj* list, jep_obj* seq, int mod)
+void jep_mod_sequence(jep_ast_node node, jep_obj* list, int mod)
 {
 	jep_ast_node l = node.leaves[0]; /* left operand  */
 	jep_ast_node r = node.leaves[1]; /* right operand */
-	jep_obj* lo = NULL;              /* left object   */
-	jep_obj* ro = NULL;              /* right object  */
+	//jep_obj* lo = NULL;              /* left object   */
+	//jep_obj* ro = NULL;              /* right object  */
 
 	/*
 	 * modified expressions can only be assignments or declarations.
@@ -3321,29 +3321,29 @@ void jep_mod_sequence(jep_ast_node node, jep_obj* list, jep_obj* seq, int mod)
 
 	if(l.token.token_code == T_COMMA)
 	{
-		jep_mod_sequence(l, list, seq, mod);
+		jep_mod_sequence(l, list, mod);
 	}
 	else
 	{
-		lo = jep_evaluate_local(l, list, mod);
-		if(lo != NULL)
-		{
-			jep_add_object(seq, lo);
-		}
+		jep_evaluate_local(l, list, mod);
+		// if(lo != NULL)
+		// {
+		// 	jep_add_object(seq, lo);
+		// }
 	}
 
 	if(r.token.token_code == T_COMMA)
 	{
-		jep_mod_sequence(r, list, seq, mod);
+		jep_mod_sequence(r, list, mod);
 	}
 	else
 	{
 		/* declaration */
-		ro = jep_evaluate_local(l, list, mod);
-		if(ro != NULL)
-		{
-			jep_add_object(seq, ro);
-		}
+		jep_evaluate_local(l, list, mod);
+		// if(ro != NULL)
+		// {
+		// 	jep_add_object(seq, ro);
+		// }
 	}
 }
 
@@ -3352,7 +3352,14 @@ jep_obj* jep_evaluate_local(jep_ast_node ast, jep_obj* list, int mod)
 {
 	jep_obj* o = NULL;
 
-
+	if(ast.token.type == T_IDENTIFIER)
+	{
+		/* TODO: implement local declaration */
+	}
+	else if(ast.token.token_code == T_EQUALS)
+	{
+		/* TODO: implement local initialization */
+	}
 
 	return o;
 }

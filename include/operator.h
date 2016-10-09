@@ -109,7 +109,7 @@ jep_obj* jep_while(jep_ast_node node, jep_obj* list);
 jep_obj* jep_modifier(jep_ast_node node, jep_obj* list);
 
 /* evaluates a comma-delimited sequence of modified expressions */
-void jep_mod_sequence(jep_ast_node node, jep_obj* list, jep_obj* seq, int mod);
+void jep_mod_sequence(jep_ast_node node, jep_obj* list, int mod);
 
 /* evaluates an AST node within a certain scope*/
 jep_obj* jep_evaluate_local(jep_ast_node ast, jep_obj* list, int mod);

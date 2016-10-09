@@ -81,6 +81,9 @@ jep_obj* jep_brace(jep_ast_node node, jep_obj* list);
 /* evaluates an array subscript */
 jep_obj* jep_subscript(jep_ast_node node, jep_obj* list);
 
+/* gets the actual element from an array */
+jep_obj* jep_get_element(jep_ast_node node, jep_obj* list);
+
 /* evaluates a function definition */
 jep_obj* jep_function(jep_ast_node node, jep_obj* list);
 

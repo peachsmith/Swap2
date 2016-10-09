@@ -2484,18 +2484,7 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 			}
 			else
 			{
-				jep_obj* array = jep_get_object(l->array_ident, list);
-				int i = 0;
-				jep_obj* elem = ((jep_obj*)(array->val))->head;
-				while(elem != NULL && i != l->index)
-				{
-					i++;
-					elem = elem->next;
-				}
-				if(elem != NULL && i == l->index)
-				{
-					o = elem;
-				}
+				o = jep_get_element(node.leaves[0], list);
 			}
 		}
 
@@ -2821,6 +2810,96 @@ jep_obj* jep_subscript(jep_ast_node node, jep_obj* list)
 
 	jep_destroy_object(index);
 	jep_destroy_object(array);
+
+	return o;
+}
+
+/* gets the actual element from an array */
+jep_obj* jep_get_element(jep_ast_node node, jep_obj* list)
+{
+	jep_obj* o = NULL;
+
+	if(list == NULL || node.leaf_count != 2)
+	{
+		return o;
+	}
+
+	jep_obj* index = jep_evaluate(node.leaves[0], list);
+	jep_obj* array = NULL;
+	jep_ast_node array_leaf = node.leaves[1];
+
+	/* evaluate existing arrays and function call that return arrays */
+	if(array_leaf.token.token_code == T_LSQUARE)
+	{
+		array = jep_get_element(array_leaf, list);
+	}
+	else
+	{
+		array = jep_evaluate(array_leaf, list);
+		if(array != NULL)
+		{
+			/* get the actual array, not just a copy */
+			if(array->type == JEP_ARRAY)
+			{
+				if(array->ident != NULL)
+				{
+					jep_obj* actual = jep_get_object(array->ident, list);
+					jep_destroy_object(array);
+					array = actual;	
+				}
+				else
+				{
+					/* 
+					 * if an array doens't have an array
+					 * identifier, then it is most likely
+					 * a local object
+					 */
+				}
+			}
+			else
+			{
+				jep_destroy_object(array);
+				array = NULL;
+			}
+		}
+	}
+
+	if(index != NULL && array != NULL)
+	{
+		if(index->type != JEP_INT)
+		{
+			printf("array subscript must be an integer\n");
+		}
+		else if(array->type != JEP_ARRAY)
+		{
+			printf("cannot access index of non array object\n");
+		}
+		else if(array->size > 0)
+		{
+			/* get the element from the actual array */
+			jep_obj* elem = ((jep_obj*)(array->val))->head;
+			int target = *(int*)(index->val);
+			int i;
+			for(i = 0; elem != NULL; i++)
+			{
+				if(i == target)
+				{
+					o = elem;
+				}
+				elem = elem->next;
+			}
+			if(o == NULL)
+			{
+				printf("array index out of bounds\n");
+			}
+		}
+		else
+		{
+			printf("cannot access an element in an empty array\n");
+		}
+	}
+
+	jep_destroy_object(index);
 
 	return o;
 }

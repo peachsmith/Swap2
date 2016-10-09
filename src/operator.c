@@ -2955,6 +2955,12 @@ jep_obj* jep_return(jep_ast_node node, jep_obj* list)
 		o = jep_evaluate(node.leaves[0], list);
 		o->ret = 1;
 	}
+	else if(node.leaf_count == 0)
+	{
+		o = jep_create_object();
+		o->type = JEP_ARGUMENT;
+		o->ret = 1;
+	}
 
 	return o;
 }

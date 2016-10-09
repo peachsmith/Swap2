@@ -51,6 +51,10 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 			return jep_while(ast, list);
 		}
 	}
+	else if(ast.token.type == T_MODIFIER)
+	{
+		return jep_modifier(ast, list);
+	}
 
 	switch(ast.token.token_code)
 	{
@@ -3274,6 +3278,81 @@ jep_obj* jep_while(jep_ast_node node, jep_obj* list)
 	jep_remove_scope(list);
 	jep_destroy_list(scope);
 	free(scope);
+
+	return o;
+}
+
+/* evaluates a modifier chain */
+jep_obj* jep_modifier(jep_ast_node node, jep_obj* list)
+{
+	jep_obj* o = NULL;
+	int mod = node.mod;
+	jep_ast_node exp;
+	jep_obj* seq;       /* modified expression */
+
+	if(node.leaf_count < 1)
+	{
+		return o;
+	}
+
+	exp = node.leaves[node.leaf_count - 1];
+
+	seq = jep_create_object();
+	seq->type = JEP_LIST;
+
+	jep_mod_sequence(exp, list, seq, mod);
+
+	return o;
+}
+
+/* evaluates a comma-delimited sequence of modified expressions */
+void jep_mod_sequence(jep_ast_node node, jep_obj* list, jep_obj* seq, int mod)
+{
+	jep_ast_node l = node.leaves[0]; /* left operand  */
+	jep_ast_node r = node.leaves[1]; /* right operand */
+	jep_obj* lo = NULL;              /* left object   */
+	jep_obj* ro = NULL;              /* right object  */
+
+	/*
+	 * modified expressions can only be assignments or declarations.
+	 * each node in the sequence must be either an identifier, or an 
+	 * assignment with an identifier as its left operand.
+	 */
+
+	if(l.token.token_code == T_COMMA)
+	{
+		jep_mod_sequence(l, list, seq, mod);
+	}
+	else
+	{
+		lo = jep_evaluate_local(l, list, mod);
+		if(lo != NULL)
+		{
+			jep_add_object(seq, lo);
+		}
+	}
+
+	if(r.token.token_code == T_COMMA)
+	{
+		jep_mod_sequence(r, list, seq, mod);
+	}
+	else
+	{
+		/* declaration */
+		ro = jep_evaluate_local(l, list, mod);
+		if(ro != NULL)
+		{
+			jep_add_object(seq, ro);
+		}
+	}
+}
+
+/* evaluates an AST node within a certain scope*/
+jep_obj* jep_evaluate_local(jep_ast_node ast, jep_obj* list, int mod)
+{
+	jep_obj* o = NULL;
+
+
 
 	return o;
 }

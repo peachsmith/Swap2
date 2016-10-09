@@ -18,6 +18,7 @@ typedef struct ASTNode
 	int error;
 	int array;
 	int loop;
+	int mod;
 }jep_ast_node;
 
 /* a stack of nodes */

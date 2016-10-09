@@ -11,10 +11,11 @@
 #define T_END 0
 #define T_SYMBOL 1
 #define T_KEYWORD 2
-#define T_IDENTIFIER 3
-#define T_NUMBER 4
-#define T_CHARACTER 5
-#define T_STRING 6
+#define T_MODIFIER 3
+#define T_IDENTIFIER 4
+#define T_NUMBER 5
+#define T_CHARACTER 6
+#define T_STRING 7
 
 /* single character symbol token codes */
 #define T_PLUS 1
@@ -70,9 +71,11 @@
 #define T_WHILE 45
 #define T_FUNCTION 46
 #define T_RETURN 47
+#define T_LOCAL 48
+#define T_CONST 49
 
 /* end of file */
-#define T_EOF 48
+#define T_EOF 50
 
 /**
  * a single token

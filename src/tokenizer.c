@@ -31,7 +31,7 @@ const char *symbols3[] =
  */
 const char *keywords[] = 
 {
-	"if", "else", "for", "while", "function", "return"
+	"if", "else", "for", "while", "function", "return", "local", "const"
 };
 
 /**
@@ -122,7 +122,7 @@ static int jep_is_symbol3(const char* s)
 static int jep_is_keyword(const char* s)
 {
 	int i;
-	for(i = 0; i < 6; i++)
+	for(i = 0; i < 8; i++)
 	{
 		if(!strcmp(s, keywords[i]))
 		{
@@ -181,7 +181,12 @@ static void jep_classify_token(jep_token* t)
 	}
 	else if(t->type == T_KEYWORD)
 	{
-		t->token_code = jep_is_keyword(t->val->buffer) + 42;
+		int code = jep_is_keyword(t->val->buffer);
+		t->token_code = code + 42;
+		if(code > 5)
+		{
+			t->type = T_MODIFIER;
+		}
 	}
 }
 
@@ -521,6 +526,11 @@ void jep_print_tokens(jep_token_stream* ts, FILE* f)
 				break;
 			case T_KEYWORD:
 				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[keyword]",
+				ts->tok[i].row, ts->tok[i].column, 
+				ts->tok[i].token_code, ts->tok[i].val->buffer);
+				break;
+			case T_MODIFIER:
+				fprintf(f,"%-12s %-7d %-7d %-12d %s\n","[modifier]",
 				ts->tok[i].row, ts->tok[i].column, 
 				ts->tok[i].token_code, ts->tok[i].val->buffer);
 				break;

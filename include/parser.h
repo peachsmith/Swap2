@@ -15,6 +15,10 @@
 #define ERR_EXPECTED 4
 #define ERR_UNIQUE 5
 
+/* modifier codes */
+#define MOD_LOCAL 1
+#define MOD_CONST 2
+
 /**
  * constructs an AST from a stream of tokens
  */

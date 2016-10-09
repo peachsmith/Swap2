@@ -11,6 +11,7 @@ jep_ast_node* jep_create_ast_node()
 	node->leaves = NULL;
 	node->array = 0;
 	node->loop = 0;
+	node->mod = 0;
 	return node;
 }
 

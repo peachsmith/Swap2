@@ -609,7 +609,7 @@ static jep_ast_node* jep_function(jep_ast_node* root, jep_ast_node** nodes)
 
 	if((*nodes)->token.token_code != T_LBRACE)
 	{
-		// jep_err(ERR_EXPECTED, (*nodes)->token, root, "{");
+		/* native function definition */
 		return fn_node;
 	}
 
@@ -664,6 +664,7 @@ jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node** nodes)
 		(*nodes)[i].error = 0;
 		(*nodes)[i].array = 0;
 		(*nodes)[i].loop = 0;
+		(*nodes)[i].mod = 0;
 	}
 
 	/* create the root of the AST */
@@ -1065,6 +1066,84 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 }
 
 /**
+ * parses a sequence of modifiers followed by an expression.
+ * where modn is the nth modifier in the chain, the following ast is produced
+ * mod0
+ *   modn
+ *   exp
+ */
+static jep_ast_node* jep_modifier(jep_ast_node* root, jep_ast_node** nodes)
+{
+	jep_ast_node* mod_node; /* the initial modifier                    */
+	jep_ast_node* exp;      /* the modified expression                 */
+	int mod;                /* bit flags to keep track of modification */
+
+	mod_node = (*nodes)++;
+	mod = 0;
+
+	if(mod_node->token.token_code == T_LOCAL)
+	{
+		mod |= 1;
+	}
+	else if(mod_node->token.token_code == T_CONST)
+	{
+		mod |= 2;
+	}
+
+	while((*nodes)->token.type == T_MODIFIER && !root->error)
+	{
+		jep_ast_node* next = (*nodes)++;
+		if(next->token.token_code == T_LOCAL)
+		{
+			if(mod & 1)
+			{
+				printf("duplicate modifier %s detected at %d,%d\n", 
+					next->token.val->buffer,
+					next->token.row,
+					next->token.column);
+				root->error = 1;
+				return NULL;
+			}
+			else
+			{
+				mod |= 1;	
+			}
+		}
+		else if(next->token.token_code == T_CONST)
+		{
+			if(mod & 2)
+			{
+				printf("duplicate modifier %s detected at %d,%d\n", 
+					next->token.val->buffer,
+					next->token.row,
+					next->token.column);
+				root->error = 1;
+				return NULL;
+			}
+			else
+			{
+				mod |= 2;	
+			}
+		}
+		jep_add_leaf_node(mod_node, next);
+	}
+
+	exp = jep_expression(root, nodes);
+	if(!jep_accept(T_SEMICOLON, nodes) || root->error)
+	{
+		jep_err(ERR_EXPECTED, (*nodes)->token, root, ";");
+		return NULL;
+	}
+
+	if(exp != NULL)
+	{
+		jep_add_leaf_node(mod_node, exp);
+	}
+	
+	return mod_node;
+}
+
+/**
  * parses a statement
  */
 static jep_ast_node* jep_statement(jep_ast_node* root, jep_ast_node** nodes)
@@ -1099,6 +1178,10 @@ static jep_ast_node* jep_statement(jep_ast_node* root, jep_ast_node** nodes)
 		{
 			jep_add_leaf_node(statement, ret_val);
 		}
+	}
+	else if((*nodes)->token.type == T_MODIFIER)
+	{
+		statement = jep_modifier(root, nodes);
 	}
 	else
 	{

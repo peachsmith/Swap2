@@ -152,6 +152,14 @@ char* jep_to_string(jep_obj* o)
 		strcat(str, o->ident);
 		strcat(str, "(...)");
 	}
+	else if(o->type == JEP_ARGUMENT)
+	{
+		if(o->val == NULL)
+		{
+			str = malloc(7);
+			strcpy(str, "[null]");
+		}
+	}
 
 	return str;
 }

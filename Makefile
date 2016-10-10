@@ -15,6 +15,17 @@ build:
 	gcc $(FLAGS) src/main.c
 	gcc main.o stringbuilder.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap
 
+debug:
+	gcc -g $(FLAGS) src/stringbuilder.c
+	gcc -g $(FLAGS) src/tokenizer.c
+	gcc -g $(FLAGS) src/parser.c
+	gcc -g $(FLAGS) src/object.c
+	gcc -g $(FLAGS) src/ast.c
+	gcc -g $(FLAGS) src/operator.c
+	gcc -g $(FLAGS) src/native.c
+	gcc -g $(FLAGS) src/main.c
+	gcc main.o stringbuilder.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap
+
 clean:
 	rm *.o
 

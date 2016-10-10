@@ -1139,6 +1139,8 @@ static jep_ast_node* jep_modifier(jep_ast_node* root, jep_ast_node** nodes)
 	{
 		jep_add_leaf_node(mod_node, exp);
 	}
+
+	mod_node->mod = mod;
 	
 	return mod_node;
 }

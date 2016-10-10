@@ -3288,7 +3288,6 @@ jep_obj* jep_modifier(jep_ast_node node, jep_obj* list)
 	jep_obj* o = NULL;
 	int mod = node.mod;
 	jep_ast_node exp;
-	// jep_obj* seq;       /* modified expression */
 
 	if(node.leaf_count < 1)
 	{
@@ -3297,10 +3296,14 @@ jep_obj* jep_modifier(jep_ast_node node, jep_obj* list)
 
 	exp = node.leaves[node.leaf_count - 1];
 
-	// seq = jep_create_object();
-	// seq->type = JEP_LIST;
-
-	jep_mod_sequence(exp, list, mod);
+	if(exp.leaf_count > 0)
+	{
+		jep_mod_sequence(exp, list, mod);	
+	}
+	else
+	{
+		jep_evaluate_local(exp, list, mod);
+	}
 
 	return o;
 }
@@ -3310,8 +3313,6 @@ void jep_mod_sequence(jep_ast_node node, jep_obj* list, int mod)
 {
 	jep_ast_node l = node.leaves[0]; /* left operand  */
 	jep_ast_node r = node.leaves[1]; /* right operand */
-	//jep_obj* lo = NULL;              /* left object   */
-	//jep_obj* ro = NULL;              /* right object  */
 
 	/*
 	 * modified expressions can only be assignments or declarations.
@@ -3326,10 +3327,6 @@ void jep_mod_sequence(jep_ast_node node, jep_obj* list, int mod)
 	else
 	{
 		jep_evaluate_local(l, list, mod);
-		// if(lo != NULL)
-		// {
-		// 	jep_add_object(seq, lo);
-		// }
 	}
 
 	if(r.token.token_code == T_COMMA)
@@ -3340,10 +3337,6 @@ void jep_mod_sequence(jep_ast_node node, jep_obj* list, int mod)
 	{
 		/* declaration */
 		jep_evaluate_local(l, list, mod);
-		// if(ro != NULL)
-		// {
-		// 	jep_add_object(seq, ro);
-		// }
 	}
 }
 
@@ -3352,9 +3345,38 @@ jep_obj* jep_evaluate_local(jep_ast_node ast, jep_obj* list, int mod)
 {
 	jep_obj* o = NULL;
 
+	if(list == NULL)
+	{
+		return o;
+	}
+
 	if(ast.token.type == T_IDENTIFIER)
 	{
-		/* TODO: implement local declaration */
+		/* get the current scope */
+		jep_obj* scope = list;
+		while(scope->tail != NULL && scope->tail->type == JEP_LIST)
+		{
+			scope = scope->tail;
+		}
+
+		/* get any existing object in the current scope */
+		jep_obj* existing = jep_get_object(ast.token.val->buffer, scope);
+
+		if(existing == NULL)
+		{
+			if(mod & 1)
+			{
+				jep_obj* local = jep_create_object();
+				local->type = JEP_ARGUMENT;
+				local->ident = ast.token.val->buffer;
+				jep_add_object(scope, local);
+			}
+		}
+		else
+		{
+			printf("the object %s has already been declared in this scope\n",
+				ast.token.val->buffer);
+		}
 	}
 	else if(ast.token.token_code == T_EQUALS)
 	{

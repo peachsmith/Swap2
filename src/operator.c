@@ -3335,8 +3335,7 @@ void jep_mod_sequence(jep_ast_node node, jep_obj* list, int mod)
 	}
 	else
 	{
-		/* declaration */
-		jep_evaluate_local(l, list, mod);
+		jep_evaluate_local(r, list, mod);
 	}
 }
 

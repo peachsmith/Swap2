@@ -201,7 +201,7 @@ jep_obj* jep_add(jep_ast_node node, jep_obj* list)
 					result = jep_create_object();
 					result->type = JEP_STRING;
 
-					char* str = malloc(strlen(l_str) + strlen(r_str));
+					char* str = malloc(strlen(l_str) + strlen(r_str) + 1);
 					strcpy(str, l_str);
 					strcat(str, r_str);
 					result->val = (void*)(str);

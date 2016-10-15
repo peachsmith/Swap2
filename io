@@ -3,7 +3,7 @@
  * 
  * author: John Powell
  */
-for darf;
+
 /**
  * Writes a string of text to standard out. If the object passed in is not
  * already a string, it will be converted to a string representation.

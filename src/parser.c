@@ -666,24 +666,6 @@ void jep_parse(jep_token_stream* ts, jep_ast_node* root)
 		nodes[i].mod = 0;
 	}
 
-	// /* create the root of the AST */
-	// root = NULL;
-	// root = malloc(sizeof(jep_ast_node));
-	// root->leaf_count = 0;
-	// root->cap = 10;
-	// root->leaves = NULL;
-	// root->token.val = jep_create_string_builder();
-	// root->token.type = T_SYMBOL;
-	// root->token.token_code = 0;
-	// root->token.row = 0;
-	// root->token.column = 0;
-	// root->token.unary = 0;
-	// root->token.postfix = 0;
-	// root->error = 0;
-	// root->array = 0;
-	// root->loop = 0;
-	// jep_append_string(root->token.val, "root");
-
 	do
 	{
 		if(nodes->token.token_code == T_LBRACE)

@@ -28,18 +28,18 @@ static void jep_err(int err, jep_token tok, jep_ast_node* root, char* val)
 	}
 	else if(err == ERR_IDENTIFIER)
 	{
-		printf("expected identifier at %d,%d but found %s\n", 
-			tok.row, tok.column, tok.val->buffer);
+		printf("expected identifier at %s %d,%d but found %s\n", 
+			tok.file, tok.row, tok.column, tok.val->buffer);
 	}
 	else if(err == ERR_UNEXPECTED)
 	{
-		printf("unexpected token '%s' at %d,%d\n",
-			tok.val->buffer, tok.row, tok.column);
+		printf("unexpected token '%s' at %s %d,%d\n",
+			tok.val->buffer, tok.file, tok.row, tok.column);
 	}
 	else if(err == ERR_EXPECTED)
 	{
-		printf("expected '%s' at %d,%d but found '%s'\n", 
-			val, tok.row, tok.column, tok.val->buffer);
+		printf("expected '%s' at %s %d,%d but found '%s'\n", 
+			val, tok.file, tok.row, tok.column, tok.val->buffer);
 	}
 	else if(err == ERR_UNIQUE)
 	{
@@ -668,7 +668,16 @@ void jep_parse(jep_token_stream* ts, jep_ast_node* root)
 
 	do
 	{
-		if(nodes->token.token_code == T_LBRACE)
+		if(nodes->token.token_code == T_IMPORT)
+		{
+			/* imports are handled during tokenization */
+			nodes++;
+			if(nodes->token.type != T_STRING)
+			{
+				jep_err(ERR_EXPECTED, nodes->token, root, "string");
+			}
+		}
+		else if(nodes->token.token_code == T_LBRACE)
 		{
 			jep_ast_node* l_brace = nodes++;
 			l_brace->error = 0;

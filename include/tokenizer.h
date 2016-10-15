@@ -90,6 +90,7 @@ typedef struct Token
 	int column;              /* the column of the token in the file */
 	int unary;               /* flag indicating a unary operator    */
 	int postfix;             /* flag indicating a postfix operator  */
+	const char* file;        /* file in which the token is located  */
 }jep_token;
 
 /**

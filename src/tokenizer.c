@@ -205,6 +205,7 @@ jep_token* jep_create_token()
 	t->column = 0;
 	t->unary = 0;
 	t->postfix = 0;
+	t->file = NULL;
 	return t;
 }
 
@@ -271,7 +272,15 @@ void jep_append_token(jep_token_stream* ts, jep_token t)
 		}
 	}
 
-	ts->tok[ts->size++] = t;
+	/* check to see if we're tokenizing a file from an import statement */
+	if(ts->size > 0 && ts->tok[ts->size - 1].token_code == T_EOF)
+	{
+		ts->tok[ts->size - 1] = t;
+	}
+	else
+	{
+		ts->tok[ts->size++] = t;
+	}
 }
 
 /**
@@ -353,7 +362,7 @@ void jep_tokenize_file(jep_token_stream* ts, const char* file_name)
 			jep_string_builder* val = jep_create_string_builder();
 			jep_token ident = 
 			{
-				val, T_IDENTIFIER, 0, row, col, 0, 0
+				val, T_IDENTIFIER, 0, row, col, 0, 0, file_name
 			};
 			do
 			{
@@ -374,7 +383,7 @@ void jep_tokenize_file(jep_token_stream* ts, const char* file_name)
 			jep_string_builder* val = jep_create_string_builder();
 			jep_token c = 
 			{
-				val, T_CHARACTER, 0, row, col, 0, 0
+				val, T_CHARACTER, 0, row, col, 0, 0, file_name
 			};
 			i++;
 			col++;
@@ -400,7 +409,7 @@ void jep_tokenize_file(jep_token_stream* ts, const char* file_name)
 			jep_string_builder* val = jep_create_string_builder();
 			jep_token str = 
 			{
-				val, T_STRING, 0, row, col, 0, 0
+				val, T_STRING, 0, row, col, 0, 0, file_name
 			};
 			i++;
 			col++;
@@ -426,7 +435,7 @@ void jep_tokenize_file(jep_token_stream* ts, const char* file_name)
 			jep_string_builder* val = jep_create_string_builder();
 			jep_token sym = 
 			{
-				val, T_SYMBOL, 0, row, col, 0, 0
+				val, T_SYMBOL, 0, row, col, 0, 0, file_name
 			};
 			char symbol[] = { s[i], '\0', '\0', '\0' };
 			if(i < sb->size - 1)
@@ -453,6 +462,11 @@ void jep_tokenize_file(jep_token_stream* ts, const char* file_name)
 
 			jep_classify_token(&sym);
 			jep_append_token(ts, sym);
+			if(sym.token_code == T_SEMICOLON && ts->size > 2
+				&& ts->tok[ts->size - 3].token_code == T_IMPORT)
+			{
+				jep_tokenize_file(ts, ts->tok[ts->size - 2].val->buffer);
+			}
 		}
 		
 		/* detect numbers */
@@ -461,7 +475,7 @@ void jep_tokenize_file(jep_token_stream* ts, const char* file_name)
 			jep_string_builder* val = jep_create_string_builder();
 			jep_token num = 
 			{
-				val, T_NUMBER, 0, row, col, 0, 0
+				val, T_NUMBER, 0, row, col, 0, 0, file_name
 			};
 			int dec = 0;
 			do
@@ -498,7 +512,7 @@ void jep_tokenize_file(jep_token_stream* ts, const char* file_name)
 	/* append an END token */
 	jep_token end_token = 
 	{
-		jep_create_string_builder(), T_END, T_EOF, row, col, 0, 0
+		jep_create_string_builder(), T_END, T_EOF, row, col, 0, 0, file_name
 	};
 	jep_append_string(end_token.val, "EOF");
 	jep_append_token(ts, end_token);

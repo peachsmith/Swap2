@@ -648,8 +648,9 @@ static int jep_accept(int token_code, jep_ast_node** nodes)
  */
 void jep_parse(jep_token_stream* ts, jep_ast_node* root)
 {
-	jep_ast_node* nodes;  /* the nodes of the AST     */
-	int i;                /* index variable          */
+	jep_ast_node* nodes;  /* the nodes of the AST      */
+	jep_ast_node* first;  /* the first node of the AST */
+	int i;                /* index variable            */
 
 	nodes = malloc(sizeof(jep_ast_node) * ts->size);
 
@@ -665,6 +666,8 @@ void jep_parse(jep_token_stream* ts, jep_ast_node* root)
 		nodes[i].loop = 0;
 		nodes[i].mod = 0;
 	}
+	
+	first = nodes;
 
 	do
 	{
@@ -701,7 +704,9 @@ void jep_parse(jep_token_stream* ts, jep_ast_node* root)
 			}
 		}
 	}while(nodes->token.token_code != T_EOF && !root->error);
-
+	
+	/* position the pointer back at the beginning of the memory chunk */
+	nodes = first;
 	free(nodes);
 
 	return;

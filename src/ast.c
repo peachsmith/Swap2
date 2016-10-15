@@ -30,8 +30,20 @@ void jep_add_leaf_node(jep_ast_node* root, jep_ast_node* leaf)
 	{
 		int new_cap = root->cap + root->cap / 2;
 		int new_size = sizeof(jep_ast_node) * new_cap;
-		root->leaves = realloc(root->leaves, new_size);
-		root->cap = new_cap;
+		jep_ast_node* new_leaves = realloc(root->leaves, new_size);
+		if(new_leaves != NULL)
+		{
+			root->leaves = new_leaves;
+			root->cap = new_cap;	
+		}
+		else
+		{
+			if(!root->error)
+			{
+				printf("failed to reallocate memory for AST\n");				
+			}
+			return;
+		}
 	}
 	if(leaf != NULL)
 	{

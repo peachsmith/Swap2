@@ -646,10 +646,9 @@ static int jep_accept(int token_code, jep_ast_node** nodes)
 /**
  * constructs an AST from a stream of tokens
  */
-jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node* root)
+void jep_parse(jep_token_stream* ts, jep_ast_node* root)
 {
-	jep_ast_node* first;  /* the first node          */
-	jep_ast_node* nodes;   /* the root of the AST     */
+	jep_ast_node* nodes;  /* the nodes of the AST     */
 	int i;                /* index variable          */
 
 	nodes = malloc(sizeof(jep_ast_node) * ts->size);
@@ -685,8 +684,6 @@ jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node* root)
 	// root->loop = 0;
 	// jep_append_string(root->token.val, "root");
 
-	first = nodes;
-
 	do
 	{
 		if(nodes->token.token_code == T_LBRACE)
@@ -714,9 +711,9 @@ jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node* root)
 		}
 	}while(nodes->token.token_code != T_EOF && !root->error);
 
-	nodes = first;
+	free(nodes);
 
-	return root;
+	return;
 }
 
 /**

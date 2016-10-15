@@ -646,75 +646,75 @@ static int jep_accept(int token_code, jep_ast_node** nodes)
 /**
  * constructs an AST from a stream of tokens
  */
-jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node** nodes)
+jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node* root)
 {
 	jep_ast_node* first;  /* the first node          */
-	jep_ast_node* root;   /* the root of the AST     */
+	jep_ast_node* nodes;   /* the root of the AST     */
 	int i;                /* index variable          */
 
-	*nodes = malloc(sizeof(jep_ast_node) * ts->size);
+	nodes = malloc(sizeof(jep_ast_node) * ts->size);
 
 	/* create an AST node for each token */
 	for(i = 0; i < ts->size; i++)
 	{
-		(*nodes)[i].leaf_count = 0;
-		(*nodes)[i].cap = 10;
-		(*nodes)[i].leaves = NULL;
-		(*nodes)[i].token = ts->tok[i];
-		(*nodes)[i].error = 0;
-		(*nodes)[i].array = 0;
-		(*nodes)[i].loop = 0;
-		(*nodes)[i].mod = 0;
+		nodes[i].leaf_count = 0;
+		nodes[i].cap = 10;
+		nodes[i].leaves = NULL;
+		nodes[i].token = ts->tok[i];
+		nodes[i].error = 0;
+		nodes[i].array = 0;
+		nodes[i].loop = 0;
+		nodes[i].mod = 0;
 	}
 
-	/* create the root of the AST */
-	root = NULL;
-	root = malloc(sizeof(jep_ast_node));
-	root->leaf_count = 0;
-	root->cap = 10;
-	root->leaves = NULL;
-	root->token.val = jep_create_string_builder();
-	root->token.type = T_SYMBOL;
-	root->token.token_code = 0;
-	root->token.row = 0;
-	root->token.column = 0;
-	root->token.unary = 0;
-	root->token.postfix = 0;
-	root->error = 0;
-	root->array = 0;
-	root->loop = 0;
-	jep_append_string(root->token.val, "root");
+	// /* create the root of the AST */
+	// root = NULL;
+	// root = malloc(sizeof(jep_ast_node));
+	// root->leaf_count = 0;
+	// root->cap = 10;
+	// root->leaves = NULL;
+	// root->token.val = jep_create_string_builder();
+	// root->token.type = T_SYMBOL;
+	// root->token.token_code = 0;
+	// root->token.row = 0;
+	// root->token.column = 0;
+	// root->token.unary = 0;
+	// root->token.postfix = 0;
+	// root->error = 0;
+	// root->array = 0;
+	// root->loop = 0;
+	// jep_append_string(root->token.val, "root");
 
-	first = *nodes;
+	first = nodes;
 
 	do
 	{
-		if((*nodes)->token.token_code == T_LBRACE)
+		if(nodes->token.token_code == T_LBRACE)
 		{
-			jep_ast_node* l_brace = (*nodes)++;
+			jep_ast_node* l_brace = nodes++;
 			l_brace->error = 0;
-			jep_block(l_brace, nodes);
+			jep_block(l_brace, &nodes);
 			root->error = l_brace->error;
-			if(!jep_accept(T_RBRACE, nodes) && !root->error)
+			if(!jep_accept(T_RBRACE, &nodes) && !root->error)
 			{
-				jep_err(ERR_EXPECTED, (*nodes)->token, root, "}");
+				jep_err(ERR_EXPECTED, nodes->token, root, "}");
 			}
 			else
 			{
 				jep_add_leaf_node(root, l_brace);
 			}
 		}
-		else if((*nodes)->token.token_code != T_EOF)
+		else if(nodes->token.token_code != T_EOF)
 		{
-			jep_ast_node* stm = jep_statement(root, nodes);
+			jep_ast_node* stm = jep_statement(root, &nodes);
 			if(stm != NULL && !root->error)
 			{
 				jep_add_leaf_node(root, stm);
 			}
 		}
-	}while((*nodes)->token.token_code != T_EOF && !root->error);
+	}while(nodes->token.token_code != T_EOF && !root->error);
 
-	(*nodes) = first;
+	nodes = first;
 
 	return root;
 }

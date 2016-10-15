@@ -22,6 +22,6 @@
 /**
  * constructs an AST from a stream of tokens
  */
-jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node** nodes);
+jep_ast_node* jep_parse(jep_token_stream* ts, jep_ast_node* root);
 
 #endif

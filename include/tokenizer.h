@@ -71,11 +71,12 @@
 #define T_WHILE 45
 #define T_FUNCTION 46
 #define T_RETURN 47
-#define T_LOCAL 48
-#define T_CONST 49
+#define T_IMPORT 48
+#define T_LOCAL 49
+#define T_CONST 50
 
 /* end of file */
-#define T_EOF 50
+#define T_EOF 51
 
 /**
  * a single token
@@ -100,6 +101,7 @@ typedef struct TokenStream
 	jep_token* tok; /* the tokens                           */
 	int size;       /* the amount of tokens in the stream   */
 	int cap;        /* the maximum amount of tokens allowed */
+	int error;      /* error flag */
 }jep_token_stream;
 
 /**
@@ -130,7 +132,7 @@ void jep_append_token(jep_token_stream* tb, jep_token t);
 /**
  * tokenizes the contents of a file
  */
-jep_token_stream* jep_tokenize_file(const char* file_name);
+void jep_tokenize_file(jep_token_stream* ts, const char* file_name);
 
 /**
  * prints the tokens

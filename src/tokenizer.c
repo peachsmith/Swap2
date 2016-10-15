@@ -31,7 +31,8 @@ const char *symbols3[] =
  */
 const char *keywords[] = 
 {
-	"if", "else", "for", "while", "function", "return", "local", "const"
+	"if", "else", "for", "while", "function", "return", "import",
+	"local", "const"
 };
 
 /**
@@ -183,7 +184,8 @@ static void jep_classify_token(jep_token* t)
 	{
 		int code = jep_is_keyword(t->val->buffer);
 		t->token_code = code + 42;
-		if(code > 5)
+		/* detect modifiers */
+		if(code > 6)
 		{
 			t->type = T_MODIFIER;
 		}
@@ -224,6 +226,7 @@ jep_token_stream* jep_create_token_stream()
 	ts->size = 0;
 	ts->cap = 50;
 	ts->tok = malloc(50 * sizeof(jep_token));
+	ts->error = 0;
 	return ts;
 }
 
@@ -250,8 +253,22 @@ void jep_append_token(jep_token_stream* ts, jep_token t)
 	if(ts->size >= ts->cap)
 	{
 		int new_cap = ts->cap + ts->cap / 2;
-		ts->tok = realloc(ts->tok, sizeof(jep_token) * new_cap);
-		ts->cap = new_cap;
+		jep_token* new_tok = NULL;
+		new_tok = realloc(ts->tok, sizeof(jep_token) * new_cap);
+		if(new_tok != NULL)
+		{
+			ts->tok = new_tok;
+			ts->cap = new_cap;
+		}
+		else
+		{
+			if(!ts->error)
+			{
+				printf("failed to reallocate memory for token stream\n");
+				ts->error = 1;
+			}
+			return;
+		}
 	}
 
 	ts->tok[ts->size++] = t;
@@ -260,12 +277,16 @@ void jep_append_token(jep_token_stream* ts, jep_token t)
 /**
  * tokenizes the contents of a text file
  */
-jep_token_stream* jep_tokenize_file(const char* file_name)
+void jep_tokenize_file(jep_token_stream* ts, const char* file_name)
 {
+	if(ts->error)
+	{
+		return;
+	}
+
 	FILE* in_file;          /* the input file                        */
 	jep_string_builder* sb; /* puts the character data into a string */
 	char* s;                /* the string of character data          */
-	jep_token_stream* ts;   /* tokens                                */
 	int row;                /* the row of each token in the file     */
 	int col;                /* the column of each token in the file  */
 	int i;                  /* loop index                            */
@@ -277,12 +298,15 @@ jep_token_stream* jep_tokenize_file(const char* file_name)
 	if(in_file == NULL)
 	{
 		/* failed to open the input file */
-		printf("could not open input file\n");
-		return NULL;
+		if(!ts->error)
+		{
+			printf("could not open file: %s\n", file_name);
+			ts->error = 2;	
+		}
+		return;
 	}
 
 	sb = jep_create_string_builder();
-	ts = jep_create_token_stream();
 	jep_scan_file(in_file, sb);
 	s = sb->buffer;
 	i = 0;
@@ -482,8 +506,6 @@ jep_token_stream* jep_tokenize_file(const char* file_name)
 	/* free memory */
 	fclose(in_file);
 	jep_destroy_string_builder(sb);
-
-	return ts;
 }
 
 /**

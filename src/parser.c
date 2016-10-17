@@ -90,6 +90,8 @@ static int jep_associativity(jep_ast_node* node)
 		case T_LSHIFTASSIGN:
 		case T_RSHIFTASSIGN:
 		case T_NOT:
+		case T_COLON:
+		case T_DOUBLECOLON:
 			return JEP_RIGHT_ASSOC;
 
 		case T_MINUS:
@@ -171,6 +173,8 @@ static int jep_priority(jep_ast_node* node)
 			return 7;
 
 		case T_NOT:
+		case T_COLON:
+		case T_DOUBLECOLON:
 			return 8;
 
 		case T_INCREMENT:
@@ -234,6 +238,8 @@ static int jep_check_unary(jep_token* cur, jep_token* prev)
 		case T_DECREMENT:
 		case T_NOT:
 		case T_LSQUARE:
+		case T_COLON:
+		case T_DOUBLECOLON:
 			cur->unary = 1;
 			return 1;
 

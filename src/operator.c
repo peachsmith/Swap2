@@ -162,6 +162,10 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 			o = jep_comma(ast, list);
 			break;
 
+		case T_DOUBLECOLON:
+			printf("this is be a reference\n");
+			break;
+
 		default:
 			printf("unrecognized token: %s\n", 
 				ast.token.val->buffer);
@@ -2564,7 +2568,7 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 		args = node.leaves[0];
 		arg_list = jep_create_object();
 		arg_list->type = JEP_LIST;
-		if(args.leaf_count > 1)
+		if(args.leaf_count >= 1)
 		{
 			if(node.leaves[0].token.token_code == T_COMMA)
 			{

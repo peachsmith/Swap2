@@ -6,7 +6,7 @@
 const char *symbols[] = 
 {
 	"+", "-", "/", "*", ";", ",", "(", ")", "[", "]", "{", 
-	"}", "<", ">", "=", ".", "&", "|", "^", "!", "%"
+	"}", "<", ">", "=", ".", "&", "|", "^", "!", "%", ":"
 };
 
 /**
@@ -15,7 +15,8 @@ const char *symbols[] =
 const char *symbols2[] = 
 {
 	"++", "--", "+=", "-=", "*=", "/=", "%=", "==", "<=", 
-	">=", ">>", "<<", "&=", "|=", "^=", "&&", "||", "!="
+	">=", ">>", "<<", "&=", "|=", "^=", "&&", "||", "!=",
+	"::"
 };
 
 /**
@@ -63,6 +64,7 @@ static int jep_is_symbol_char(char c)
 		case '|':
 		case '^':
 		case '%':
+		case ':':
 			return 1;
 		default:
 			return 0;
@@ -75,7 +77,7 @@ static int jep_is_symbol_char(char c)
 static int jep_is_symbol(const char* s)
 {
 	int i;
-	for(i = 0; i < 21; i++)
+	for(i = 0; i < 22; i++)
 	{
 		if(!strcmp(symbols[i], s))
 		{
@@ -91,7 +93,7 @@ static int jep_is_symbol(const char* s)
 static int jep_is_symbol2(const char* s)
 {
 	int i;
-	for(i = 0; i < 18; i++)
+	for(i = 0; i < 19; i++)
 	{
 		if(!strcmp(symbols2[i], s))
 		{

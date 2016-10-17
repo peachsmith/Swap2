@@ -173,17 +173,17 @@ static void jep_classify_token(jep_token* t)
 		}
 		else if(t->val->size == 2)
 		{
-			t->token_code = jep_is_symbol2(t->val->buffer) + 22;
+			t->token_code = jep_is_symbol2(t->val->buffer) + 23;
 		}
 		else if(t->val->size == 3)
 		{
-			t->token_code = jep_is_symbol3(t->val->buffer) + 40;
+			t->token_code = jep_is_symbol3(t->val->buffer) + 42;
 		}
 	}
 	else if(t->type == T_KEYWORD)
 	{
 		int code = jep_is_keyword(t->val->buffer);
-		t->token_code = code + 42;
+		t->token_code = code + 44;
 		/* detect modifiers */
 		if(code > 6)
 		{

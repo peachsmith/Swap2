@@ -39,44 +39,48 @@
 #define T_BITXOR 19
 #define T_NOT 20
 #define T_MODULUS 21
+/* unused single character symbols */
+#define T_COLON 22
 
 /* double character symbol token codes */
-#define T_INCREMENT 22
-#define T_DECREMENT 23
-#define T_ADDASSIGN 24
-#define T_SUBASSIGN 25
-#define T_MULASSIGN 26
-#define T_DIVASSIGN 27
-#define T_MODASSIGN 28
-#define T_EQUIVALENT 29
-#define T_LOREQUAL 30
-#define T_GOREQUAL 31
-#define T_RSHIFT 32
-#define T_LSHIFT 33
-#define T_ANDASSIGN 34
-#define T_ORASSIGN 35
-#define T_XORASSIGN 36
-#define T_LOGAND 37
-#define T_LOGOR 38
-#define T_NOTEQUIVALENT 39
+#define T_INCREMENT 23
+#define T_DECREMENT 24
+#define T_ADDASSIGN 25
+#define T_SUBASSIGN 26
+#define T_MULASSIGN 27
+#define T_DIVASSIGN 28
+#define T_MODASSIGN 29
+#define T_EQUIVALENT 30
+#define T_LOREQUAL 31
+#define T_GOREQUAL 32
+#define T_RSHIFT 33
+#define T_LSHIFT 34
+#define T_ANDASSIGN 35
+#define T_ORASSIGN 36
+#define T_XORASSIGN 37
+#define T_LOGAND 38
+#define T_LOGOR 39
+#define T_NOTEQUIVALENT 40
+/* unused double character symbols */
+#define T_DOUBLECOLON 41
 
 /* tripple character symbol token codes */
-#define T_LSHIFTASSIGN 40
-#define T_RSHIFTASSIGN 41
+#define T_LSHIFTASSIGN 42
+#define T_RSHIFTASSIGN 43
 
 /* keyword token codes */
-#define T_IF 42
-#define T_ELSE 43
-#define T_FOR 44
-#define T_WHILE 45
-#define T_FUNCTION 46
-#define T_RETURN 47
-#define T_IMPORT 48
-#define T_LOCAL 49
-#define T_CONST 50
+#define T_IF 44
+#define T_ELSE 45
+#define T_FOR 46
+#define T_WHILE 47
+#define T_FUNCTION 48
+#define T_RETURN 49
+#define T_IMPORT 50
+#define T_LOCAL 51
+#define T_CONST 52
 
 /* end of file */
-#define T_EOF 51
+#define T_EOF 53
 
 /**
  * a single token

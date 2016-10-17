@@ -1,0 +1,16 @@
+i before function call: global variable
+j before function call: global variable
+k before function call: global variable
+i has been initialized locally to like, literally darf
+j has been initialized locally to [null]
+k has been initialized locally to [array]
+1
+2
+3
+4
+5
+6
+i after function call: global variable
+j after function call: global variable
+k after function call: global variable
+minimum value in splat: -50

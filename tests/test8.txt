@@ -1,0 +1,42 @@
+import "io";
+
+function localTest() {
+	local i = "like, literally darf", j, k = {{1,2,3},{4,5,6}};
+	writeln("i has been initialized locally to " + i);
+	writeln("j has been initialized locally to " + j);
+	writeln("k has been initialized locally to " + k);
+	for(i = 0; i < 2; i++) {
+		for(j = 0; j < 3; j++) {
+			writeln(k[i][j]);
+		}
+	}
+}
+
+function min(a, s) {
+	local i, min = a[0];
+	for(i = 0; i < s; i++) {
+		if(a[i] <= min) {
+			min = a[i];
+		}
+	}
+	return min;
+}
+
+i = "global variable";
+j = "global variable";
+k = "global variable";
+
+writeln("i before function call: " + i);
+writeln("j before function call: " + j);
+writeln("k before function call: " + k);
+
+localTest();
+
+writeln("i after function call: " + i);
+writeln("j after function call: " + j);
+writeln("k after function call: " + k);
+
+
+splat = {17,-50,4};
+m = min(splat, 3);
+writeln("minimum value in splat: " + m);

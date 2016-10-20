@@ -740,7 +740,7 @@ void jep_print_object(jep_obj* obj)
 		}
 		else if(obj->type == JEP_REFERENCE)
 		{
-			printf("[reference]\n");
+			printf("[reference] %s\n", obj->ident);
 		}
 		else
 		{

@@ -3009,7 +3009,30 @@ jep_obj* jep_reference(jep_ast_node node, jep_obj* list)
 
 	if(v != NULL)
 	{
-		if(v->ident != NULL)
+		if(v->index != -1)
+		{
+			jep_ast_node arr = node.leaves[0];
+			/* handle parentheses */
+			if(arr.token.token_code == T_LPAREN)
+			{
+				while(arr.token.token_code == T_LPAREN)
+				{
+					arr = arr.leaves[0];
+					if(arr.token.token_code == T_COMMA)
+					{
+						while(arr.token.token_code == T_COMMA)
+						{
+							arr = arr.leaves[1];
+						}
+					}
+				}
+			}
+			jep_obj* elem = jep_get_element(arr, list);
+			o = jep_create_object();
+			o->type = JEP_REFERENCE;
+			o->val = elem;
+		}
+		else if(v->ident != NULL)
 		{
 			jep_obj* ref = jep_get_object(v->ident, list);
 			o = jep_create_object();

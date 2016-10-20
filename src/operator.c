@@ -2508,9 +2508,7 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 			jep_add_object(list, o);
 		}
 
-
 		jep_copy_object(o, r);	
-
 
 		if(r->type == JEP_ARRAY)
 		{
@@ -3043,6 +3041,7 @@ jep_obj* jep_dereference(jep_ast_node node, jep_obj* list)
 		{
 			jep_obj* ref = (jep_obj*)(v->val);
 			o = jep_create_object();
+			o->ident = ref->ident;
 			jep_copy_object(o, ref);
 		}
 		else
@@ -3050,6 +3049,10 @@ jep_obj* jep_dereference(jep_ast_node node, jep_obj* list)
 			printf("cannot dereference something that is not a reference\n");
 		}
 		jep_destroy_object(v);
+	}
+	else
+	{
+		printf("could not evaluate dereference operand\n");
 	}
 
 	return o;

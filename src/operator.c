@@ -3457,6 +3457,7 @@ jep_obj* jep_evaluate_local(jep_ast_node ast, jep_obj* list, int mod)
 				ast.leaves[0].token.val->buffer);
 		}
 
+		/*
 		if(ast.leaves[1].token.token_code == T_LSQUARE
 			|| ast.leaves[1].token.token_code == T_LPAREN
 			|| ast.leaves[1].token.token_code == T_LBRACE
@@ -3465,6 +3466,7 @@ jep_obj* jep_evaluate_local(jep_ast_node ast, jep_obj* list, int mod)
 			|| ast.leaves[1].token.type == T_STRING
 			|| ast.leaves[1].token.type == T_IDENTIFIER)
 		{
+		*/
 			/* get the current scope */
 			jep_obj* scope = list;
 			while(scope->tail != NULL && scope->tail->type == JEP_LIST)
@@ -3491,11 +3493,13 @@ jep_obj* jep_evaluate_local(jep_ast_node ast, jep_obj* list, int mod)
 				printf("the object %s has already been declared in this scope\n",
 					ast.token.val->buffer);
 			}
+		/*
 		}
 		else
 		{
 			printf("invalid right operand for local initialization\n");
 		}
+		*/
 	}
 
 	return o;

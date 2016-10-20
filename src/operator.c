@@ -3457,49 +3457,32 @@ jep_obj* jep_evaluate_local(jep_ast_node ast, jep_obj* list, int mod)
 				ast.leaves[0].token.val->buffer);
 		}
 
-		/*
-		if(ast.leaves[1].token.token_code == T_LSQUARE
-			|| ast.leaves[1].token.token_code == T_LPAREN
-			|| ast.leaves[1].token.token_code == T_LBRACE
-			|| ast.leaves[1].token.type == T_NUMBER
-			|| ast.leaves[1].token.type == T_CHARACTER
-			|| ast.leaves[1].token.type == T_STRING
-			|| ast.leaves[1].token.type == T_IDENTIFIER)
+		/* get the current scope */
+		jep_obj* scope = list;
+		while(scope->tail != NULL && scope->tail->type == JEP_LIST)
 		{
-		*/
-			/* get the current scope */
-			jep_obj* scope = list;
-			while(scope->tail != NULL && scope->tail->type == JEP_LIST)
-			{
-				scope = scope->tail;
-			}
+			scope = scope->tail;
+		}
 
-			/* get any existing object in the current scope */
-			jep_obj* existing = jep_get_object(ast.token.val->buffer, scope);
-
-			if(existing == NULL)
+		/* get any existing object in the current scope */
+		jep_obj* existing = jep_get_object(ast.token.val->buffer, scope);
+		
+		if(existing == NULL)
+		{
+			if(mod & 1)
 			{
-				if(mod & 1)
-				{
-					jep_obj* local = jep_create_object();
-					local->type = JEP_ARGUMENT;
-					local->ident = ast.leaves[0].token.val->buffer;
-					jep_add_object(scope, local);
-					o = jep_assign(ast, list);
-				}
+				jep_obj* local = jep_create_object();
+				local->type = JEP_ARGUMENT;
+				local->ident = ast.leaves[0].token.val->buffer;
+				jep_add_object(scope, local);
+				o = jep_assign(ast, list);
 			}
-			else
-			{
-				printf("the object %s has already been declared in this scope\n",
-					ast.token.val->buffer);
-			}
-		/*
 		}
 		else
 		{
-			printf("invalid right operand for local initialization\n");
+			printf("the object %s has already been declared in this scope\n",
+				ast.token.val->buffer);
 		}
-		*/
 	}
 
 	return o;

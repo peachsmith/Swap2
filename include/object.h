@@ -18,6 +18,7 @@
 #define JEP_ARGUMENT 8
 #define JEP_LIST 9
 #define JEP_NATIVE 10
+#define JEP_REFERENCE 11
 
 typedef struct Object
 {

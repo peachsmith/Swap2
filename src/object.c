@@ -54,6 +54,10 @@ static void jep_print_array(jep_obj* array)
 				printf("[array] ");
 				jep_print_array((jep_obj*)(elem->val));
 			}
+			else if(elem->type == JEP_REFERENCE)
+			{
+				printf("[reference] ");
+			}
 			else if(elem->type == JEP_ARGUMENT)
 			{
 				printf("[null]");
@@ -321,6 +325,10 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 		{
 			jep_free_function(dest);
 		}
+		else if(dest->type == JEP_REFERENCE)
+		{
+
+		}
 		else
 		{
 			free(dest->val);
@@ -410,6 +418,10 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 			jep_add_object(dest, body);	
 		}
 	}
+	else if(dest->type == JEP_REFERENCE)
+	{
+		dest->val = src->val;
+	}
 }
 
 /* frees the memory used by an object */
@@ -449,6 +461,10 @@ void jep_destroy_object(jep_obj* obj)
 		else if(obj->type == JEP_ARGUMENT)
 		{
 			/* arguments have no value */
+		}
+		else if(obj->type == JEP_REFERENCE)
+		{
+			/* the values of references should be freed elsewhere */
 		}
 		else if(obj->type == JEP_LIST)
 		{
@@ -721,6 +737,10 @@ void jep_print_object(jep_obj* obj)
 			printf("inner list %d\n", inner_list);
 			jep_print_list(obj);
 			inner_list--;
+		}
+		else if(obj->type == JEP_REFERENCE)
+		{
+			printf("[reference]\n");
 		}
 		else
 		{

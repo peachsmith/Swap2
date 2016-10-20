@@ -162,8 +162,12 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 			o = jep_comma(ast, list);
 			break;
 
+		case T_COLON:
+			o = jep_reference(ast, list);
+			break;
+
 		case T_DOUBLECOLON:
-			printf("this is be a reference\n");
+			o = jep_dereference(ast, list);
 			break;
 
 		default:
@@ -3002,6 +3006,53 @@ jep_obj* jep_comma(jep_ast_node node, jep_obj* list)
 	}
 
 	return ro;
+}
+
+/* evaluates a reference */
+jep_obj* jep_reference(jep_ast_node node, jep_obj* list)
+{
+	jep_obj* o = NULL;
+
+	jep_obj* v = jep_evaluate(node.leaves[0], list);
+
+	if(v != NULL)
+	{
+		if(v->ident != NULL)
+		{
+			jep_obj* ref = jep_get_object(v->ident, list);
+			o = jep_create_object();
+			o->type = JEP_REFERENCE;
+			o->val = ref;
+		}
+		jep_destroy_object(v);
+	}
+
+	return o;
+}
+
+/* evaluates a dereference */
+jep_obj* jep_dereference(jep_ast_node node, jep_obj* list)
+{
+	jep_obj* o = NULL;
+
+	jep_obj* v = jep_evaluate(node.leaves[0], list);
+
+	if(v != NULL)
+	{
+		if(v->type == JEP_REFERENCE)
+		{
+			jep_obj* ref = (jep_obj*)(v->val);
+			o = jep_create_object();
+			jep_copy_object(o, ref);
+		}
+		else
+		{
+			printf("cannot dereference something that is not a reference\n");
+		}
+		jep_destroy_object(v);
+	}
+
+	return o;
 }
 
 /* evaluates a comma-delimited sequence of objects */

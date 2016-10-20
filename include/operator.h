@@ -93,6 +93,12 @@ jep_obj* jep_return(jep_ast_node node, jep_obj* list);
 /* evaluates a comma tree */
 jep_obj* jep_comma(jep_ast_node node, jep_obj* list);
 
+/* evaluates a reference */
+jep_obj* jep_reference(jep_ast_node node, jep_obj* list);
+
+/* evaluates a dereference */
+jep_obj* jep_dereference(jep_ast_node node, jep_obj* list);
+
 /* evaluates a comma-delimited sequence of objects */
 void jep_sequence(jep_ast_node node, jep_obj* list, jep_obj* seq);
 

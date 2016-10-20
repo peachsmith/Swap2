@@ -2503,7 +2503,23 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 			}
 			else
 			{
-				o = jep_get_element(node.leaves[0], list);
+				jep_ast_node arr = node.leaves[0];
+				/* handle parentheses */
+				if(arr.token.token_code == T_LPAREN)
+				{
+					while(arr.token.token_code == T_LPAREN)
+					{
+						arr = arr.leaves[0];
+						if(arr.token.token_code == T_COMMA)
+						{
+							while(arr.token.token_code == T_COMMA)
+							{
+								arr = arr.leaves[1];
+							}
+						}
+					}
+				}
+				o = jep_get_element(arr, list);
 			}
 		}
 
@@ -3046,11 +3062,13 @@ jep_obj* jep_dereference(jep_ast_node node, jep_obj* list)
 	{
 		if(v->type == JEP_REFERENCE)
 		{
-			// jep_obj* ref = (jep_obj*)(v->val);
+			/* jep_obj* ref = (jep_obj*)(v->val); */
 			o = v;
-			// o = jep_create_object();
-			// o->ident = ref->ident;
-			// jep_copy_object(o, ref);
+			/*
+			o = jep_create_object();
+			o->ident = ref->ident;
+			jep_copy_object(o, ref);
+			*/
 		}
 		else
 		{

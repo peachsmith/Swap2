@@ -2544,7 +2544,7 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 /* evaluates the contents of a set of parentheses */
 jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 {
-	if(!node.token.unary)
+	if(!node.token.postfix)
 	{
 		if(node.leaf_count == 1)
 		{
@@ -3466,7 +3466,7 @@ jep_obj* jep_evaluate_local(jep_ast_node ast, jep_obj* list, int mod)
 
 		/* get any existing object in the current scope */
 		jep_obj* existing = jep_get_object(ast.token.val->buffer, scope);
-		
+
 		if(existing == NULL)
 		{
 			if(mod & 1)

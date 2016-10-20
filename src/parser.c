@@ -197,7 +197,8 @@ static int jep_prioritize(jep_ast_node* cur, jep_ast_node* top)
 		{
 			if(cur->token.postfix)
 			{
-				if(top->token.postfix)
+				if((top->token.postfix && !top->token.unary)
+					|| (!top->token.postfix && top->token.unary))
 				{
 					return 0;
 				}

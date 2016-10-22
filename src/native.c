@@ -69,15 +69,17 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 		}
 		o = jep_readln();
 	}
-	else if(native == 3)
+	else if(native == 3) /* open a file */
 	{
-		if(args == NULL || args->size != 1)
+		if(args == NULL || args->size != 2)
 		{
 			printf("invalid number of arguments for fopen\n");
 			return o;
 		}
 		jep_obj* path_obj = args->head;
-		if(path_obj->type != JEP_STRING)
+		if(path_obj->type != JEP_STRING 
+			|| path_obj->next == NULL
+			|| path_obj->next->type != JEP_STRING)
 		{
 			printf("invalid argument type for fopen\n");
 			return o;
@@ -85,7 +87,7 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 		char* path_str = (char*)(path_obj->val);
 		if(path_str != NULL)
 		{
-			FILE* file = fopen(path_str, "r");
+			FILE* file = fopen(path_str, (char*)(path_obj->next->val));
 			if(file != NULL)
 			{
 				jep_file* file_val = malloc(sizeof(jep_file));
@@ -163,38 +165,6 @@ static jep_obj* jep_readln()
 	jep_obj* o = NULL;
 
 	o = jep_freadln(stdin);
-	// size_t size = 0;
-	// size_t len  = 0;
-	// size_t last = 0;
-	// char *buffer = NULL;
-
-	// do {
-
-	// 	size += BUFSIZ;
-	// 	buffer = realloc(buffer, size);
-
-	// 	if (buffer == NULL) 
-	// 	{
-	// 		return NULL;
-	// 	}
-	// 	if(fgets(buffer + last, size, stdin) == NULL)
-	// 	{
-	// 		if(buffer != NULL)
-	// 		{
-	// 			free(buffer);
-	// 		}
-	// 		return o;
-	// 	}
-	// 	len = strlen(buffer);
-	// 	last = len - 1;
-	// } while (!feof(stdin) && buffer[last] != '\n');
-
-	// if(buffer != NULL)
-	// {
-	// 	o = jep_create_object();
-	// 	o->type = JEP_STRING;
-	// 	o->val = (void*)(buffer);
-	// }
 
 	return o;
 }
@@ -220,11 +190,19 @@ static jep_obj* jep_freadln(FILE* file)
 		}
 		if(fgets(buffer + last, size, file) == NULL)
 		{
-			printf("failed to read from file\n");
 			if(buffer != NULL)
 			{
 				free(buffer);
 			}
+
+			/* create an empty string */
+			char* empty = malloc(1);
+			empty[0] = '\0';
+
+			o = jep_create_object();
+			o->type = JEP_STRING;
+			o->val = empty;
+
 			return o;
 		}
 		len = strlen(buffer);

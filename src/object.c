@@ -349,7 +349,6 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 			(file_obj->refs)--;
 			if(file_obj->refs <= 0)
 			{
-				printf("no other objects are using this file, so it will be closed\n");
 				if(file_obj->open)
 				{
 					fclose(file_obj->file);
@@ -507,7 +506,6 @@ void jep_destroy_object(jep_obj* obj)
 			/* destroy the file object if nothing is using it */
 			if(file_obj->refs <= 0)
 			{
-				printf("no other objects are using this file, so it will be destroyed\n");
 				if(file_obj->open)
 				{
 					fclose(file_obj->file);

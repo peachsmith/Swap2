@@ -33,7 +33,7 @@ function readln();
  *
  * returns: a file object
  */
-function fopen(path);
+function fopen(path, mode);
 
 /**
  * Reads a string of text from a file in terminated by a newline.

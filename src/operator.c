@@ -2575,6 +2575,12 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 				jep_obj* a = jep_evaluate(node.leaves[0], list);
 				if(a != NULL)
 				{
+					if(a->type == JEP_FILE && a->val != NULL)
+					{
+						/* function arguments don't count towards references */
+						jep_file* file_obj = (jep_file*)(a->val);
+						(file_obj->refs)--;
+					}
 					jep_add_object(arg_list, a);	
 				}
 				else
@@ -2588,6 +2594,12 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 			jep_obj* a = jep_evaluate(node.leaves[0], list);
 			if(a != NULL)
 			{
+				if(a->type == JEP_FILE && a->val != NULL)
+				{
+					/* function arguments don't count towards references */
+					jep_file* file_obj = (jep_file*)(a->val);
+					(file_obj->refs)--;
+				}
 				jep_add_object(arg_list, a);		
 			}
 			else

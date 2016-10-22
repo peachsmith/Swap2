@@ -22,7 +22,7 @@ function write(data);
 function writeln(data);
 
 /**
- * Reads a string of text from standard in terminated bya  newline.
+ * Reads a string of text from standard in terminated by a newline.
  *
  * returns: a string
  */

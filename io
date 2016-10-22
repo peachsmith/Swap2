@@ -27,3 +27,17 @@ function writeln(data);
  * returns: a string
  */
 function readln();
+
+/**
+ * Opens a file.
+ *
+ * returns: a file object
+ */
+function fopen(path);
+
+/**
+ * Reads a string of text from a file in terminated by a newline.
+ *
+ * returns: a string
+ */
+function freadln(file);

@@ -19,6 +19,7 @@
 #define JEP_LIST 9
 #define JEP_NATIVE 10
 #define JEP_REFERENCE 11
+#define JEP_FILE 12
 
 typedef struct Object
 {
@@ -34,6 +35,13 @@ typedef struct Object
 	int index;           /* index in an array             */
 	char* array_ident;   /* array identifier              */
 }jep_obj;
+
+typedef struct File
+{
+	FILE *file;        /* the file pointer                   */
+	int open;          /* open flag                          */
+	unsigned int refs; /* amount of objects referencing this */
+}jep_file;
 
 typedef struct Memory
 {

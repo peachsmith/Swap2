@@ -58,6 +58,10 @@ static void jep_print_array(jep_obj* array)
 			{
 				printf("[reference] ");
 			}
+			else if(elem->type == JEP_FILE)
+			{
+				printf("[file] ");
+			}
 			else if(elem->type == JEP_ARGUMENT)
 			{
 				printf("[null]");
@@ -155,6 +159,16 @@ char* jep_to_string(jep_obj* o)
 		strcpy(str, "function: ");
 		strcat(str, o->ident);
 		strcat(str, "(...)");
+	}
+	else if(o->type == JEP_REFERENCE)
+	{
+		str = malloc(12);
+		strcpy(str, "[reference]");
+	}
+	else if(o->type == JEP_FILE)
+	{
+		str = malloc(7);
+		strcpy(str, "[file]");
 	}
 	else if(o->type == JEP_ARGUMENT)
 	{
@@ -329,6 +343,20 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 		{
 
 		}
+		else if(dest->type == JEP_FILE)
+		{
+			jep_file* file_obj = (jep_file*)(dest->val);
+			(file_obj->refs)--;
+			if(file_obj->refs <= 0)
+			{
+				printf("no other objects are using this file, so it will be closed\n");
+				if(file_obj->open)
+				{
+					fclose(file_obj->file);
+				}
+				free(dest->val);
+			}
+		}
 		else
 		{
 			free(dest->val);
@@ -418,8 +446,14 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 			jep_add_object(dest, body);	
 		}
 	}
-	else if(dest->type == JEP_REFERENCE)
+	else if(src->type == JEP_FILE)
 	{
+		dest->val = src->val;
+		((jep_file*)(dest->val))->refs++;
+	}
+	else if(src->type == JEP_REFERENCE)
+	{
+		/* changed if condition from dest->type to src->type */
 		dest->val = src->val;
 	}
 }
@@ -465,6 +499,21 @@ void jep_destroy_object(jep_obj* obj)
 		else if(obj->type == JEP_REFERENCE)
 		{
 			/* the values of references should be freed elsewhere */
+		}
+		else if(obj->type == JEP_FILE)
+		{
+			jep_file* file_obj = (jep_file*)(obj->val);
+			(file_obj->refs)--;
+			/* destroy the file object if nothing is using it */
+			if(file_obj->refs <= 0)
+			{
+				printf("no other objects are using this file, so it will be destroyed\n");
+				if(file_obj->open)
+				{
+					fclose(file_obj->file);
+				}
+				free(file_obj);
+			}
 		}
 		else if(obj->type == JEP_LIST)
 		{
@@ -741,6 +790,10 @@ void jep_print_object(jep_obj* obj)
 		else if(obj->type == JEP_REFERENCE)
 		{
 			printf("[reference] %s\n", obj->ident);
+		}
+		else if(obj->type == JEP_FILE)
+		{
+			printf("[file] %s\n", obj->ident);
 		}
 		else
 		{

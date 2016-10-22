@@ -2501,7 +2501,7 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 			o->ident = node.leaves[0].token.val->buffer;
 			jep_add_object(list, o);
 		}
-
+		
 		jep_copy_object(o, r);	
 
 		if(r->type == JEP_ARRAY)

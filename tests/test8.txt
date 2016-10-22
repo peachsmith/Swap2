@@ -40,3 +40,27 @@ writeln("k after function call: " + k);
 splat = {17,-50,4};
 m = min(splat, 3);
 writeln("minimum value in splat: " + m);
+
+b = 4;
+c = :b;
+d = ::c + 6;
+writeln("d: " + d);
+
+function referenceTest(ref) {
+	local a = 4, b = {1,2}, c = b[1];
+	writeln("local a: " + a);
+	a++;
+	writeln("local a: " + a);
+	local derf = b[0];
+	writeln("derf: " + derf);
+	writeln("c: " + c);
+	::ref = "very berry smoothie";
+}
+
+a = "this should be changed";
+
+writeln("a: " + a);
+
+referenceTest(:a);
+
+writeln("a: " + a);

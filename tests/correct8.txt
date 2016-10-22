@@ -14,3 +14,10 @@ i after function call: global variable
 j after function call: global variable
 k after function call: global variable
 minimum value in splat: -50
+d: 10
+a: this should be changed
+local a: 4
+local a: 5
+derf: 1
+c: 2
+a: very berry smoothie

@@ -31,6 +31,12 @@ function readln();
 /**
  * Opens a file.
  *
+ * path - a string designating the file's location
+ * mode - a string indicating what will be dne with the file
+ *        acceptable file modes:
+ *            "r"  reading
+ *            "a"  appending
+ *
  * returns: a file object
  */
 function fopen(path, mode);
@@ -38,6 +44,22 @@ function fopen(path, mode);
 /**
  * Reads a string of text from a file in terminated by a newline.
  *
+ * file - a file object
+ *
  * returns: a string
  */
 function freadln(file);
+
+/**
+ * Writes a string of text to a file.
+ *
+ * returns: a string
+ */
+function fwrite(file, data);
+
+/**
+ * Writes a string of text to a file in appended by a newline.
+ *
+ * returns: a string
+ */
+function fwriteln(file, data);

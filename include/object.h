@@ -7,7 +7,7 @@
 #include <limits.h>
 #include "ast.h"
 
-/* the primitive types */
+/* types of jep_objects */
 #define JEP_INT 1
 #define JEP_LONG 2
 #define JEP_DOUBLE 3
@@ -20,6 +20,10 @@
 #define JEP_NATIVE 10
 #define JEP_REFERENCE 11
 #define JEP_FILE 12
+
+/* file modes */
+#define JEP_READ 1
+#define JEP_APPEND 2
 
 typedef struct Object
 {
@@ -40,6 +44,7 @@ typedef struct File
 {
 	FILE *file;        /* the file pointer                   */
 	int open;          /* open flag                          */
+	int mode;          /* what will be done with the file    */
 	unsigned int refs; /* amount of objects referencing this */
 }jep_file;
 

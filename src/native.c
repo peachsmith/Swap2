@@ -1,18 +1,20 @@
 #include "native.h"
 
-#define JEP_NATIVE_COUNT 5
+#define JEP_NATIVE_COUNT 7
 
 /* native function identifiers */
 const char *natives[] = 
 {
-	"write", "writeln", "readln", "fopen", "freadln"
+	"write", "writeln", "readln", "fopen", "freadln", "fwriteln", "fwrite"
 };
 
 /* native function forward declarations */
 static jep_obj* jep_write(const char*);
 static jep_obj* jep_writeln(const char*);
 static jep_obj* jep_readln();
-static jep_obj* jep_freadln(FILE* file);
+static jep_obj* jep_freadln(FILE*);
+static jep_obj* jep_fwriteln(FILE*, const char*);
+static jep_obj* jep_fwrite(FILE*, const char*);
 
 /* calls a native function */
 jep_obj* jep_call_native(const char* ident, jep_obj* args)
@@ -94,6 +96,18 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 				file_val->file = file;
 				file_val->open = 1;
 				file_val->refs = 1;
+				if(!strcmp((char*)(path_obj->next->val), "r"))
+				{
+					file_val->mode = JEP_READ;
+				}
+				else if(!strcmp((char*)(path_obj->next->val), "a"))
+				{
+					file_val->mode = JEP_APPEND;
+				}
+				else
+				{
+					file_val->mode = 0;
+				}
 				
 				o = jep_create_object();
 				o->type = JEP_FILE;
@@ -105,7 +119,7 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 			}
 		}
 	}
-	else if(native == 4)
+	else if(native == 4) /* freadln */
 	{
 		if(args == NULL || args->size != 1)
 		{
@@ -128,8 +142,90 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 			printf("could not read from file\n");
 			return o;
 		}
-		
+		if(file_obj->mode != JEP_READ)
+		{
+			printf("the file is not open for reading\n");
+			return o;
+		}
 		o = jep_freadln(file_obj->file);
+	}
+	else if(native == 5) /* fwriteln */
+	{
+		if(args == NULL || args->size != 2)
+		{
+			printf("invalid number of arguments\n");
+			return o;
+		}
+
+		jep_obj* arg = args->head;
+
+		if(arg == NULL || arg->val == NULL || arg->next == NULL)
+		{
+			printf("could not write to file\n");
+			return o;
+		}
+
+		jep_file* file_obj = (jep_file*)(arg->val);
+		jep_obj* data = arg->next;
+
+		if(file_obj->file == NULL || !file_obj->open)
+		{
+			printf("could not write to file\n");
+			return o;
+		}
+		if(file_obj->mode != JEP_APPEND)
+		{
+			printf("the file is not open for appending\n");
+			return o;
+		}
+
+		char* str = jep_to_string(data);
+
+		o = jep_fwriteln(file_obj->file, str);
+
+		if(str != NULL)
+		{
+			free(str);
+		}
+	}
+	else if(native == 6) /* fwrite */
+	{
+		if(args == NULL || args->size != 2)
+		{
+			printf("invalid number of arguments\n");
+			return o;
+		}
+
+		jep_obj* arg = args->head;
+
+		if(arg == NULL || arg->val == NULL || arg->next == NULL)
+		{
+			printf("could not write to file\n");
+			return o;
+		}
+
+		jep_file* file_obj = (jep_file*)(arg->val);
+		jep_obj* data = arg->next;
+
+		if(file_obj->file == NULL || !file_obj->open)
+		{
+			printf("could not write to file\n");
+			return o;
+		}
+		if(file_obj->mode != JEP_APPEND)
+		{
+			printf("the file is not open for appending\n");
+			return o;
+		}
+
+		char* str = jep_to_string(data);
+
+		o = jep_fwrite(file_obj->file, str);
+
+		if(str != NULL)
+		{
+			free(str);
+		}
 	}
 	else
 	{
@@ -215,6 +311,24 @@ static jep_obj* jep_freadln(FILE* file)
 		o->type = JEP_STRING;
 		o->val = (void*)(buffer);
 	}
+
+	return o;
+}
+
+static jep_obj* jep_fwriteln(FILE* file, const char* data)
+{
+	jep_obj* o = NULL;
+
+	fprintf(file, "%s\n", data);
+
+	return o;
+}
+
+static jep_obj* jep_fwrite(FILE* file, const char* data)
+{
+	jep_obj* o = NULL;
+
+	fprintf(file, "%s", data);
 
 	return o;
 }

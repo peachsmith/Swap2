@@ -1,11 +1,12 @@
 #include "native.h"
 
-#define JEP_NATIVE_COUNT 7
+#define JEP_NATIVE_COUNT 9
 
 /* native function identifiers */
 const char *natives[] = 
 {
-	"write", "writeln", "readln", "fopen", "freadln", "fwriteln", "fwrite"
+	"write", "writeln", "readln", "fopen", "freadln", "fwriteln", "fwrite",
+	"freadb", "fwriteb"
 };
 
 /* native function forward declarations */
@@ -15,6 +16,8 @@ static jep_obj* jep_readln();
 static jep_obj* jep_freadln(FILE*);
 static jep_obj* jep_fwriteln(FILE*, const char*);
 static jep_obj* jep_fwrite(FILE*, const char*);
+static jep_obj* jep_freadb(FILE*, size_t);
+static jep_obj* jep_fwriteb(FILE*, const unsigned char*, size_t);
 
 /* calls a native function */
 jep_obj* jep_call_native(const char* ident, jep_obj* args)
@@ -103,6 +106,14 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 				else if(!strcmp((char*)(path_obj->next->val), "a"))
 				{
 					file_val->mode = JEP_APPEND;
+				}
+				else if(!strcmp((char*)(path_obj->next->val), "rb"))
+				{
+					file_val->mode = JEP_READ_BINARY;
+				}
+				else if(!strcmp((char*)(path_obj->next->val), "ab"))
+				{
+					file_val->mode = JEP_APPEND_BINARY;
 				}
 				else
 				{
@@ -227,6 +238,103 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 			free(str);
 		}
 	}
+	else if(native == 7) /* freadb */
+	{
+		if(args == NULL || args->size != 2)
+		{
+			printf("invalid number of arguments\n");
+			return o;
+		}
+
+		jep_obj* arg = args->head;
+
+		if(arg == NULL || arg->val == NULL || arg->next == NULL)
+		{
+			printf("could not read from file\n");
+			return o;
+		}
+
+		jep_file* file_obj = (jep_file*)(arg->val);
+		jep_obj* size = arg->next;
+		
+		if(size->type != JEP_INT)
+		{
+			printf("invalid buffer size for binary file read\n");
+			return o;
+		}
+
+		int n = *((int*)(size->val));
+
+		if(file_obj->file == NULL || !file_obj->open)
+		{
+			printf("could not read from file\n");
+			return o;
+		}
+		if(file_obj->mode != JEP_READ_BINARY)
+		{
+			printf("the file is not open for binary reading\n");
+			return o;
+		}
+		o = jep_freadb(file_obj->file, n);
+	}
+	else if(native == 8) /* fwriteb */
+	{
+		if(args == NULL || args->size != 2)
+		{
+			printf("invalid number of arguments\n");
+			return o;
+		}
+
+		jep_obj* arg = args->head;
+
+		if(arg == NULL || arg->val == NULL || arg->next == NULL)
+		{
+			printf("could not write to file\n");
+			return o;
+		}
+
+		jep_file* file_obj = (jep_file*)(arg->val);
+		jep_obj* data = arg->next;
+		unsigned char* byte_array = NULL;
+
+		if(file_obj->file == NULL || !file_obj->open)
+		{
+			printf("could not write to file\n");
+			return o;
+		}
+		if(file_obj->mode != JEP_APPEND_BINARY)
+		{
+			printf("the file is not open for binary appending\n");
+			return o;
+		}
+
+		jep_obj* bytes = jep_get_bytes(data);
+
+		if(bytes == NULL)
+		{
+			printf("could not covnert data into binary\n");
+			return o;
+		}
+		else
+		{
+			byte_array = NULL;
+			size_t s = bytes->size;
+			jep_obj* b = ((jep_obj*)(bytes->val))->head;
+			byte_array = malloc(s);
+			int i;
+			for(i = 0; i < s && b != NULL; i++, b = b->next)
+			{
+				byte_array[i] = *((unsigned char*)(b->val));
+			}
+			
+			o = jep_fwriteb(file_obj->file, byte_array, s);
+		}
+
+		if(byte_array != NULL)
+		{
+			free(byte_array);
+		}
+	}
 	else
 	{
 		printf("native is somehow: %d\n", native);
@@ -331,4 +439,54 @@ static jep_obj* jep_fwrite(FILE* file, const char* data)
 	fprintf(file, "%s", data);
 
 	return o;
+}
+
+static jep_obj* jep_freadb(FILE* file, size_t n)
+{
+	jep_obj* byte_array = NULL;
+	jep_obj* bytes = NULL;
+	unsigned char *data = malloc(n);
+	size_t read = fread(data, n, 1, file);
+
+	if(read)
+	{
+		byte_array = jep_create_object();
+		byte_array->type = JEP_ARRAY;
+
+		bytes = jep_create_object();
+		bytes->type = JEP_LIST;
+
+		int i;
+		for(i = 0; i < n; i++)
+		{
+			jep_obj* byte = jep_create_object();
+			byte->type = JEP_BYTE;
+			unsigned char* c = malloc(1);
+			*c = data[i];
+			byte->val = c;
+			jep_add_object(bytes, byte);
+		}
+
+		byte_array->size = bytes->size;
+		byte_array->val = bytes;
+	}
+
+	free(data);
+
+	return byte_array;
+}
+
+static jep_obj* jep_fwriteb(FILE* file, const unsigned char* data, size_t n)
+{
+	jep_obj* written = NULL;
+
+	size_t read = fwrite(data, n, 1, file);
+
+	written = jep_create_object();
+	written->type = JEP_INT;
+	int* i = malloc(sizeof(int));
+	*i = (int)read;
+	written->val = i;
+
+	return written;
 }

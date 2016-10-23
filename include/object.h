@@ -8,22 +8,25 @@
 #include "ast.h"
 
 /* types of jep_objects */
-#define JEP_INT 1
-#define JEP_LONG 2
-#define JEP_DOUBLE 3
-#define JEP_CHARACTER 4
-#define JEP_STRING 5
-#define JEP_ARRAY 6
-#define JEP_FUNCTION 7
-#define JEP_ARGUMENT 8
-#define JEP_LIST 9
-#define JEP_NATIVE 10
-#define JEP_REFERENCE 11
-#define JEP_FILE 12
+#define JEP_BYTE 1
+#define JEP_INT 2
+#define JEP_LONG 3
+#define JEP_DOUBLE 4
+#define JEP_CHARACTER 5
+#define JEP_STRING 6
+#define JEP_ARRAY 7
+#define JEP_FUNCTION 8
+#define JEP_ARGUMENT 9
+#define JEP_LIST 10
+#define JEP_NATIVE 11
+#define JEP_REFERENCE 12
+#define JEP_FILE 13
 
 /* file modes */
 #define JEP_READ 1
 #define JEP_APPEND 2
+#define JEP_READ_BINARY 3
+#define JEP_APPEND_BINARY 4
 
 typedef struct Object
 {
@@ -63,6 +66,9 @@ void jep_destroy_object(jep_obj* obj);
 
 /* creates a string representation of an object */
 char* jep_to_string(jep_obj* o);
+
+/* converts an object into an array of bytes */
+jep_obj* jep_get_bytes(jep_obj* o);
 
 /* frees the memory used by an array */
 void jep_free_array(jep_obj* array);

@@ -32,7 +32,7 @@ function readln();
  * Opens a file.
  *
  * path - a string designating the file's location
- * mode - a string indicating what will be dne with the file
+ * mode - a string indicating what will be done with the file
  *        acceptable file modes:
  *            "r"  reading
  *            "a"  appending
@@ -63,3 +63,23 @@ function fwrite(file, data);
  * returns: a string
  */
 function fwriteln(file, data);
+
+/**
+ * Reads an array of bytes from a file
+ *
+ * file - the file object
+ * n - number of bytes to be read
+ *
+ * returns: an array of bytes
+ */
+function freadb(file, n);
+
+/**
+ * Writes an array of bytes to a file
+ *
+ * file - the file object
+ * buffer - the memory for the bytes
+ *
+ * returns: a string
+ */
+function fwriteb(file, buffer);

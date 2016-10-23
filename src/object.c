@@ -101,6 +101,29 @@ char* jep_to_string(jep_obj* o)
 		str[0] = *c;
 		str[1] = '\0';
 	}
+	else if(o->type == JEP_BYTE)
+	{
+		unsigned char b = *(unsigned char*)(o->val);
+		char s[100];
+
+		int n = sprintf(s, "%d", b);
+	
+		if(n > 0)
+		{
+			if(n >= 100)
+			{
+				s[99] = '\0';
+			}
+			else
+			{
+				s[n] = '\0';
+			}
+			int len = strlen(s);
+			str = malloc(len + 1);
+			strcpy(str, s);
+			str[len] = '\0';
+		}
+	}
 	else if(o->type == JEP_INT)
 	{
 		int i = *(int*)(o->val);
@@ -182,6 +205,59 @@ char* jep_to_string(jep_obj* o)
 	return str;
 }
 
+/* converts a character or string of characters into bytes */
+jep_obj* jep_get_bytes(jep_obj* o)
+{
+	jep_obj* bytes = NULL;
+	jep_obj* byte_array = NULL;
+	if(o == NULL || o->val == NULL)
+	{
+		return NULL;
+	}
+
+	if(o->type != JEP_CHARACTER && o->type != JEP_STRING)
+	{
+		/* only converting strings and chars for now */
+		return NULL;
+	}
+
+	byte_array = jep_create_object();
+	byte_array->type = JEP_ARRAY;
+
+	bytes = jep_create_object();
+	bytes->type = JEP_LIST;
+
+	if(o->type == JEP_CHARACTER)
+	{
+		jep_obj* byte = jep_create_object();
+		byte->type = JEP_BYTE;
+		unsigned char* c = malloc(1);
+		*c = *((unsigned char*)(o->val));
+		byte->val = c;
+		jep_add_object(bytes, byte);
+	}
+	else if(o->type == JEP_STRING)
+	{
+		char* str = (char*)(o->val);
+		size_t len =  strlen(str);
+		int i;
+		for(i = 0; i < len; i++)
+		{
+			jep_obj* byte = jep_create_object();
+			byte->type = JEP_BYTE;
+			unsigned char* c = malloc(1);
+			*c = str[i];
+			byte->val = c;
+			jep_add_object(bytes, byte);
+		}
+	}
+
+	byte_array->val = bytes;
+	byte_array->size = bytes->size;
+
+	return byte_array;
+}
+
 /* frees the memory used by an array */
 void jep_free_array(jep_obj* array)
 {
@@ -205,6 +281,10 @@ void jep_free_array(jep_obj* array)
 				free(elem->val);
 			}
 			else if(elem->type == JEP_CHARACTER)
+			{
+				free(elem->val);
+			}
+			else if(elem->type == JEP_BYTE)
 			{
 				free(elem->val);
 			}
@@ -388,6 +468,12 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 		*c = *(char*)(src->val);
 		dest->val = (void*)c;
 	}
+	else if(src->type == JEP_BYTE)
+	{
+		unsigned char* c = malloc(sizeof(unsigned char));
+		*c = *(unsigned char*)(src->val);
+		dest->val = (void*)c;
+	}
 	else if(src->type == JEP_STRING)
 	{
 		int len = strlen((char*)(src->val));
@@ -475,6 +561,10 @@ void jep_destroy_object(jep_obj* obj)
 			free(obj->val);
 		}
 		else if(obj->type == JEP_CHARACTER && obj->val != NULL)
+		{
+			free(obj->val);
+		}
+		else if(obj->type == JEP_BYTE && obj->val != NULL)
 		{
 			free(obj->val);
 		}

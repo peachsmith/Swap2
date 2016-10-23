@@ -1,12 +1,12 @@
 #include "native.h"
 
-#define JEP_NATIVE_COUNT 9
+#define JEP_NATIVE_COUNT 10
 
 /* native function identifiers */
 const char *natives[] = 
 {
 	"write", "writeln", "readln", "fopen", "freadln", "fwriteln", "fwrite",
-	"freadb", "fwriteb"
+	"freadb", "fwriteb", "byte"
 };
 
 /* native function forward declarations */
@@ -334,6 +334,40 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 		{
 			free(byte_array);
 		}
+	}
+	else if(native == 9) /* byte */
+	{
+		if(args == NULL || args->size != 1)
+		{
+			printf("invalid number of arguments\n");
+			return o;
+		}
+
+		jep_obj* arg = args->head;
+
+		if(arg == NULL || arg->val == NULL 
+			|| (arg->type != JEP_INT && arg->type != JEP_LONG))
+		{
+			printf("invalid argument for byte truncation\n");
+			return o;
+		}
+
+		unsigned char *b = malloc(1);
+
+		if(arg->type == JEP_INT)
+		{
+			int i = *((int*)(arg->val));
+			*b = i & UCHAR_MAX;
+		}
+		else if(arg->type == JEP_LONG)
+		{
+			long int i = *((long int*)(arg->val));
+			*b = i & UCHAR_MAX;
+		}
+
+		o = jep_create_object();
+		o->type = JEP_BYTE;
+		o->val = b;
 	}
 	else
 	{

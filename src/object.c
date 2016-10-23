@@ -898,7 +898,12 @@ void jep_print_object(jep_obj* obj)
 		else if(obj->type == JEP_FUNCTION)
 		{
 			printf("[function] %s (", obj->ident);
-			jep_obj* arg = obj->head->head;
+			jep_obj* args = obj->head;
+			jep_obj* arg = NULL;
+			if(args != NULL)
+			{
+				arg = args->head;
+			}
 			while(arg != NULL)
 			{
 				printf("%s", arg->ident);

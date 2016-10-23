@@ -110,6 +110,14 @@ int main(int argc, char** argv)
 		{
 			jep_obj* list = jep_create_object();
 			list->type = JEP_LIST;
+
+			/* add built in functions */
+			jep_obj* f_byte = jep_create_object();
+			f_byte->type = JEP_FUNCTION;
+			f_byte->ident = "byte";
+			f_byte->size = 1;
+			jep_add_object(list, f_byte);
+
 			jep_obj* o;
 			int i;
 			for(i = 0; i < root->leaf_count; i++)
@@ -117,6 +125,10 @@ int main(int argc, char** argv)
 				o = jep_evaluate(root->leaves[i], list);
 				if(o != NULL)
 				{
+					if(o->type == JEP_FILE)
+					{
+						
+					}
 					jep_destroy_object(o);
 					o = NULL;
 				}

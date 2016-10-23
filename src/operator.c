@@ -2618,7 +2618,12 @@ jep_obj* jep_paren(jep_ast_node node, jep_obj* list)
 	if(func != NULL)
 	{
 		jep_obj* fargs = func->head;
-		jep_obj* farg = fargs->head;
+		jep_obj* farg = NULL;
+
+		if(fargs != NULL)
+		{
+			farg = fargs->head;
+		}
 
 		/* native function call */
 		if(func->size == 1)

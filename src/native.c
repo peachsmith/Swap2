@@ -308,9 +308,9 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 			return o;
 		}
 
-		jep_obj* bytes = jep_get_bytes(data);
+		/* jep_obj* bytes = jep_get_bytes(data); */
 
-		if(bytes == NULL)
+		if(data == NULL)
 		{
 			printf("could not covnert data into binary\n");
 			return o;
@@ -318,8 +318,8 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 		else
 		{
 			byte_array = NULL;
-			size_t s = bytes->size;
-			jep_obj* b = ((jep_obj*)(bytes->val))->head;
+			size_t s = data->size;
+			jep_obj* b = ((jep_obj*)(data->val))->head;
 			byte_array = malloc(s);
 			int i;
 			for(i = 0; i < s && b != NULL; i++, b = b->next)

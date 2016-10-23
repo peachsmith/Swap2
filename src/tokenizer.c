@@ -493,6 +493,12 @@ void jep_tokenize_file(jep_token_stream* ts, const char* file_name)
 				}
 				col++;
 			}while((isdigit(s[i]) || s[i] == '.' ) && dec < 2);
+			if(s[i] == 'b')
+			{
+				jep_append_char(num.val, s[i]);
+				i++;
+				col++;
+			}
 			jep_append_token(ts, num);
 			i--;
 			col--;

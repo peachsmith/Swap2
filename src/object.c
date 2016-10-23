@@ -29,7 +29,11 @@ static void jep_print_array(jep_obj* array)
 		jep_obj* elem = array->head;
 		while(elem != NULL)
 		{
-			if(elem->type == JEP_INT)
+			if(elem->type == JEP_BYTE)
+			{
+				printf("[byte] %d", *((int*)(elem->val)));
+			}
+			else if(elem->type == JEP_INT)
 			{
 				printf("[int] %d", *((int*)(elem->val)));
 			}
@@ -444,7 +448,13 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 	
 	dest->type = src->type;
 
-	if(src->type == JEP_INT)
+	if(src->type == JEP_BYTE)
+	{
+		unsigned char* b = malloc(sizeof(int));
+		*b = *(unsigned char*)(src->val);
+		dest->val = (void*)b;
+	}
+	else if(src->type == JEP_INT)
 	{
 		int* i = malloc(sizeof(int));
 		*i = *(int*)(src->val);
@@ -653,6 +663,34 @@ jep_obj* jep_number(const char* s)
 	endptr = NULL;
 	obj = NULL;
 
+	/* check for bytes */
+	const size_t len = strlen(s);
+	if(s[len-1] == 'b')
+	{
+		char tmp[len + 1];
+		strcpy(tmp, s);
+		tmp[len-1] = '\0';
+		l = strtol(tmp, &endptr, 10);
+		if(errno == ERANGE)
+		{
+			printf("byte out of range\n");
+			return NULL;
+		}
+		else if(l > UCHAR_MAX || l < 0)
+		{
+			printf("byte out of range\n");
+			return NULL;
+		}
+		unsigned char* b = malloc(1);
+		*b = (unsigned char)(l & UCHAR_MAX);
+		val = (void*)b;
+		obj = jep_create_object();
+		obj->val = (void*)val;
+		obj->type = JEP_BYTE;
+
+		return obj;
+	}
+
 	/* attempt to convert the string to a long int */
 	l = strtol(s, &endptr, 10);
 
@@ -826,7 +864,11 @@ void jep_print_object(jep_obj* obj)
 	static int inner_list = 0;
 	if(obj != NULL)
 	{
-		if(obj->type == JEP_INT)
+		if(obj->type == JEP_BYTE)
+		{
+			printf("[byte] %s: %d\n", obj->ident, *((int*)(obj->val)));
+		}
+		else if(obj->type == JEP_INT)
 		{
 			printf("[int] %s: %d\n", obj->ident, *((int*)(obj->val)));
 		}

@@ -364,8 +364,10 @@ jep_obj* jep_sub(jep_ast_node node, jep_obj* list)
 			&& l->type != JEP_DOUBLE)
 		{
 			printf("invalid operand types for operation -\n");
+			result = jep_create_object();
+			result->type = JEP_ARGUMENT;
 		}
-		if(l->type == JEP_INT)
+		else if(l->type == JEP_INT)
 		{
 			int *n = malloc(sizeof(int));
 			*n = 0 - (*(int*)(l->val));

@@ -14,8 +14,9 @@
 #define T_MODIFIER 3
 #define T_IDENTIFIER 4
 #define T_NUMBER 5
-#define T_CHARACTER 6
-#define T_STRING 7
+#define T_BYTE 6
+#define T_CHARACTER 7
+#define T_STRING 8
 
 /* single character symbol token codes */
 #define T_PLUS 1

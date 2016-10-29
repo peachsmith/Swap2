@@ -3467,7 +3467,7 @@ jep_obj* jep_evaluate_local(jep_ast_node ast, jep_obj* list, int mod)
 
 		if(existing == NULL)
 		{
-			if(mod & 1)
+			if(mod & 3)
 			{
 				jep_obj* local = jep_create_object();
 				local->type = JEP_ARGUMENT;
@@ -3508,7 +3508,7 @@ jep_obj* jep_evaluate_local(jep_ast_node ast, jep_obj* list, int mod)
 
 		if(existing == NULL)
 		{
-			if(mod & 1)
+			if(mod & 3)
 			{
 				jep_obj* local = jep_create_object();
 				local->type = JEP_ARGUMENT;

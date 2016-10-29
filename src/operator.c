@@ -2503,6 +2503,14 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 			o->ident = node.leaves[0].token.val->buffer;
 			jep_add_object(list, o);
 		}
+		else if(o->mod & 2)
+		{
+			/* don't allow reassignment of constants */
+			printf("error: cannot reassign a constant\n");
+			jep_destroy_object(l);
+			jep_destroy_object(r);
+			return NULL;
+		}
 		
 		jep_copy_object(o, r);	
 
@@ -3465,6 +3473,8 @@ jep_obj* jep_evaluate_local(jep_ast_node ast, jep_obj* list, int mod)
 				local->type = JEP_ARGUMENT;
 				local->ident = ast.token.val->buffer;
 				jep_add_object(scope, local);
+				jep_obj* con = jep_get_object(local->ident, scope);
+				con->mod = mod;
 			}
 		}
 		else
@@ -3505,6 +3515,8 @@ jep_obj* jep_evaluate_local(jep_ast_node ast, jep_obj* list, int mod)
 				local->ident = ast.leaves[0].token.val->buffer;
 				jep_add_object(scope, local);
 				o = jep_assign(ast, list);
+				jep_obj* con = jep_get_object(local->ident, scope);
+				con->mod = mod;
 			}
 		}
 		else

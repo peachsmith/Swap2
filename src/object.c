@@ -339,6 +339,7 @@ jep_obj* jep_create_object()
 	o->size = 0;
 	o->ret = 0;
 	o->index = -1;
+	o->mod = 0;
 	o->array_ident = NULL;
 
 	return o;

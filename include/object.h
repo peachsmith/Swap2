@@ -40,6 +40,7 @@ typedef struct Object
 	int size;            /* number of objects in the list */
 	int ret;             /* return flag                   */
 	int index;           /* index in an array             */
+	int mod;             /* modifier flags                */
 	char* array_ident;   /* array identifier              */
 }jep_obj;
 

@@ -125,7 +125,7 @@ static int jep_is_symbol3(const char* s)
 static int jep_is_keyword(const char* s)
 {
 	int i;
-	for(i = 0; i < 8; i++)
+	for(i = 0; i < 9; i++)
 	{
 		if(!strcmp(s, keywords[i]))
 		{

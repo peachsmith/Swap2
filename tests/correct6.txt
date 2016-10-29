@@ -1,3 +1,4 @@
+[function] byte ()
 [int] a: 1
 [character] b: c
 [string] c: words

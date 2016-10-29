@@ -36,6 +36,26 @@ const char *keywords[] =
 	"local", "const"
 };
 
+/* escape characters */
+const char escapes[] = 
+{
+	'a', 'b', 'f', 'n', 'r', 't', 'v', '\\', '\'', '"', '?'
+};
+
+/* checks for an escape character */
+static int jep_is_escape(char c)
+{
+	int i;
+	for(i = 0; i < 11; i++)
+	{
+		if(escapes[i] == c)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
 /**
  * checks for a symbol character
  */
@@ -192,6 +212,63 @@ static void jep_classify_token(jep_token* t)
 			t->type = T_MODIFIER;
 		}
 	}
+}
+
+static int jep_escape(char c, char *esc)
+{
+	int result = 1;
+	switch(jep_is_escape(c))
+	{
+		case 0:
+			*esc = '\a';
+			break;
+
+		case 1:
+			*esc = '\b';
+			break;
+
+		case 2:
+			*esc = '\f';
+			break;
+
+		case 3:
+			*esc = '\n';
+			break;
+
+		case 4:
+			*esc = '\r';
+			break;
+
+		case 5:
+			*esc = '\t';
+			break;
+
+		case 6:
+			*esc = '\v';
+			break;
+
+		case 7:
+			*esc = '\\';
+			break;
+
+		case 8:
+			*esc = '\'';
+			break;
+
+		case 9:
+			*esc = '\"';
+			break;
+
+		case 10:
+			*esc = '\?';
+			break;
+
+		default:
+			printf("invalid escape character %c\n", c);
+			result = 0;
+			break;
+	}
+	return result;
 }
 
 /**
@@ -391,12 +468,23 @@ void jep_tokenize_file(jep_token_stream* ts, const char* file_name)
 			col++;
 			do
 			{
-				jep_append_char(c.val, s[i]);
 				/* check for escape sequences */
 				if(s[i] == '\\')
 				{
-					i++;
-					col++;
+					char esc;
+					if(jep_escape(s[i + 1], &esc))
+					{
+						i++;
+						col++;
+						jep_append_char(c.val, esc);
+					}
+					else
+					{
+						ts->error++;
+					}
+				}
+				else
+				{
 					jep_append_char(c.val, s[i]);
 				}
 				i++;
@@ -417,12 +505,23 @@ void jep_tokenize_file(jep_token_stream* ts, const char* file_name)
 			col++;
 			while(s[i] != '"' && i < sb->size)
 			{
-				jep_append_char(str.val, s[i]);
 				/* check for escape sequences */
-				if(s[i] == '\\' && s[i+1] == '"')
+				if(s[i] == '\\')
 				{
-					i++;
-					col++;
+					char esc;
+					if(jep_escape(s[i + 1], &esc))
+					{
+						i++;
+						col++;
+						jep_append_char(str.val, esc);
+					}
+					else
+					{
+						ts->error++;
+					}
+				}
+				else
+				{
 					jep_append_char(str.val, s[i]);
 				}
 				i++;

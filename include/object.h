@@ -21,6 +21,7 @@
 #define JEP_NATIVE 11
 #define JEP_REFERENCE 12
 #define JEP_FILE 13
+#define JEP_NULL 14
 
 /* file modes */
 #define JEP_READ 1

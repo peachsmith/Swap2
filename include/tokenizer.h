@@ -77,11 +77,12 @@
 #define T_FUNCTION 48
 #define T_RETURN 49
 #define T_IMPORT 50
-#define T_LOCAL 51
-#define T_CONST 52
+#define T_NULL 51
+#define T_LOCAL 52
+#define T_CONST 53
 
 /* end of file */
-#define T_EOF 53
+#define T_EOF 54
 
 /**
  * a single token

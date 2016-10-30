@@ -48,6 +48,10 @@ static void jep_print_array(jep_obj* array)
 			}
 			else if(elem->type == JEP_ARGUMENT)
 			{
+				printf("[arg]");
+			}
+			else if(elem->type == JEP_NULL)
+			{
 				printf("[null]");
 			}
 			if(elem->next != NULL)
@@ -178,6 +182,14 @@ char* jep_to_string(jep_obj* o)
 		strcpy(str, "[file]");
 	}
 	else if(o->type == JEP_ARGUMENT)
+	{
+		if(o->val == NULL)
+		{
+			str = malloc(6);
+			strcpy(str, "[arg]");
+		}
+	}
+	else if(o->type == JEP_NULL)
 	{
 		if(o->val == NULL)
 		{
@@ -532,6 +544,10 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 		/* changed if condition from dest->type to src->type */
 		dest->val = src->val;
 	}
+	else if(src->type == JEP_NULL)
+	{
+		dest->val = NULL;
+	}
 }
 
 /* frees the memory used by an object */
@@ -579,6 +595,10 @@ void jep_destroy_object(jep_obj* obj)
 		else if(obj->type == JEP_REFERENCE)
 		{
 			/* the values of references should be freed elsewhere */
+		}
+		else if(obj->type == JEP_NULL)
+		{
+			/* null objects have no memory allocated for a value */
 		}
 		else if(obj->type == JEP_FILE)
 		{
@@ -848,6 +868,10 @@ void jep_print_object(jep_obj* obj)
 		else if(obj->type == JEP_FILE)
 		{
 			printf("[file] %s\n", obj->ident);
+		}
+		else if(obj->type == JEP_NULL)
+		{
+			printf("[null] %s\n", obj->ident);
 		}
 		else
 		{

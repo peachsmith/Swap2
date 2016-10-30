@@ -1013,6 +1013,22 @@ static jep_ast_node* jep_expression(jep_ast_node* root, jep_ast_node** nodes)
 			}
 				break;
 
+			case T_KEYWORD:
+			{
+				if((*nodes)->token.token_code != T_NULL)
+				{
+					jep_err(ERR_UNEXPECTED, *cur, root, NULL);
+					free(exp.nodes);
+					free(opr.nodes);
+					return NULL;
+				}
+				else
+				{
+					jep_push(&exp, *nodes);
+				}
+			}
+				break;
+
 			default:
 				jep_err(ERR_UNEXPECTED, *cur, root, NULL);
 				free(exp.nodes);

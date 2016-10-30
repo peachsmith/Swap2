@@ -32,7 +32,7 @@ const char *symbols3[] =
  */
 const char *keywords[] = 
 {
-	"if", "else", "for", "while", "function", "return", "import",
+	"if", "else", "for", "while", "function", "return", "import", "null",
 	"local", "const"
 };
 
@@ -145,7 +145,7 @@ static int jep_is_symbol3(const char* s)
 static int jep_is_keyword(const char* s)
 {
 	int i;
-	for(i = 0; i < 9; i++)
+	for(i = 0; i < 10; i++)
 	{
 		if(!strcmp(s, keywords[i]))
 		{
@@ -207,7 +207,7 @@ static void jep_classify_token(jep_token* t)
 		int code = jep_is_keyword(t->val->buffer);
 		t->token_code = code + 44;
 		/* detect modifiers */
-		if(code > 6)
+		if(code > 7)
 		{
 			t->type = T_MODIFIER;
 		}

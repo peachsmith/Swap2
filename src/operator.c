@@ -50,6 +50,12 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 		{
 			return jep_while(ast, list);
 		}
+		else if(ast.token.token_code == T_NULL)
+		{
+			jep_obj* n = jep_create_object();
+			n->type = JEP_NULL;
+			return n;
+		}
 	}
 	else if(ast.token.type == T_MODIFIER)
 	{
@@ -2781,7 +2787,7 @@ jep_obj* jep_subscript(jep_ast_node node, jep_obj* list)
 		for(i = 0; i < s; i++)
 		{
 			jep_obj* elem = jep_create_object();
-			elem->type = JEP_ARGUMENT;
+			elem->type = JEP_NULL;
 			elem->index = i;
 			jep_add_object(array, elem);
 		}

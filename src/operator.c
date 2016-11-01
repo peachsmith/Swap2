@@ -2487,8 +2487,7 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 
 	r = jep_evaluate(node.leaves[1], list);
 
-	if(r != NULL 
-		&& (l != NULL || node.leaves[0].token.type == T_IDENTIFIER))
+	if(l != NULL || node.leaves[0].token.type == T_IDENTIFIER)
 	{
 		if(l == NULL)
 		{
@@ -2542,6 +2541,13 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 			printf("error: cannot reassign a constant\n");
 			jep_destroy_object(l);
 			jep_destroy_object(r);
+			return NULL;
+		}
+
+		if(r == NULL)
+		{
+			o->type = JEP_NULL;
+			jep_destroy_object(l);
 			return NULL;
 		}
 		

@@ -321,7 +321,7 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 			size_t s = data->size;
 			jep_obj* b = ((jep_obj*)(data->val))->head;
 			byte_array = malloc(s);
-			int i;
+			unsigned int i;
 			for(i = 0; i < s && b != NULL; i++, b = b->next)
 			{
 				byte_array[i] = *((unsigned char*)(b->val));
@@ -462,6 +462,7 @@ static jep_obj* jep_fwriteln(FILE* file, const char* data)
 	jep_obj* o = NULL;
 
 	fprintf(file, "%s\n", data);
+	fflush(file);
 
 	return o;
 }
@@ -471,6 +472,7 @@ static jep_obj* jep_fwrite(FILE* file, const char* data)
 	jep_obj* o = NULL;
 
 	fprintf(file, "%s", data);
+	fflush(file);
 
 	return o;
 }
@@ -490,7 +492,7 @@ static jep_obj* jep_freadb(FILE* file, size_t n)
 		bytes = jep_create_object();
 		bytes->type = JEP_LIST;
 
-		int i;
+		unsigned int i;
 		for(i = 0; i < n; i++)
 		{
 			jep_obj* byte = jep_create_object();
@@ -515,6 +517,7 @@ static jep_obj* jep_fwriteb(FILE* file, const unsigned char* data, size_t n)
 	jep_obj* written = NULL;
 
 	size_t read = fwrite(data, n, 1, file);
+	fflush(file);
 
 	written = jep_create_object();
 	written->type = JEP_INT;

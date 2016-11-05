@@ -236,7 +236,7 @@ jep_obj* jep_get_bytes(jep_obj* o)
 	{
 		char* str = (char*)(o->val);
 		size_t len =  strlen(str);
-		int i;
+		unsigned int i;
 		for(i = 0; i < len; i++)
 		{
 			jep_obj* byte = jep_create_object();
@@ -668,10 +668,11 @@ jep_obj* jep_number(const char* s)
 	const size_t len = strlen(s);
 	if(s[len-1] == 'b')
 	{
-		char tmp[len + 1];
+		char* tmp = malloc(len + 1);
 		strcpy(tmp, s);
 		tmp[len-1] = '\0';
 		l = strtol(tmp, &endptr, 10);
+		free(tmp);
 		if(errno == ERANGE)
 		{
 			printf("byte out of range\n");

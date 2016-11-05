@@ -2454,7 +2454,9 @@ jep_obj* jep_inc(jep_ast_node node, jep_obj* list)
 	if(obj != NULL)
 	{
 		if((obj->ident == NULL && obj->index == -1) 
-			|| obj->type != JEP_INT || obj->val == NULL)
+			|| (obj->type != JEP_INT && obj->type != JEP_BYTE 
+				&& obj->type != JEP_LONG) 
+			|| obj->val == NULL)
 		{
 			printf("invalid operand\n");
 			return NULL;
@@ -2531,7 +2533,9 @@ jep_obj* jep_dec(jep_ast_node node, jep_obj* list)
 	if(obj != NULL)
 	{
 		if((obj->ident == NULL && obj->index == -1) 
-			|| obj->type != JEP_INT || obj->val == NULL)
+			|| (obj->type != JEP_INT && obj->type != JEP_BYTE 
+				&& obj->type != JEP_LONG) 
+			|| obj->val == NULL)
 		{
 			printf("invalid operand\n");
 			return NULL;

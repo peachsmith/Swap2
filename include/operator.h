@@ -69,6 +69,30 @@ jep_obj* jep_inc(jep_ast_node node, jep_obj* list);
 /* performs a decrement on an integer */
 jep_obj* jep_dec(jep_ast_node node, jep_obj* list);
 
+/* performs an addition assignmnet */
+jep_obj* jep_add_assign(jep_ast_node node, jep_obj* list);
+
+/* performs a subtraction assignment */
+jep_obj* jep_sub_assign(jep_ast_node node, jep_obj* list);
+
+/* performs a multiplication assignment */
+jep_obj* jep_mul_assign(jep_ast_node node, jep_obj* list);
+
+/* performs a division assignment */
+jep_obj* jep_div_assign(jep_ast_node node, jep_obj* list);
+
+/* performs a modulus assignment */
+jep_obj* jep_mod_assign(jep_ast_node node, jep_obj* list);
+
+/* performs a bitwise and assignment on an integer */
+jep_obj* jep_and_assign(jep_ast_node node, jep_obj* list);
+
+/* performs a bitwise and assignment on an integer */
+jep_obj* jep_or_assign(jep_ast_node node, jep_obj* list);
+
+/* performs a bitwise exclusive or assignment on an integer */
+jep_obj* jep_xor_assign(jep_ast_node node, jep_obj* list);
+
 /* evaluates an assignment */
 jep_obj* jep_assign(jep_ast_node node, jep_obj* list);
 

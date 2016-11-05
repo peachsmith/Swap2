@@ -176,6 +176,38 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 			o = jep_dereference(ast, list);
 			break;
 
+		case T_ADDASSIGN:
+			o = jep_add_assign(ast, list);
+			break;
+
+		case T_SUBASSIGN:
+			o = jep_sub_assign(ast, list);
+			break;
+
+		case T_DIVASSIGN:
+			o = jep_div_assign(ast, list);
+			break;
+
+		case T_MULASSIGN:
+			o = jep_mul_assign(ast, list);
+			break;
+
+		case T_MODASSIGN:
+			o = jep_mod_assign(ast, list);
+			break;
+
+		case T_ANDASSIGN:
+			o = jep_and_assign(ast, list);
+			break;
+
+		case T_ORASSIGN:
+			o = jep_or_assign(ast, list);
+			break;
+
+		case T_XORASSIGN:
+			o = jep_xor_assign(ast, list);
+			break;
+
 		default:
 			printf("unrecognized token: %s\n", 
 				ast.token.val->buffer);
@@ -2462,6 +2494,150 @@ jep_obj* jep_dec(jep_ast_node node, jep_obj* list)
 	}
 
 	return o;
+}
+
+/* performs an addition assignmnet */
+jep_obj* jep_add_assign(jep_ast_node node, jep_obj* list)
+{
+	jep_token equals = { NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL };
+
+	jep_token operator = { NULL, 0, T_PLUS, 0, 0, 0, 0, NULL };
+
+	jep_ast_node operands[] = { node.leaves[0], node.leaves[1] };
+
+	jep_ast_node operation = { operator, 2, 0, operands, 0, 0, 0, 0 };
+
+	jep_ast_node asign_operands[] = { node.leaves[0], operation };
+
+	jep_ast_node assignment = { equals, 2, 0, asign_operands, 0, 0, 0, 0 };
+
+	return jep_evaluate(assignment, list);
+}
+
+/* performs a subtraction assignment */
+jep_obj* jep_sub_assign(jep_ast_node node, jep_obj* list)
+{
+	jep_token equals = { NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL };
+
+	jep_token operator = { NULL, 0, T_MINUS, 0, 0, 0, 0, NULL };
+
+	jep_ast_node operands[] = { node.leaves[0], node.leaves[1] };
+
+	jep_ast_node operation = { operator, 2, 0, operands, 0, 0, 0, 0 };
+
+	jep_ast_node asign_operands[] = { node.leaves[0], operation };
+
+	jep_ast_node assignment = { equals, 2, 0, asign_operands, 0, 0, 0, 0 };
+
+	return jep_evaluate(assignment, list);
+}
+
+/* performs a multiplication assignment */
+jep_obj* jep_mul_assign(jep_ast_node node, jep_obj* list)
+{
+	jep_token equals = { NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL };
+
+	jep_token operator = { NULL, 0, T_STAR, 0, 0, 0, 0, NULL };
+
+	jep_ast_node operands[] = { node.leaves[0], node.leaves[1] };
+
+	jep_ast_node operation = { operator, 2, 0, operands, 0, 0, 0, 0 };
+
+	jep_ast_node asign_operands[] = { node.leaves[0], operation };
+
+	jep_ast_node assignment = { equals, 2, 0, asign_operands, 0, 0, 0, 0 };
+
+	return jep_evaluate(assignment, list);
+}
+
+/* performs a division assignment */
+jep_obj* jep_div_assign(jep_ast_node node, jep_obj* list)
+{
+	jep_token equals = { NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL };
+
+	jep_token operator = { NULL, 0, T_FSLASH, 0, 0, 0, 0, NULL };
+
+	jep_ast_node operands[] = { node.leaves[0], node.leaves[1] };
+
+	jep_ast_node operation = { operator, 2, 0, operands, 0, 0, 0, 0 };
+
+	jep_ast_node asign_operands[] = { node.leaves[0], operation };
+
+	jep_ast_node assignment = { equals, 2, 0, asign_operands, 0, 0, 0, 0 };
+
+	return jep_evaluate(assignment, list);
+}
+
+/* performs a modulus assignment */
+jep_obj* jep_mod_assign(jep_ast_node node, jep_obj* list)
+{
+	jep_token equals = { NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL };
+
+	jep_token operator = { NULL, 0, T_MODULUS, 0, 0, 0, 0, NULL };
+
+	jep_ast_node operands[] = { node.leaves[0], node.leaves[1] };
+
+	jep_ast_node operation = { operator, 2, 0, operands, 0, 0, 0, 0 };
+
+	jep_ast_node asign_operands[] = { node.leaves[0], operation };
+
+	jep_ast_node assignment = { equals, 2, 0, asign_operands, 0, 0, 0, 0 };
+
+	return jep_evaluate(assignment, list);
+}
+
+/* performs a bitwise and assignment on an integer */
+jep_obj* jep_and_assign(jep_ast_node node, jep_obj* list)
+{
+	jep_token equals = { NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL };
+
+	jep_token operator = { NULL, 0, T_BITAND, 0, 0, 0, 0, NULL };
+
+	jep_ast_node operands[] = { node.leaves[0], node.leaves[1] };
+
+	jep_ast_node operation = { operator, 2, 0, operands, 0, 0, 0, 0 };
+
+	jep_ast_node asign_operands[] = { node.leaves[0], operation };
+
+	jep_ast_node assignment = { equals, 2, 0, asign_operands, 0, 0, 0, 0 };
+
+	return jep_evaluate(assignment, list);
+}
+
+/* performs a bitwise and assignment on an integer */
+jep_obj* jep_or_assign(jep_ast_node node, jep_obj* list)
+{
+	jep_token equals = { NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL };
+
+	jep_token operator = { NULL, 0, T_BITOR, 0, 0, 0, 0, NULL };
+
+	jep_ast_node operands[] = { node.leaves[0], node.leaves[1] };
+
+	jep_ast_node operation = { operator, 2, 0, operands, 0, 0, 0, 0 };
+
+	jep_ast_node asign_operands[] = { node.leaves[0], operation };
+
+	jep_ast_node assignment = { equals, 2, 0, asign_operands, 0, 0, 0, 0 };
+
+	return jep_evaluate(assignment, list);
+}
+
+/* performs a bitwise exclusive or assignment on an integer */
+jep_obj* jep_xor_assign(jep_ast_node node, jep_obj* list)
+{
+	jep_token equals = { NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL };
+
+	jep_token operator = { NULL, 0, T_BITXOR, 0, 0, 0, 0, NULL };
+
+	jep_ast_node operands[] = { node.leaves[0], node.leaves[1] };
+
+	jep_ast_node operation = { operator, 2, 0, operands, 0, 0, 0, 0 };
+
+	jep_ast_node asign_operands[] = { node.leaves[0], operation };
+
+	jep_ast_node assignment = { equals, 2, 0, asign_operands, 0, 0, 0, 0 };
+
+	return jep_evaluate(assignment, list);
 }
 
 /* evaluates an assignment */

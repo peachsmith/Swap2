@@ -6,6 +6,7 @@ all: build clean
 
 build:
 	gcc $(FLAGS) src/stringbuilder.c
+	gcc $(FLAGS) src/import.c
 	gcc $(FLAGS) src/tokenizer.c
 	gcc $(FLAGS) src/parser.c
 	gcc $(FLAGS) src/object.c
@@ -13,10 +14,11 @@ build:
 	gcc $(FLAGS) src/operator.c
 	gcc $(FLAGS) src/native.c
 	gcc $(FLAGS) src/main.c
-	gcc main.o stringbuilder.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap
+	gcc main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap
 
 debug:
 	gcc -g $(FLAGS) src/stringbuilder.c
+	gcc -g $(FLAGS) src/import.c
 	gcc -g $(FLAGS) src/tokenizer.c
 	gcc -g $(FLAGS) src/parser.c
 	gcc -g $(FLAGS) src/object.c
@@ -24,7 +26,7 @@ debug:
 	gcc -g $(FLAGS) src/operator.c
 	gcc -g $(FLAGS) src/native.c
 	gcc -g $(FLAGS) src/main.c
-	gcc main.o stringbuilder.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap
+	gcc main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap
 
 clean:
 	rm *.o

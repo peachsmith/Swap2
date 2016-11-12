@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "tokenizer.h"
+#include "import.h"
 
 /**
  * one-character symbols
@@ -596,7 +597,23 @@ void jep_tokenize_file(jep_token_stream* ts, const char* file_name)
 				&& ts->tok[ts->size - 3].token_code == T_IMPORT)
 			{
 				/* handle imports */
-				jep_tokenize_file(ts, ts->tok[ts->size - 2].val->buffer);
+				char *local_path = ts->tok[ts->size - 2].val->buffer;
+				char *import_path = jep_get_import(local_path);
+
+				FILE *import = NULL;
+				if((import = fopen(local_path, "r")) != NULL)
+				{
+					/* check for local imports */
+					fclose(import);
+					jep_tokenize_file(ts, ts->tok[ts->size - 2].val->buffer);	
+				}
+				else
+				{
+					/* attempt system import */
+					jep_tokenize_file(ts, import_path);
+				}
+				
+				free(import_path);
 			}
 		}
 		

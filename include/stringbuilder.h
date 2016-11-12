@@ -4,11 +4,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/**
+ * a utility for building a dynamic string of characters
+ */
 typedef struct StringBuilder
 {
-	char* buffer;
-	int size;
-	int cap;
+	char* buffer; /* the character array                    */
+	int size;     /* the amount of characters in the array  */
+	int cap;      /* the current maximum character capacity */
 } jep_string_builder;
 
 /**

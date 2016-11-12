@@ -36,13 +36,17 @@ const char *keywords[] =
 	"local", "const"
 };
 
-/* escape characters */
+/**
+ * escape characters
+ */
 const char escapes[] = 
 {
 	'a', 'b', 'f', 'n', 'r', 't', 'v', '\\', '\'', '"', '?'
 };
 
-/* checks for an escape character */
+/**
+ * checks for an escape character
+ */
 static int jep_is_escape(char c)
 {
 	int i;
@@ -214,6 +218,9 @@ static void jep_classify_token(jep_token* t)
 	}
 }
 
+/**
+ * determines the appropriate escaped character for an escape sequence
+ */
 static int jep_escape(char c, char *esc)
 {
 	int result = 1;
@@ -544,28 +551,34 @@ void jep_tokenize_file(jep_token_stream* ts, const char* file_name)
 				symbol[1] = s[i+1];
 				symbol[2] = s[i+2];
 			}
+
 			if(jep_is_symbol3(symbol) >= 0)
 			{
+				/* handle 3 character symbols */
 				jep_append_string(sym.val, symbol);
 				i += 2;
 				col += 2;
 			}
 			else if(symbol[2] = '\0', jep_is_symbol2(symbol) >= 0)
 			{
+				/* handle 2 character symbols */
 				jep_append_string(sym.val, symbol);
 				i++;
 				col++;
 			}
 			else if(symbol[1] = '\0', jep_is_symbol(symbol) >= 0)
 			{
+				/* handle 1 character symbols */
 				jep_append_string(sym.val, symbol);
 			}
 
 			jep_classify_token(&sym);
 			jep_append_token(ts, sym);
+			
 			if(sym.token_code == T_SEMICOLON && ts->size > 2
 				&& ts->tok[ts->size - 3].token_code == T_IMPORT)
 			{
+				/* handle imports */
 				jep_tokenize_file(ts, ts->tok[ts->size - 2].val->buffer);
 			}
 		}

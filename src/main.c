@@ -9,13 +9,16 @@
 
 #define MAX_FLAGS 3
 
-const char *flags[] = 
+const char *flags[MAX_FLAGS] = 
 {
 	"-t", /* print tokens  */
 	"-a", /* print ast     */ 
 	"-o"  /* print objects */
 };
 
+/**
+ * checks an input flag to see if it is in the array of acceptable flags
+ */
 int jep_check_flag(const char* arg)
 {
 	int i;
@@ -38,15 +41,19 @@ int main(int argc, char** argv)
 	int i;
 	char* file_name = NULL;
 
+	if(argc == 1)
+	{
+		/* TODO: output more information */
+		printf("swap\n");
+		return 0;
+	}
+
 	for(i = 1; i < argc; i++)
 	{
 		int f = jep_check_flag(argv[i]);
-		if(f == -1)
+		if(f == -1 && file_name == NULL)
 		{
-			if(file_name == NULL)
-			{
-				file_name = argv[i];
-			}
+			file_name = argv[i];
 		}
 		else
 		{
@@ -56,6 +63,7 @@ int main(int argc, char** argv)
 			}
 			else
 			{
+				/* TODO: output usage information */
 				printf("unexpected flag: %s\n", argv[i]);
 				return 1;
 			}
@@ -96,6 +104,7 @@ int main(int argc, char** argv)
 	root->loop = 0;
 	jep_append_string(root->token.val, "root");
 
+	/* build the AST */
 	jep_parse(ts, root);
 
 	if(root != NULL)
@@ -118,6 +127,7 @@ int main(int argc, char** argv)
 			f_byte->size = 1;
 			jep_add_object(list, f_byte);
 
+			/* traverse and interpret the AST */
 			jep_obj* o;
 			int i;
 			for(i = 0; i < root->leaf_count; i++)
@@ -125,18 +135,17 @@ int main(int argc, char** argv)
 				o = jep_evaluate(root->leaves[i], list);
 				if(o != NULL)
 				{
-					if(o->type == JEP_FILE)
-					{
-						
-					}
 					jep_destroy_object(o);
 					o = NULL;
 				}
 			}
+			
 			if(flags[JEP_OBJ])
 			{
 				jep_print_list(list);
 			}
+
+			/* destroy all remaining objects */
 			jep_destroy_list(list);
 		}
 
@@ -151,7 +160,7 @@ int main(int argc, char** argv)
 
 	if(nodes != NULL)
 	{
-		/* destroy all of the individual nodes */
+		/* destroy all of the individual AST nodes */
 		for(i = 0; i < ts->size; i++)
 		{
 			if(nodes[i].leaves != NULL)

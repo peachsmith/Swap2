@@ -100,8 +100,7 @@ typedef struct Token
 }jep_token;
 
 /**
- * a sequence of tokens. when the size reaches the capacity, the token
- * buffer should be resized
+ * a utility for building a dynamic sequence of tokens
  */
 typedef struct TokenStream
 {

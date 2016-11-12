@@ -1,3 +1,20 @@
+/*
+    The swap interpreter.
+    Copyright (C) 2016 John Powell
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "ast.h"
 #include "parser.h"
 #include "operator.h"
@@ -6,14 +23,18 @@
 #define JEP_TOK 0
 #define JEP_AST 1
 #define JEP_OBJ 2
+#define JEP_VER 3
+#define JEP_VER_LONG 4
 
-#define MAX_FLAGS 3
+#define MAX_FLAGS 5
 
 const char *flags[MAX_FLAGS] = 
 {
-	"-t", /* print tokens  */
-	"-a", /* print ast     */ 
-	"-o"  /* print objects */
+	"-t",       /* print tokens  */
+	"-a",       /* print ast     */ 
+	"-o",       /* print objects */
+	"-v",       /* version info  */
+	"--version" /* version info  */
 };
 
 /**
@@ -37,16 +58,9 @@ int main(int argc, char** argv)
 	jep_token_stream* ts = NULL;
 	jep_ast_node* nodes = NULL;
 	jep_ast_node* root = NULL;
-	int flags[MAX_FLAGS] = { 0, 0, 0 };
+	int flags[MAX_FLAGS] = { 0, 0, 0, 0, 0 };
 	int i;
 	char* file_name = NULL;
-
-	if(argc == 1)
-	{
-		/* TODO: output more information */
-		printf("swap\n");
-		return 0;
-	}
 
 	for(i = 1; i < argc; i++)
 	{
@@ -70,10 +84,29 @@ int main(int argc, char** argv)
 		}
 	}
 
+	if(flags[JEP_VER] || flags[JEP_VER_LONG])
+	{
+		printf("swap 0.0.9\n");
+		printf("Copyright (C) 2016 John Powell\n");
+		printf("This is free software. There is NO warranty;");
+		printf(" not even for\nMERCHANTABILITY or FITNESS FOR ");
+		printf("A PARTICULAR PURPOSE.\n");
+
+		if(file_name == NULL)
+		{
+			return 0;
+		}
+	}
+
 	if(file_name != NULL)
 	{
 		ts = jep_create_token_stream();
 		jep_tokenize_file(ts, file_name);
+	}
+	else
+	{
+		printf("error: no input file\n");
+		return 1;
 	}
 
 	if(ts->error)

@@ -29,6 +29,9 @@
 #define JEP_READ_BINARY 3
 #define JEP_APPEND_BINARY 4
 
+/**
+ * a structure representing all objects and lists of objects
+ */
 typedef struct Object
 {
 	char* ident;         /* identifier                    */
@@ -45,6 +48,9 @@ typedef struct Object
 	char* array_ident;   /* array identifier              */
 }jep_obj;
 
+/**
+ * a structre representing a file for file io
+ */
 typedef struct File
 {
 	FILE *file;        /* the file pointer                   */
@@ -52,13 +58,6 @@ typedef struct File
 	int mode;          /* what will be done with the file    */
 	unsigned int refs; /* amount of objects referencing this */
 }jep_file;
-
-typedef struct Memory
-{
-	void** addr; /* pointers that have been freed           */
-	int cap;     /* capacity of pointer array               */
-	int size;    /* amount of pointers that have been freed */
-}jep_mem;
 
 /* allocates memory for a new object */
 jep_obj* jep_create_object();
@@ -71,12 +70,6 @@ char* jep_to_string(jep_obj* o);
 
 /* converts an object into an array of bytes */
 jep_obj* jep_get_bytes(jep_obj* o);
-
-/* frees the memory used by an array */
-void jep_free_array(jep_obj* array);
-
-/* frees the memory used by a function */
-void jep_free_function(jep_obj* func);
 
 /* adds an object to a list */
 void jep_add_object(jep_obj* list, jep_obj* o);

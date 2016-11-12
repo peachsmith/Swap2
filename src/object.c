@@ -64,6 +64,68 @@ static void jep_print_array(jep_obj* array)
 	printf(" }");
 }
 
+/* frees the memory used by an array */
+static void jep_free_array(jep_obj* array)
+{
+	if(array != NULL && array->size > 0)
+	{
+		jep_obj* elem = array->tail;
+		jep_obj* prev = NULL;
+		while(elem != NULL)
+		{
+			prev = elem->prev;
+			if(elem->type == JEP_INT)
+			{
+				free(elem->val);
+			}
+			else if(elem->type == JEP_LONG)
+			{
+				free(elem->val);
+			}
+			else if(elem->type == JEP_DOUBLE)
+			{
+				free(elem->val);
+			}
+			else if(elem->type == JEP_CHARACTER)
+			{
+				free(elem->val);
+			}
+			else if(elem->type == JEP_BYTE)
+			{
+				free(elem->val);
+			}
+			else if(elem->type == JEP_STRING)
+			{
+				free(elem->val);
+			}
+			else if(elem->type == JEP_ARRAY)
+			{
+				/* frees the memory used by an array */
+				jep_free_array(elem);
+			}
+
+			free(elem);
+			elem = prev;
+		}
+	}
+}
+
+/* frees the memory used by a function */
+static void jep_free_function(jep_obj* func)
+{
+	jep_obj* args = func->head;
+
+	/* destroy the body of non-native functions */
+	if(func->size == 2)
+	{
+		jep_obj* body = args->next;
+		free(body);	
+	}
+
+	jep_destroy_list(args);
+	free(args);
+}
+
 /* creates a string representation of an object */
 char* jep_to_string(jep_obj* o)
 {
@@ -252,68 +314,6 @@ jep_obj* jep_get_bytes(jep_obj* o)
 	byte_array->size = bytes->size;
 
 	return byte_array;
-}
-
-/* frees the memory used by an array */
-void jep_free_array(jep_obj* array)
-{
-	if(array != NULL && array->size > 0)
-	{
-		jep_obj* elem = array->tail;
-		jep_obj* prev = NULL;
-		while(elem != NULL)
-		{
-			prev = elem->prev;
-			if(elem->type == JEP_INT)
-			{
-				free(elem->val);
-			}
-			else if(elem->type == JEP_LONG)
-			{
-				free(elem->val);
-			}
-			else if(elem->type == JEP_DOUBLE)
-			{
-				free(elem->val);
-			}
-			else if(elem->type == JEP_CHARACTER)
-			{
-				free(elem->val);
-			}
-			else if(elem->type == JEP_BYTE)
-			{
-				free(elem->val);
-			}
-			else if(elem->type == JEP_STRING)
-			{
-				free(elem->val);
-			}
-			else if(elem->type == JEP_ARRAY)
-			{
-				/* frees the memory used by an array */
-				jep_free_array(elem);
-			}
-
-			free(elem);
-			elem = prev;
-		}
-	}
-}
-
-/* frees the memory used by a function */
-void jep_free_function(jep_obj* func)
-{
-	jep_obj* args = func->head;
-
-	/* destroy the body of non-native functions */
-	if(func->size == 2)
-	{
-		jep_obj* body = args->next;
-		free(body);	
-	}
-
-	jep_destroy_list(args);
-	free(args);
 }
 
 /* allocates memory for a new object */

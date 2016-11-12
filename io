@@ -36,6 +36,8 @@ function readln();
  *        acceptable file modes:
  *            "r"  reading
  *            "a"  appending
+ *            "rb"  binary reading
+ *            "ab"  binary appending
  *
  * returns: a file object
  */

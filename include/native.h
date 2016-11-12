@@ -3,7 +3,9 @@
 
 #include "object.h"
 
-/* calls a native function */
+/**
+ * calls a native function
+ */
 jep_obj* jep_call_native(const char* ident, jep_obj* args);
 
 #endif

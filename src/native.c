@@ -13,6 +13,7 @@ const char *natives[] =
 static jep_obj* jep_write(const char*);
 static jep_obj* jep_writeln(const char*);
 static jep_obj* jep_readln();
+static jep_obj* jep_fopen(const char*, const char*);
 static jep_obj* jep_freadln(FILE*);
 static jep_obj* jep_fwriteln(FILE*, const char*);
 static jep_obj* jep_fwrite(FILE*, const char*);
@@ -39,7 +40,7 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 		return o;
 	}
 
-	if(native == 0 || native == 1)
+	if(native == 0 || native == 1) /* write or writeln */
 	{
 		if(args == NULL || args->size != 1)
 		{
@@ -65,7 +66,7 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 			free(str);
 		}
 	}
-	else if(native == 2)
+	else if(native == 2) /* readln */
 	{
 		if(args != NULL && args->size > 0)
 		{
@@ -92,42 +93,7 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 		char* path_str = (char*)(path_obj->val);
 		if(path_str != NULL)
 		{
-			FILE* file = fopen(path_str, (char*)(path_obj->next->val));
-			if(file != NULL)
-			{
-				jep_file* file_val = malloc(sizeof(jep_file));
-				file_val->file = file;
-				file_val->open = 1;
-				file_val->refs = 1;
-				if(!strcmp((char*)(path_obj->next->val), "r"))
-				{
-					file_val->mode = JEP_READ;
-				}
-				else if(!strcmp((char*)(path_obj->next->val), "a"))
-				{
-					file_val->mode = JEP_APPEND;
-				}
-				else if(!strcmp((char*)(path_obj->next->val), "rb"))
-				{
-					file_val->mode = JEP_READ_BINARY;
-				}
-				else if(!strcmp((char*)(path_obj->next->val), "ab"))
-				{
-					file_val->mode = JEP_APPEND_BINARY;
-				}
-				else
-				{
-					file_val->mode = 0;
-				}
-				
-				o = jep_create_object();
-				o->type = JEP_FILE;
-				o->val = file_val;
-			}
-			else
-			{
-				printf("could not open file %s\n", path_str);
-			}
+			o = jep_fopen(path_str, (char*)(path_obj->next->val));
 		}
 	}
 	else if(native == 4) /* freadln */
@@ -403,6 +369,50 @@ static jep_obj* jep_readln()
 	jep_obj* o = NULL;
 
 	o = jep_freadln(stdin);
+
+	return o;
+}
+
+/**
+ * opens a file
+ */
+static jep_obj* jep_fopen(const char* path_str, const char* mode)
+{
+	FILE* file = fopen(path_str, mode);
+	jep_obj* o = NULL;
+	o = jep_create_object();
+	o->type = JEP_NULL;
+
+	if(file != NULL)
+	{
+		jep_file* file_val = malloc(sizeof(jep_file));
+		file_val->file = file;
+		file_val->open = 1;
+		file_val->refs = 1;
+		if(!strcmp(mode, "r"))
+		{
+			file_val->mode = JEP_READ;
+		}
+		else if(!strcmp(mode, "a"))
+		{
+			file_val->mode = JEP_APPEND;
+		}
+		else if(!strcmp(mode, "rb"))
+		{
+			file_val->mode = JEP_READ_BINARY;
+		}
+		else if(!strcmp(mode, "ab"))
+		{
+			file_val->mode = JEP_APPEND_BINARY;
+		}
+		else
+		{
+			file_val->mode = 0;
+		}
+		
+		o->type = JEP_FILE;
+		o->val = file_val;
+	}
 
 	return o;
 }

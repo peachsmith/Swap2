@@ -212,13 +212,9 @@ static int jep_prioritize(jep_ast_node* cur, jep_ast_node* top)
 	{
 		if(jep_priority(cur) < jep_priority(top))
 		{
-			if(cur->token.postfix)
+			if(cur->token.postfix && top->token.postfix)
 			{
-				if(top->token.postfix)
-				{
-					return 0;
-				}
-				return 1;
+				return 0;
 			}
 			return 1;
 		}
@@ -315,7 +311,8 @@ static jep_ast_node* jep_if(jep_ast_node* root, jep_ast_node** nodes)
 	jep_ast_node* body;    /* the body of the if statement     */
 
 	if_node = (*nodes)++;
-	if(if_node->token.token_code == T_IF && (*nodes)->token.token_code != T_LPAREN)
+	if(if_node->token.token_code == T_IF 
+		&& (*nodes)->token.token_code != T_LPAREN)
 	{
 		jep_err(ERR_EXPECTED, (*nodes)->token, root, "(");
 		return NULL;
@@ -475,6 +472,7 @@ static jep_ast_node* jep_for(jep_ast_node* root, jep_ast_node** nodes)
 	}
 
 	head = (*nodes)++;
+	
 	/* parse the index */
 	ind = jep_expression(root, nodes);
 	if(!jep_accept(T_SEMICOLON, nodes) || root->error)
@@ -482,6 +480,7 @@ static jep_ast_node* jep_for(jep_ast_node* root, jep_ast_node** nodes)
 		jep_err(ERR_EXPECTED, (*nodes)->token, root, ";");
 		return NULL;
 	}
+
 	/* parse the condition */
 	con = jep_expression(root, nodes);
 	if(!jep_accept(T_SEMICOLON, nodes) || root->error)
@@ -489,6 +488,7 @@ static jep_ast_node* jep_for(jep_ast_node* root, jep_ast_node** nodes)
 		jep_err(ERR_EXPECTED, (*nodes)->token, root, ";");
 		return NULL;
 	}
+
 	/* parse the index change */
 	chg = jep_expression(root, nodes);
 	if(!jep_accept(T_RPAREN, nodes) || root->error)

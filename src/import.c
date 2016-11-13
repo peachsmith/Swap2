@@ -21,8 +21,8 @@
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
 #include <windows.h>
-#elif define(__linux__)
-/* TODO: implement linux functionality */
+#elif defined(__linux__)
+#include <unistd.h>
 #elif defined(__APPLE__) || defined(__MACH__)
 /* TODO: implement mac functionality */
 #endif
@@ -34,6 +34,7 @@
  */
 char* jep_get_import(const char* path)
 {
+	errno = 0;
 	char app_path[1024];
 	char *import_path = NULL;
 
@@ -50,9 +51,7 @@ char* jep_get_import(const char* path)
 	}
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-
-	errno = 0;
-
+	
 	/* get the path to the application */
 	GetModuleFileName(NULL, app_path, 1024);
 
@@ -78,10 +77,33 @@ char* jep_get_import(const char* path)
 	strcat(import_path, path);
 
 #elif defined(__linux__)
-	/* TODO: implement linux functionality */
-	import_path = malloc(p_len);
-	memset(import_path, '\0', p_len);
-	strcpy(import_path, path);
+
+	ssize_t len;
+
+	len = readlink("/proc/self/exe", app_path, sizeof(app_path)-1);
+	if(len == -1)
+	{
+		return import_path;
+	}
+
+	app_path[len] = '\0';
+
+	/* remove the application name from the path */
+	int i = strlen(app_path);
+	for(; app_path[i] != '/' && i > 0; i--)
+	{
+		app_path[i] = '\0';
+	}
+
+	size_t a_len = strlen(app_path);
+
+	const int i_len = a_len + p_len + 10;
+	import_path = malloc(i_len);
+	memset(import_path, '\0', i_len);
+	strcpy(import_path, app_path);
+	strcat(import_path, "imports/");
+	strcat(import_path, path);
+
 #elif defined(__APPLE__) || defined(__MACH__)
 	/* TODO: implement mac functionality */
 	import_path = malloc(p_len);

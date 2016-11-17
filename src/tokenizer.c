@@ -51,7 +51,7 @@ const char *symbols3[] =
 const char *keywords[] = 
 {
 	"if", "else", "for", "while", "function", "return", "import", "null",
-	"local", "const"
+	"struct", "local", "const"
 };
 
 /**
@@ -229,7 +229,7 @@ static void jep_classify_token(jep_token* t)
 		int code = jep_is_keyword(t->val->buffer);
 		t->token_code = code + 44;
 		/* detect modifiers */
-		if(code > 7)
+		if(code > 8)
 		{
 			t->type = T_MODIFIER;
 		}

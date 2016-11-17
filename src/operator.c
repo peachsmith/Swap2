@@ -73,6 +73,10 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 			n->type = JEP_NULL;
 			return n;
 		}
+		else if(ast.token.token_code == T_STRUCT)
+		{
+			return jep_struct(ast, list);
+		}
 	}
 	else if(ast.token.type == T_MODIFIER)
 	{
@@ -3696,6 +3700,43 @@ jep_obj* jep_while(jep_ast_node node, jep_obj* list)
 	free(scope);
 
 	return o;
+}
+
+/* evaluates a structure definition */
+jep_obj* jep_struct(jep_ast_node node, jep_obj* list)
+{
+	jep_obj* struc = NULL;
+
+	if(node.leaf_count != 2)
+	{
+		return struc;
+	}
+
+	struc = jep_create_object();
+	struc->type = JEP_STRUCT;
+
+	struc->ident = node.leaves[0].token.val->buffer;
+
+	jep_obj* members = jep_create_object();
+	members->type = JEP_LIST;
+
+	if(node.leaves[1].leaf_count > 0)
+	{
+		int i;
+		for(i = 0; i < node.leaves[1].leaf_count; i++)
+		{
+			jep_obj* mem = jep_create_object();
+			mem->type = JEP_NULL;
+			mem->ident = node.leaves[1].leaves[i].token.val->buffer;
+			jep_add_object(members, mem);
+		}
+	}
+
+	struc->val = members;
+
+	jep_add_object(list, struc);
+
+	return NULL;
 }
 
 /* evaluates a modifier chain */

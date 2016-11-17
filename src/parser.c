@@ -319,6 +319,62 @@ static int jep_check_postfix(jep_token* cur, jep_token* prev)
 }
 
 /**
+ * parses a struct definition
+ */
+static jep_ast_node* jep_struct(jep_ast_node* root, jep_ast_node** nodes)
+{
+	jep_ast_node* struct_node;
+	jep_ast_node* ident;
+	jep_ast_node* members;
+
+	struct_node = (*nodes)++;
+
+	if((*nodes)->token.type != T_IDENTIFIER)
+	{
+		jep_err(ERR_EXPECTED, (*nodes)->token, root, "identifier");
+		return NULL;	
+	}
+
+	ident = (*nodes)++;
+
+	jep_add_leaf_node(struct_node, ident);
+
+	members = (*nodes)++;
+
+	if(members->token.token_code != T_LBRACE)
+	{
+		jep_err(ERR_IDENTIFIER, (*nodes)->token, root, NULL);
+		return NULL;
+	}
+
+	if(!jep_accept(T_RBRACE ,nodes))
+	{
+		do
+		{
+			if((*nodes)->token.type != T_IDENTIFIER)
+			{
+				jep_err(ERR_IDENTIFIER, (*nodes)->token, root, NULL);
+				return NULL;
+			}
+			jep_ast_node* mem = (*nodes)++;
+			jep_add_leaf_node(members, mem);
+		}
+		while(jep_accept(T_SEMICOLON, nodes) 
+			&& (*nodes)->token.token_code != T_RBRACE);
+
+		if(!jep_accept(T_RBRACE, nodes))
+		{
+			jep_err(ERR_EXPECTED, (*nodes)->token, root, "}");
+			return NULL;
+		}
+	}
+
+	jep_add_leaf_node(struct_node, members);
+
+	return struct_node;
+}
+
+/**
  * parses an if statement
  */
 static jep_ast_node* jep_if(jep_ast_node* root, jep_ast_node** nodes)
@@ -1185,7 +1241,11 @@ static jep_ast_node* jep_statement(jep_ast_node* root, jep_ast_node** nodes)
 {
 	jep_ast_node* statement = NULL;
 	
-	if((*nodes)->token.token_code == T_IF)
+	if((*nodes)->token.token_code == T_STRUCT)
+	{
+		statement = jep_struct(root, nodes);
+	}
+	else if((*nodes)->token.token_code == T_IF)
 	{
 		statement = jep_if(root, nodes);
 	}

@@ -152,6 +152,9 @@ jep_obj* jep_for(jep_ast_node node, jep_obj* list);
 /* evaluates a while loop */
 jep_obj* jep_while(jep_ast_node node, jep_obj* list);
 
+/* evaluates a structure definition */
+jep_obj* jep_struct(jep_ast_node node, jep_obj* list);
+
 /* evaluates a modifier chain */
 jep_obj* jep_modifier(jep_ast_node node, jep_obj* list);
 

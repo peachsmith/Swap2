@@ -95,11 +95,12 @@
 #define T_RETURN 49
 #define T_IMPORT 50
 #define T_NULL 51
-#define T_LOCAL 52
-#define T_CONST 53
+#define T_STRUCT 52
+#define T_LOCAL 53
+#define T_CONST 54
 
 /* end of file */
-#define T_EOF 54
+#define T_EOF 55
 
 /**
  * a single token

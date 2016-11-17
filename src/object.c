@@ -67,6 +67,10 @@ static void jep_print_array(jep_obj* array)
 			{
 				printf("[arg]");
 			}
+			else if(elem->type == JEP_ARGUMENT)
+			{
+				printf("[struct]");
+			}
 			else if(elem->type == JEP_NULL)
 			{
 				printf("[null]");
@@ -119,6 +123,11 @@ static void jep_free_array(jep_obj* array)
 			{
 				/* frees the memory used by an array */
 				jep_free_array(elem);
+			}
+			else if(elem->type == JEP_STRUCT)
+			{
+				jep_destroy_list((jep_obj*)(elem->val));
+				free(elem->val);
 			}
 
 			free(elem);
@@ -450,6 +459,11 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 				free(dest->val);
 			}
 		}
+		else if(dest->type == JEP_STRUCT)
+		{
+			jep_destroy_list((jep_obj*)(dest->val));
+			free(dest->val);
+		}
 		else
 		{
 			free(dest->val);
@@ -561,6 +575,20 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 		/* changed if condition from dest->type to src->type */
 		dest->val = src->val;
 	}
+	else if(src->type == JEP_STRUCT)
+	{
+		jep_obj* members = jep_create_object();
+		members->type = JEP_LIST;
+		jep_obj* src_mem = ((jep_obj*)(src->val))->head;
+		while(src_mem != NULL)
+		{
+			jep_obj* mem = jep_create_object();
+			jep_copy_object(mem, src_mem);
+			jep_add_object(members, src_mem);
+			src_mem = src_mem->next;
+		}
+		dest->val = members;
+	}
 	else if(src->type == JEP_NULL)
 	{
 		dest->val = NULL;
@@ -630,6 +658,11 @@ void jep_destroy_object(jep_obj* obj)
 				}
 				free(file_obj);
 			}
+		}
+		else if(obj->type == JEP_STRUCT)
+		{
+			jep_destroy_list(obj->val);
+			free(obj->val);
 		}
 		else if(obj->type == JEP_LIST)
 		{
@@ -890,6 +923,10 @@ void jep_print_object(jep_obj* obj)
 		else if(obj->type == JEP_NULL)
 		{
 			printf("[null] %s\n", obj->ident);
+		}
+		else if(obj->type == JEP_STRUCT)
+		{
+			printf("[struct] %s\n", obj->ident);
 		}
 		else
 		{

@@ -124,7 +124,7 @@ static void jep_free_array(jep_obj* array)
 				/* frees the memory used by an array */
 				jep_free_array(elem);
 			}
-			else if(elem->type == JEP_STRUCT)
+			else if(elem->type == JEP_STRUCT || elem->type == JEP_STRUCTDEF)
 			{
 				jep_destroy_list((jep_obj*)(elem->val));
 				free(elem->val);
@@ -284,6 +284,16 @@ char* jep_to_string(jep_obj* o)
 			str = malloc(7);
 			strcpy(str, "[null]");
 		}
+	}
+	else if(o->type == JEP_STRUCT)
+	{
+		str = malloc(9);
+		strcpy(str, "[struct]");
+	}
+	else if(o->type == JEP_STRUCTDEF)
+	{
+		str = malloc(12);
+		strcpy(str, "[structdef]");
 	}
 
 	return str;
@@ -459,7 +469,7 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 				free(dest->val);
 			}
 		}
-		else if(dest->type == JEP_STRUCT)
+		else if(dest->type == JEP_STRUCT || dest->type == JEP_STRUCTDEF)
 		{
 			jep_destroy_list((jep_obj*)(dest->val));
 			free(dest->val);
@@ -575,7 +585,7 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 		/* changed if condition from dest->type to src->type */
 		dest->val = src->val;
 	}
-	else if(src->type == JEP_STRUCT)
+	else if(src->type == JEP_STRUCT || src->type == JEP_STRUCTDEF)
 	{
 		jep_obj* members = jep_create_object();
 		members->type = JEP_LIST;
@@ -583,8 +593,9 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 		while(src_mem != NULL)
 		{
 			jep_obj* mem = jep_create_object();
+			mem->ident = src_mem->ident;
 			jep_copy_object(mem, src_mem);
-			jep_add_object(members, src_mem);
+			jep_add_object(members, mem);
 			src_mem = src_mem->next;
 		}
 		dest->val = members;
@@ -659,9 +670,9 @@ void jep_destroy_object(jep_obj* obj)
 				free(file_obj);
 			}
 		}
-		else if(obj->type == JEP_STRUCT)
+		else if(obj->type == JEP_STRUCT || obj->type == JEP_STRUCTDEF)
 		{
-			jep_destroy_list(obj->val);
+			jep_destroy_list((jep_obj*)(obj->val));
 			free(obj->val);
 		}
 		else if(obj->type == JEP_LIST)
@@ -927,6 +938,10 @@ void jep_print_object(jep_obj* obj)
 		else if(obj->type == JEP_STRUCT)
 		{
 			printf("[struct] %s\n", obj->ident);
+		}
+		else if(obj->type == JEP_STRUCTDEF)
+		{
+			printf("[structdef] %s\n", obj->ident);
 		}
 		else
 		{

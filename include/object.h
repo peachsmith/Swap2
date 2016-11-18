@@ -40,6 +40,7 @@
 #define JEP_FILE 13
 #define JEP_NULL 14
 #define JEP_STRUCT 15
+#define JEP_STRUCTDEF 16
 
 /* file modes */
 #define JEP_READ 1

@@ -250,42 +250,39 @@ jep_obj* jep_add(jep_ast_node node, jep_obj* list)
 		return NULL;
 	}
 	
-
 	l = jep_evaluate(node.leaves[0], list);
 	r = jep_evaluate(node.leaves[1], list);
 
 	if(l != NULL && r != NULL)
 	{
 		/* string concatenation */
+		if(l->type == JEP_STRING || r->type == JEP_STRING)
 		{
-			if(l->type == JEP_STRING || r->type == JEP_STRING)
+			char* l_str = jep_to_string(l);
+			char* r_str = jep_to_string(r);
+
+			if(l_str != NULL && r_str != NULL)
 			{
-				char* l_str = jep_to_string(l);
-				char* r_str = jep_to_string(r);
+				result = jep_create_object();
+				result->type = JEP_STRING;
 
-				if(l_str != NULL && r_str != NULL)
-				{
-					result = jep_create_object();
-					result->type = JEP_STRING;
-
-					char* str = malloc(strlen(l_str) + strlen(r_str) + 1);
-					strcpy(str, l_str);
-					strcat(str, r_str);
-					result->val = (void*)(str);
-				}
-
-				if(l_str != NULL)
-				{
-					free(l_str);
-				}
-
-				if(r_str != NULL)
-				{
-					free(r_str);
-				}
-
-				return result;
+				char* str = malloc(strlen(l_str) + strlen(r_str) + 1);
+				strcpy(str, l_str);
+				strcat(str, r_str);
+				result->val = (void*)(str);
 			}
+
+			if(l_str != NULL)
+			{
+				free(l_str);
+			}
+
+			if(r_str != NULL)
+			{
+				free(r_str);
+			}
+
+			return result;
 		}
 
 		if(l->type != JEP_INT && l->type != JEP_LONG
@@ -3706,6 +3703,7 @@ jep_obj* jep_while(jep_ast_node node, jep_obj* list)
 jep_obj* jep_struct(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* struc = NULL;
+	jep_obj* copy = NULL;
 
 	if(node.leaf_count != 2)
 	{
@@ -3713,7 +3711,7 @@ jep_obj* jep_struct(jep_ast_node node, jep_obj* list)
 	}
 
 	struc = jep_create_object();
-	struc->type = JEP_STRUCT;
+	struc->type = JEP_STRUCTDEF;
 
 	struc->ident = node.leaves[0].token.val->buffer;
 
@@ -3734,9 +3732,12 @@ jep_obj* jep_struct(jep_ast_node node, jep_obj* list)
 
 	struc->val = members;
 
-	jep_add_object(list, struc);
+	copy = jep_create_object();
 
-	return NULL;
+	jep_add_object(list, struc);
+	jep_copy_object(copy, struc);
+
+	return copy;
 }
 
 /* evaluates a modifier chain */

@@ -67,9 +67,13 @@ static void jep_print_array(jep_obj* array)
 			{
 				printf("[arg]");
 			}
-			else if(elem->type == JEP_ARGUMENT)
+			else if(elem->type == JEP_STRUCT)
 			{
 				printf("[struct]");
+			}
+			else if(elem->type == JEP_STRUCTDEF)
+			{
+				printf("[structdef]");
 			}
 			else if(elem->type == JEP_NULL)
 			{

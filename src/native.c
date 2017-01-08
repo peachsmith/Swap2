@@ -460,13 +460,23 @@ static jep_obj* jep_freadln(FILE* file)
 				free(buffer);
 			}
 
-			/* create an empty string */
-			char* empty = malloc(1);
-			empty[0] = '\0';
-
 			o = jep_create_object();
-			o->type = JEP_STRING;
-			o->val = empty;
+
+			/* check if EOF or just empty line */
+			if(feof(file))
+			{
+				printf("this is the end of the file\n");
+				o->type = JEP_NULL;
+			}
+			else
+			{
+				printf("this is just an empty line\n");
+				/* create an empty string */
+				char* empty = malloc(1);
+				empty[0] = '\0';
+				o->type = JEP_STRING;
+				o->val = empty;
+			}	
 
 			return o;
 		}

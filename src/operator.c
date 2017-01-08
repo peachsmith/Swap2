@@ -1014,7 +1014,7 @@ jep_obj* jep_greater(jep_ast_node node, jep_obj* list)
 				&& l->type != JEP_DOUBLE && r->type != JEP_INT
 				&& r->type != JEP_LONG && r->type != JEP_DOUBLE)
 			{
-				printf("invalid operand types for operation <\n");
+				printf("invalid operand types for operation >\n");
 			}
 			if(l->type == JEP_INT)
 			{
@@ -1141,7 +1141,7 @@ jep_obj* jep_lorequal(jep_ast_node node, jep_obj* list)
 				&& l->type != JEP_DOUBLE && r->type != JEP_INT
 				&& r->type != JEP_LONG && r->type != JEP_DOUBLE)
 			{
-				printf("invalid operand types for operation <\n");
+				printf("invalid operand types for operation <=\n");
 			}
 			if(l->type == JEP_INT)
 			{
@@ -1268,7 +1268,7 @@ jep_obj* jep_gorequal(jep_ast_node node, jep_obj* list)
 				&& l->type != JEP_DOUBLE && r->type != JEP_INT
 				&& r->type != JEP_LONG && r->type != JEP_DOUBLE)
 			{
-				printf("invalid operand types for operation <\n");
+				printf("invalid operand types for operation >=\n");
 			}
 			if(l->type == JEP_INT)
 			{
@@ -1547,9 +1547,10 @@ jep_obj* jep_noteq(jep_ast_node node, jep_obj* list)
 		{
 			if(l->type != JEP_INT && l->type != JEP_LONG
 				&& l->type != JEP_DOUBLE && r->type != JEP_INT
-				&& r->type != JEP_LONG && r->type != JEP_DOUBLE)
+				&& r->type != JEP_LONG && r->type != JEP_DOUBLE
+				&& l->type != JEP_NULL && r->type != JEP_NULL)
 			{
-				printf("invalid operand types for operation <\n");
+				printf("invalid operand types for operation !=\n");
 			}
 			if(l->type == JEP_INT)
 			{
@@ -1571,6 +1572,14 @@ jep_obj* jep_noteq(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = (*(double*)(l->val)) != (*(double*)(r->val));
+				result = jep_create_object();
+				result->val = (void*)n;
+				result->type = JEP_INT;
+			}
+			else if(l->type == JEP_NULL)
+			{
+				int *n = malloc(sizeof(int));
+				*n = r->type != JEP_NULL;
 				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
@@ -1605,7 +1614,7 @@ jep_obj* jep_noteq(jep_ast_node node, jep_obj* list)
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
-		else if(l->type == JEP_LONG || r->type != JEP_LONG)
+		else if(l->type == JEP_LONG || r->type == JEP_LONG)
 		{
 			int *n = malloc(sizeof(int));
 			if(l->type == JEP_LONG)
@@ -1630,6 +1639,23 @@ jep_obj* jep_noteq(jep_ast_node node, jep_obj* list)
 					*n = (*(long*)(l->val)) != (*(long*)(r->val));
 				}
 			}
+			result = jep_create_object();
+			result->val = (void*)n;
+			result->type = JEP_INT;
+		}
+		else if(l->type == JEP_NULL || r->type == JEP_NULL)
+		{
+			int *n = malloc(sizeof(int));
+
+			if(l->type != JEP_NULL || r->type != JEP_NULL)
+			{
+				*n = 1;
+			}
+			else
+			{
+				*n = 0;
+			}
+
 			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;
@@ -1735,7 +1761,7 @@ jep_obj* jep_and(jep_ast_node node, jep_obj* list)
 				&& l->type != JEP_DOUBLE && r->type != JEP_INT
 				&& r->type != JEP_LONG && r->type != JEP_DOUBLE)
 			{
-				printf("invalid operand types for operation <\n");
+				printf("invalid operand types for operation &&\n");
 			}
 			if(l->type == JEP_INT)
 			{
@@ -1862,7 +1888,7 @@ jep_obj* jep_or(jep_ast_node node, jep_obj* list)
 				&& l->type != JEP_DOUBLE && r->type != JEP_INT
 				&& r->type != JEP_LONG && r->type != JEP_DOUBLE)
 			{
-				printf("invalid operand types for operation <\n");
+				printf("invalid operand types for operation ||\n");
 			}
 			if(l->type == JEP_INT)
 			{
@@ -1989,7 +2015,7 @@ jep_obj* jep_bitand(jep_ast_node node, jep_obj* list)
 				&& l->type != JEP_DOUBLE && r->type != JEP_INT
 				&& r->type != JEP_LONG && r->type != JEP_DOUBLE)
 			{
-				printf("invalid operand types for operation <\n");
+				printf("invalid operand types for operation &\n");
 			}
 			if(l->type == JEP_INT)
 			{
@@ -2083,7 +2109,7 @@ jep_obj* jep_bitor(jep_ast_node node, jep_obj* list)
 				&& l->type != JEP_DOUBLE && r->type != JEP_INT
 				&& r->type != JEP_LONG && r->type != JEP_DOUBLE)
 			{
-				printf("invalid operand types for operation <\n");
+				printf("invalid operand types for operation |\n");
 			}
 			if(l->type == JEP_INT)
 			{
@@ -2177,7 +2203,7 @@ jep_obj* jep_bitxor(jep_ast_node node, jep_obj* list)
 				&& l->type != JEP_DOUBLE && r->type != JEP_INT
 				&& r->type != JEP_LONG && r->type != JEP_DOUBLE)
 			{
-				printf("invalid operand types for operation <\n");
+				printf("invalid operand types for operation ^\n");
 			}
 			if(l->type == JEP_INT)
 			{
@@ -2271,7 +2297,7 @@ jep_obj* jep_lshift(jep_ast_node node, jep_obj* list)
 				&& l->type != JEP_DOUBLE && r->type != JEP_INT
 				&& r->type != JEP_LONG && r->type != JEP_DOUBLE)
 			{
-				printf("invalid operand types for operation <\n");
+				printf("invalid operand types for operation <<\n");
 			}
 			if(l->type == JEP_INT)
 			{
@@ -2365,7 +2391,7 @@ jep_obj* jep_rshift(jep_ast_node node, jep_obj* list)
 				&& l->type != JEP_DOUBLE && r->type != JEP_INT
 				&& r->type != JEP_LONG && r->type != JEP_DOUBLE)
 			{
-				printf("invalid operand types for operation <\n");
+				printf("invalid operand types for operation >>\n");
 			}
 			if(l->type == JEP_INT)
 			{

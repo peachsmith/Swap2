@@ -17,13 +17,13 @@
 */
 #include "native.h"
 
-#define JEP_NATIVE_COUNT 12
+#define JEP_NATIVE_COUNT 13
 
 /* native function identifiers */
 const char *natives[] = 
 {
 	"write", "writeln", "readln", "fopen", "freadln", "fwriteln", "fwrite",
-	"freadb", "fwriteb", "byte", "int", "double"
+	"freadb", "fwriteb", "byte", "int", "double", "typeof"
 };
 
 /* native function forward declarations */
@@ -38,6 +38,7 @@ static jep_obj* jep_freadb(FILE*, size_t);
 static jep_obj* jep_fwriteb(FILE*, const unsigned char*, size_t);
 static jep_obj* jep_int(jep_obj* obj);
 static jep_obj* jep_double(jep_obj* obj);
+static jep_obj* jep_typeof(jep_obj* obj);
 
 /* calls a native function */
 jep_obj* jep_call_native(const char* ident, jep_obj* args)
@@ -373,6 +374,16 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 		}
 
 		return jep_double(args->head);
+	}
+	else if(native == 12) /* typeof */
+	{
+		if(args == NULL || args->size != 1)
+		{
+			printf("invalid number of arguments\n");
+			return o;
+		}
+
+		return jep_typeof(args->head);
 	}
 	else
 	{
@@ -797,4 +808,78 @@ static jep_obj* jep_double(jep_obj* obj)
 	}
 
 	return i;
+}
+
+static jep_obj* jep_typeof(jep_obj* obj)
+{
+	if(obj == NULL)
+	{
+		return NULL;
+	}
+
+	jep_obj* type = jep_create_object();
+	type->type = JEP_STRING;
+	char* str = NULL;
+
+	switch(obj->type)
+	{
+		case JEP_INT:
+			str = malloc(4);
+			strcpy(str, "int");
+			break;
+
+		case JEP_LONG:
+			str = malloc(5);
+			strcpy(str, "long");
+			break;
+
+		case JEP_DOUBLE:
+			str = malloc(7);
+			strcpy(str, "double");
+			break;
+
+		case JEP_CHARACTER:
+			str = malloc(5);
+			strcpy(str, "char");
+			break;
+
+		case JEP_STRING:
+			str = malloc(7);
+			strcpy(str, "string");
+			break;
+
+		case JEP_ARRAY:
+			str = malloc(6);
+			strcpy(str, "array");
+			break;
+
+		case JEP_FUNCTION:
+			str = malloc(9);
+			strcpy(str, "function");
+			break;
+
+		case JEP_STRUCTDEF:
+			str = malloc(10);
+			strcpy(str, "structdef");
+			break;
+
+		case JEP_STRUCT:
+			str = malloc(7);
+			strcpy(str, "struct");
+			break;
+
+		case JEP_NULL:
+			str = malloc(5);
+			strcpy(str, "null");
+			break;
+
+		default:
+			str = malloc(5);
+			strcpy(str, "null");
+			break;
+	}
+
+	type->val = (void*)str;
+
+	return type;
 }

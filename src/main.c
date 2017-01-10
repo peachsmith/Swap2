@@ -172,6 +172,12 @@ int main(int argc, char** argv)
 			f_double->size = 1;
 			jep_add_object(list, f_double);
 
+			jep_obj* f_typeof = jep_create_object();
+			f_typeof->type = JEP_FUNCTION;
+			f_typeof->ident = "typeof";
+			f_typeof->size = 1;
+			jep_add_object(list, f_typeof);
+
 			/* traverse and interpret the AST */
 			jep_obj* o;
 			int i;

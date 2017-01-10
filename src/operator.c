@@ -1395,7 +1395,8 @@ jep_obj* jep_equiv(jep_ast_node node, jep_obj* list)
 			if(l->type != JEP_INT && l->type != JEP_LONG
 				&& l->type != JEP_DOUBLE && r->type != JEP_INT
 				&& r->type != JEP_LONG && r->type != JEP_DOUBLE
-				&& l->type != JEP_NULL && r->type != JEP_NULL)
+				&& l->type != JEP_NULL && r->type != JEP_NULL
+				&& l->type != JEP_STRING && r->type != JEP_STRING)
 			{
 				printf("invalid operand types for operation ==\n");
 			}
@@ -1417,7 +1418,7 @@ jep_obj* jep_equiv(jep_ast_node node, jep_obj* list)
 			}
 			else if(l->type == JEP_DOUBLE)
 			{
-				int *n = malloc(sizeof(double));
+				int *n = malloc(sizeof(int));
 				*n = (*(double*)(l->val)) == (*(double*)(r->val));
 				result = jep_create_object();
 				result->val = (void*)n;
@@ -1427,6 +1428,14 @@ jep_obj* jep_equiv(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = 1;
+				result = jep_create_object();
+				result->val = (void*)n;
+				result->type = JEP_INT;
+			}
+			else if(l->type == JEP_STRING)
+			{
+				int *n = malloc(sizeof(double));
+				*n = !strcmp((char*)(l->val), (char*)(r->val));
 				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
@@ -1507,6 +1516,14 @@ jep_obj* jep_equiv(jep_ast_node node, jep_obj* list)
 			result->val = (void*)n;
 			result->type = JEP_INT;
 		}
+		else if(l->type == JEP_STRING || r->type == JEP_STRING)
+		{
+			int *n = malloc(sizeof(int));
+			*n = 0;
+			result = jep_create_object();
+			result->val = (void*)n;
+			result->type = JEP_INT;
+		}
 	}
 	else
 	{
@@ -1548,7 +1565,8 @@ jep_obj* jep_noteq(jep_ast_node node, jep_obj* list)
 			if(l->type != JEP_INT && l->type != JEP_LONG
 				&& l->type != JEP_DOUBLE && r->type != JEP_INT
 				&& r->type != JEP_LONG && r->type != JEP_DOUBLE
-				&& l->type != JEP_NULL && r->type != JEP_NULL)
+				&& l->type != JEP_NULL && r->type != JEP_NULL
+				&& l->type != JEP_STRING && r->type != JEP_STRING)
 			{
 				printf("invalid operand types for operation !=\n");
 			}
@@ -1580,6 +1598,14 @@ jep_obj* jep_noteq(jep_ast_node node, jep_obj* list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = r->type != JEP_NULL;
+				result = jep_create_object();
+				result->val = (void*)n;
+				result->type = JEP_INT;
+			}
+			else if(l->type == JEP_STRING)
+			{
+				int *n = malloc(sizeof(double));
+				*n = strcmp((char*)(l->val), (char*)(r->val));
 				result = jep_create_object();
 				result->val = (void*)n;
 				result->type = JEP_INT;
@@ -1656,6 +1682,14 @@ jep_obj* jep_noteq(jep_ast_node node, jep_obj* list)
 				*n = 0;
 			}
 
+			result = jep_create_object();
+			result->val = (void*)n;
+			result->type = JEP_INT;
+		}
+		else if(l->type == JEP_STRING || r->type == JEP_STRING)
+		{
+			int *n = malloc(sizeof(int));
+			*n = 1;
 			result = jep_create_object();
 			result->val = (void*)n;
 			result->type = JEP_INT;

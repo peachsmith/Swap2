@@ -1,0 +1,81 @@
+/**
+ * evaluates the largest whole number less than n
+ */
+function floor(n) {
+
+	local t, x, d = 67108864, neg = 0;
+
+	t = typeof(n);
+
+	if(t != "int" && t != "long" && t != "double") {
+		writeln("cannot floor an object of type " + typeof(n));
+		return null;
+	}
+
+	if(t == "int") x = 0; else x = 0.0;
+
+	if(n < 0) {
+		neg = 1;
+		n = -n;
+	} else {
+		neg = 0;
+	}
+
+	while(x + 1 < n) {
+		while(x + d > n && d > 1) d /= 2;
+		if(x + d <= n) x += d;
+	}
+
+	if(neg) {
+		if(x == n) return -x;
+		return -x - 1;
+	}
+
+	if(x + 1 == n) return x + 1;
+
+	return x;
+}
+
+/**
+ * evaluates the smallest whole number greater than n
+ */
+function ceil(n) {
+
+	local t, x, d = 67108864, neg = 0;
+
+	t = typeof(n);
+
+	if(t != "int" && t != "long" && t != "double") {
+		writeln("cannot ceil an object of type " + typeof(n));
+		return null;
+	}
+
+	if(t == "int") x = 0; else x = 0.0;
+
+	if(n < 0) {
+		neg = 1;
+		n = -n;
+	} else neg = 0;
+
+	while(x + 1 < n) {
+		while(x + d > n && d > 1) d /= 2;
+		if(x + d <= n) x += d;
+	}
+
+	if(neg) {
+		if(x + 1 == n) return x + 1;
+		return -x;
+	}
+
+	if(x == n) return x;
+
+	return x + 1;
+}
+
+/**
+ * evaluates the absolute value of a number
+ */
+function abs(n) {
+	if(n < 0) return -n;
+	else return n;
+}

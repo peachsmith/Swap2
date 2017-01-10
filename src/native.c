@@ -605,6 +605,7 @@ static jep_obj* jep_int(jep_obj* obj)
 	{
 		i = jep_create_object();
 		i->type = JEP_INT;
+		i->val = malloc(sizeof(int));
 		*(int*)(i->val) = (int)(*(long*)(obj->val));
 		return i;
 	}
@@ -612,6 +613,7 @@ static jep_obj* jep_int(jep_obj* obj)
 	{
 		i = jep_create_object();
 		i->type = JEP_INT;
+		i->val = malloc(sizeof(int));
 		*(int*)(i->val) = (int)(*(double*)(obj->val));
 		return i;
 	}
@@ -619,6 +621,7 @@ static jep_obj* jep_int(jep_obj* obj)
 	{
 		i = jep_create_object();
 		i->type = JEP_INT;
+		i->val = malloc(sizeof(int));
 		*(int*)(i->val) = (int)(*(char*)(obj->val) - '0');
 		return i;
 	}
@@ -702,6 +705,7 @@ static jep_obj* jep_double(jep_obj* obj)
 	{
 		i = jep_create_object();
 		i->type = JEP_DOUBLE;
+		i->val = malloc(sizeof(double));
 		*(double*)(i->val) = (double)(*(int*)(obj->val));
 		return i;
 	}
@@ -709,6 +713,7 @@ static jep_obj* jep_double(jep_obj* obj)
 	{
 		i = jep_create_object();
 		i->type = JEP_DOUBLE;
+		i->val = malloc(sizeof(double));
 		*(double*)(i->val) = (double)(*(long*)(obj->val));
 		return i;
 	}
@@ -722,6 +727,7 @@ static jep_obj* jep_double(jep_obj* obj)
 	{
 		i = jep_create_object();
 		i->type = JEP_DOUBLE;
+		i->val = malloc(sizeof(double));
 		*(double*)(i->val) = (double)(*(char*)(obj->val) - '0');
 		return i;
 	}

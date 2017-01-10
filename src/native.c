@@ -868,6 +868,11 @@ static jep_obj* jep_typeof(jep_obj* obj)
 			strcpy(str, "struct");
 			break;
 
+		case JEP_REFERENCE:
+			str = malloc(10);
+			strcpy(str, "reference");
+			break;
+
 		case JEP_NULL:
 			str = malloc(5);
 			strcpy(str, "null");

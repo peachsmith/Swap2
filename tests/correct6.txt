@@ -1,4 +1,5 @@
 [function] byte ()
+[function] int ()
 [int] a: 1
 [character] b: c
 [string] c: words

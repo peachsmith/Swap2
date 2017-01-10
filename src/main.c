@@ -160,6 +160,12 @@ int main(int argc, char** argv)
 			f_byte->size = 1;
 			jep_add_object(list, f_byte);
 
+			jep_obj* f_int = jep_create_object();
+			f_int->type = JEP_FUNCTION;
+			f_int->ident = "int";
+			f_int->size = 1;
+			jep_add_object(list, f_int);
+
 			/* traverse and interpret the AST */
 			jep_obj* o;
 			int i;

@@ -17,13 +17,13 @@
 */
 #include "native.h"
 
-#define JEP_NATIVE_COUNT 11
+#define JEP_NATIVE_COUNT 12
 
 /* native function identifiers */
 const char *natives[] = 
 {
 	"write", "writeln", "readln", "fopen", "freadln", "fwriteln", "fwrite",
-	"freadb", "fwriteb", "byte", "int"
+	"freadb", "fwriteb", "byte", "int", "double"
 };
 
 /* native function forward declarations */
@@ -37,6 +37,7 @@ static jep_obj* jep_fwrite(FILE*, const char*);
 static jep_obj* jep_freadb(FILE*, size_t);
 static jep_obj* jep_fwriteb(FILE*, const unsigned char*, size_t);
 static jep_obj* jep_int(jep_obj* obj);
+static jep_obj* jep_double(jep_obj* obj);
 
 /* calls a native function */
 jep_obj* jep_call_native(const char* ident, jep_obj* args)
@@ -363,6 +364,16 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 
 		return jep_int(args->head);
 	}
+	else if(native == 11) /* double */
+	{
+		if(args == NULL || args->size != 1)
+		{
+			printf("invalid number of arguments\n");
+			return o;
+		}
+
+		return jep_double(args->head);
+	}
 	else
 	{
 		printf("native is somehow: %d\n", native);
@@ -670,6 +681,105 @@ static jep_obj* jep_int(jep_obj* obj)
 		else
 		{
 			printf("value to large to fit in an integer\n");
+		}
+
+		return i;
+	}
+	else
+	{
+		printf("cannot convert object to integer\n");
+		printf("must be int, long, double, character, or string\n");
+	}
+
+	return i;
+}
+
+static jep_obj* jep_double(jep_obj* obj)
+{
+	jep_obj* i = NULL;
+	
+	if(obj->type == JEP_INT)
+	{
+		i = jep_create_object();
+		i->type = JEP_DOUBLE;
+		*(double*)(i->val) = (double)(*(int*)(obj->val));
+		return i;
+	}
+	else if(obj->type == JEP_LONG)
+	{
+		i = jep_create_object();
+		i->type = JEP_DOUBLE;
+		*(double*)(i->val) = (double)(*(long*)(obj->val));
+		return i;
+	}
+	else if(obj->type == JEP_DOUBLE)
+	{
+		i = jep_create_object();
+		jep_copy_object(i, obj);
+		return i;
+	}
+	else if(obj->type == JEP_CHARACTER)
+	{
+		i = jep_create_object();
+		i->type = JEP_DOUBLE;
+		*(double*)(i->val) = (double)(*(char*)(obj->val) - '0');
+		return i;
+	}
+	else if(obj->type == JEP_STRING)
+	{
+		if(obj->val == NULL)
+		{
+			printf("invalid integer format\n");
+			return i;
+		}
+
+		int neg = 0;
+		char* s;
+		char* endptr;
+		double d;
+		void* val;
+		
+		errno = 0;
+		endptr = NULL;
+		s = NULL;
+
+		s = (char*)(obj->val);
+
+		/* allow for signed integers */
+		if(*s == '-')
+		{
+			s++;
+			neg++;
+		}
+
+		/* attempt to convert the string to a double */
+		d = strtod(s, &endptr);
+
+		if(errno == ERANGE)
+		{
+			printf("value to large to fit in a double\n");
+		}
+		else if((endptr != s && *endptr != '\0') 
+			|| (strlen(s) > 1 && *s == '0') || !isdigit(*s))
+		{
+			printf("invalid integer format\n");
+		}
+		else
+		{
+			/* cast the value as an int if it will fit */
+			double* l_ptr = malloc(sizeof(double));
+			if(neg)
+			{
+				*l_ptr = -d;	
+			}
+			else
+			{
+				*l_ptr = d;
+			}
+			val = (void*)l_ptr;
+			i = jep_create_object();
+			i->val = (void*)val;
+			i->type = JEP_DOUBLE;
 		}
 
 		return i;

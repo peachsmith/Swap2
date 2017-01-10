@@ -1,5 +1,7 @@
 [function] byte ()
 [function] int ()
+[function] double ()
+[function] typeof ()
 [int] a: 4
 [int] b: 5
 [int] c: 8

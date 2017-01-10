@@ -1,5 +1,7 @@
 [function] byte ()
 [function] int ()
+[function] double ()
+[function] typeof ()
 [int] a: 1
 [character] b: c
 [string] c: words

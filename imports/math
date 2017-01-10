@@ -1,4 +1,10 @@
 /**
+ * math - basic math functions
+ * 
+ * author: John Powell
+ */
+
+/**
  * evaluates the largest whole number less than n
  */
 function floor(n) {

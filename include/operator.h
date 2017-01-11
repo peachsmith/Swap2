@@ -152,8 +152,17 @@ jep_obj* jep_for(jep_ast_node node, jep_obj* list);
 /* evaluates a while loop */
 jep_obj* jep_while(jep_ast_node node, jep_obj* list);
 
+/* checks if a struct has a data member with the specfied identifier */
+int jep_has_data_member(jep_obj* members, const char* ident);
+
 /* evaluates a structure definition */
 jep_obj* jep_struct(jep_ast_node node, jep_obj* list);
+
+/* creates a new instance of a certain type of object */
+jep_obj* jep_new(jep_ast_node node, jep_obj* list);
+
+/* accesses members of an object */
+jep_obj* jep_member(jep_ast_node node, jep_obj* list);
 
 /* evaluates a modifier chain */
 jep_obj* jep_modifier(jep_ast_node node, jep_obj* list);

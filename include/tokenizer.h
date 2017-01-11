@@ -57,7 +57,6 @@
 #define T_BITXOR 19
 #define T_NOT 20
 #define T_MODULUS 21
-/* unused single character symbols */
 #define T_COLON 22
 
 /* double character symbol token codes */
@@ -98,9 +97,10 @@
 #define T_STRUCT 52
 #define T_LOCAL 53
 #define T_CONST 54
+#define T_NEW 55
 
 /* end of file */
-#define T_EOF 55
+#define T_EOF 56
 
 /**
  * a single token

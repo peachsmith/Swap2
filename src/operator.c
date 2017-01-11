@@ -229,6 +229,14 @@ jep_obj* jep_evaluate(jep_ast_node ast, jep_obj* list)
 			o = jep_xor_assign(ast, list);
 			break;
 
+		case T_NEW:
+			o = jep_new(ast, list);
+			break;
+
+		case T_PERIOD:
+			o = jep_member(ast, list);
+			break;
+
 		default:
 			printf("unrecognized token: %s\n", 
 				ast.token.val->buffer);
@@ -3759,11 +3767,33 @@ jep_obj* jep_while(jep_ast_node node, jep_obj* list)
 	return o;
 }
 
+/* checks if a struct has a data member with the specfied identifier */
+int jep_has_data_member(jep_obj* members, const char* ident)
+{
+	int has = 0;
+
+	if(members->size > 0)
+	{
+		jep_obj* mem = members->head;
+		while(mem != NULL)
+		{
+			if(!strcmp(mem->ident, ident))
+			{
+				has = 1;
+			}
+			mem = mem->next;
+		}
+	}
+
+	return has;
+}
+
 /* evaluates a structure definition */
 jep_obj* jep_struct(jep_ast_node node, jep_obj* list)
 {
 	jep_obj* struc = NULL;
 	jep_obj* copy = NULL;
+	int dup = 0;
 
 	if(node.leaf_count != 2)
 	{
@@ -3781,16 +3811,31 @@ jep_obj* jep_struct(jep_ast_node node, jep_obj* list)
 	if(node.leaves[1].leaf_count > 0)
 	{
 		int i;
-		for(i = 0; i < node.leaves[1].leaf_count; i++)
+		for(i = 0; i < node.leaves[1].leaf_count && !dup; i++)
 		{
-			jep_obj* mem = jep_create_object();
-			mem->type = JEP_NULL;
-			mem->ident = node.leaves[1].leaves[i].token.val->buffer;
-			jep_add_object(members, mem);
+			if(!jep_has_data_member(members, 
+				node.leaves[1].leaves[i].token.val->buffer))
+			{
+				jep_obj* mem = jep_create_object();
+				mem->type = JEP_NULL;
+				mem->ident = node.leaves[1].leaves[i].token.val->buffer;
+				jep_add_object(members, mem);	
+			}
+			else
+			{
+				printf("duplicate member identifiers\n");
+				dup = 1;
+			}
 		}
 	}
 
 	struc->val = members;
+
+	if(dup)
+	{
+		jep_destroy_object(struc);
+		return NULL;
+	}
 
 	copy = jep_create_object();
 
@@ -3798,6 +3843,109 @@ jep_obj* jep_struct(jep_ast_node node, jep_obj* list)
 	jep_copy_object(copy, struc);
 
 	return copy;
+}
+
+/* creates a new instance of a certain type of object */
+jep_obj* jep_new(jep_ast_node node, jep_obj* list)
+{
+	jep_obj* new_obj = NULL;
+	jep_obj* struct_def;
+	jep_obj* def_members;
+	jep_obj* def_mem;
+	jep_obj* members;
+
+	if(node.leaf_count != 1)
+	{
+		return new_obj;
+	}
+
+	struct_def = jep_get_object(node.leaves[0].token.val->buffer, list);
+
+	/* ensure that the structure definition exists */
+	if(struct_def == NULL || struct_def->type != JEP_STRUCTDEF)
+	{
+		printf("no structure definition of type %s\n",
+			node.token.val->buffer);
+		return new_obj;
+	}
+
+	new_obj = jep_create_object();
+	new_obj->type = JEP_STRUCT;
+
+	members = jep_create_object();
+	members->type = JEP_LIST;
+
+	def_members = (jep_obj*)(struct_def->val);
+
+	def_mem = def_members->head;
+	while(def_mem != NULL)
+	{
+		jep_obj* mem = jep_create_object();
+		mem->type = JEP_NULL;
+		mem->ident = def_mem->ident;
+		jep_add_object(members, mem);
+		def_mem = def_mem->next;
+	}
+
+	new_obj->val = members;
+
+	return new_obj;
+}
+
+/* accesses members of an object */
+jep_obj* jep_member(jep_ast_node node, jep_obj* list)
+{
+	if(node.leaf_count != 2)
+	{
+		return NULL;
+	}
+
+	jep_obj* mem;
+	jep_obj* struc;
+	jep_obj* members;
+
+	struc = jep_get_object(node.leaves[0].token.val->buffer, list);
+
+	if(struc == NULL)
+	{
+		printf("could not obtain object with identifier %s\n",
+			node.leaves[0].token.val->buffer);
+		return NULL;
+	}
+	else if(struc->type != JEP_STRUCT)
+	{
+		printf("%s is not a struct\n",
+			node.leaves[0].token.val->buffer);
+		return NULL;
+	}
+
+	members = (jep_obj*)(struc->val);
+	mem = NULL;
+
+	if(members->size > 0)
+	{
+		jep_obj* m = members->head;
+		while(m != NULL && mem == NULL)
+		{
+			if(!strcmp(m->ident, node.leaves[1].token.val->buffer))
+			{
+				mem = jep_create_object();
+				jep_copy_object(mem, m);
+			}
+			m = m->next;
+		}
+		if(mem == NULL)
+		{
+			printf("%s does not have a member with the identifier %s\n",
+				struc->ident, node.leaves[1].token.val->buffer);
+		}
+	}
+	else
+	{
+		return NULL;
+	}
+
+	return mem;
 }
 
 /* evaluates a modifier chain */

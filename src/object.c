@@ -598,6 +598,7 @@ void jep_copy_object(jep_obj* dest, jep_obj* src)
 		{
 			jep_obj* mem = jep_create_object();
 			mem->ident = src_mem->ident;
+			mem->index = src_mem->index;
 			jep_copy_object(mem, src_mem);
 			jep_add_object(members, mem);
 			src_mem = src_mem->next;

@@ -2848,6 +2848,26 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 					o = jep_get_object(l->ident, list);	
 				}
 			}
+			else if(l->index == -2)
+			{
+				jep_ast_node mem = node.leaves[0];
+				/* handle parentheses */
+				if(mem.token.token_code == T_LPAREN)
+				{
+					while(mem.token.token_code == T_LPAREN)
+					{
+						mem = mem.leaves[0];
+						if(mem.token.token_code == T_COMMA)
+						{
+							while(mem.token.token_code == T_COMMA)
+							{
+								mem = mem.leaves[1];
+							}
+						}
+					}
+				}
+				o = jep_get_data_member(mem, list);
+			}
 			else
 			{
 				jep_ast_node arr = node.leaves[0];
@@ -3314,6 +3334,77 @@ jep_obj* jep_get_element(jep_ast_node node, jep_obj* list)
 	jep_destroy_object(index);
 
 	return o;
+}
+
+jep_obj* jep_get_data_member(jep_ast_node node, jep_obj* list)
+{
+	if(node.leaf_count != 2)
+	{
+		return NULL;
+	}
+
+	jep_obj* mem;
+	jep_obj* struc;
+	jep_obj* members;
+
+	if(node.leaves[0].token.token_code == T_PERIOD)
+	{
+		struc = jep_get_data_member(node.leaves[0], list);
+	}
+	else if(node.leaves[0].token.type == T_IDENTIFIER)
+	{
+		struc = jep_get_object(node.leaves[0].token.val->buffer, list);
+	}
+	else
+	{
+		struc = NULL;
+	}
+
+	if(struc == NULL)
+	{
+		printf("could not obtain object with identifier %s\n",
+			node.leaves[0].token.val->buffer);
+		return NULL;
+	}
+	else if(struc->type != JEP_STRUCT)
+	{
+		printf("%s is not a struct\n",
+			node.leaves[0].token.val->buffer);
+		return NULL;
+	}
+
+	if(node.leaves[1].token.type != T_IDENTIFIER)
+	{
+		printf("an identifier must be used to access data members\n");
+		return NULL;
+	}
+
+	members = (jep_obj*)(struc->val);
+	mem = NULL;
+
+	if(members->size > 0)
+	{
+		jep_obj* m = members->head;
+		while(m != NULL && mem == NULL)
+		{
+			if(!strcmp(m->ident, node.leaves[1].token.val->buffer))
+			{
+				mem = m;
+			}
+			m = m->next;
+		}
+		if(mem == NULL)
+		{
+			printf("%s does not have a member with the identifier %s\n",
+				struc->ident, node.leaves[1].token.val->buffer);
+		}
+	}
+	else
+	{
+		return NULL;
+	}
+
+	return mem;
 }
 
 /* evaluates a function definition */
@@ -3883,6 +3974,7 @@ jep_obj* jep_new(jep_ast_node node, jep_obj* list)
 		jep_obj* mem = jep_create_object();
 		mem->type = JEP_NULL;
 		mem->ident = def_mem->ident;
+		mem->index = -2;
 		jep_add_object(members, mem);
 		def_mem = def_mem->next;
 	}
@@ -3897,6 +3989,7 @@ jep_obj* jep_member(jep_ast_node node, jep_obj* list)
 {
 	if(node.leaf_count != 2)
 	{
+		printf("invalid leaf_count for data member access\n");
 		return NULL;
 	}
 
@@ -3904,7 +3997,7 @@ jep_obj* jep_member(jep_ast_node node, jep_obj* list)
 	jep_obj* struc;
 	jep_obj* members;
 
-	struc = jep_get_object(node.leaves[0].token.val->buffer, list);
+	struc = jep_evaluate(node.leaves[0], list);
 
 	if(struc == NULL)
 	{
@@ -3916,6 +4009,12 @@ jep_obj* jep_member(jep_ast_node node, jep_obj* list)
 	{
 		printf("%s is not a struct\n",
 			node.leaves[0].token.val->buffer);
+		return NULL;
+	}
+
+	if(node.leaves[1].token.type != T_IDENTIFIER)
+	{
+		printf("an identifier must be used to access data members\n");
 		return NULL;
 	}
 
@@ -3931,6 +4030,8 @@ jep_obj* jep_member(jep_ast_node node, jep_obj* list)
 			{
 				mem = jep_create_object();
 				jep_copy_object(mem, m);
+				mem->index = -2;
+				mem->ident = m->ident;
 			}
 			m = m->next;
 		}
@@ -3942,6 +4043,7 @@ jep_obj* jep_member(jep_ast_node node, jep_obj* list)
 	}
 	else
 	{
+		printf("returning NULL here for some reason\n");
 		return NULL;
 	}
 

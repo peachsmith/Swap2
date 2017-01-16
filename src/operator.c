@@ -2536,6 +2536,28 @@ jep_obj* jep_inc(jep_ast_node node, jep_obj* list)
 		obj = NULL;
 		obj = jep_get_element(arr, list);
 	}
+	else if(obj->index == -2)
+	{
+		jep_ast_node struc = node.leaves[0];
+		/* handle parentheses */
+		if(struc.token.token_code == T_LPAREN)
+		{
+			while(struc.token.token_code == T_LPAREN)
+			{
+				struc = struc.leaves[0];
+				if(struc.token.token_code == T_COMMA)
+				{
+					while(struc.token.token_code == T_COMMA)
+					{
+						struc = struc.leaves[1];
+					}
+				}
+			}
+		}
+		jep_destroy_object(obj);
+		obj = NULL;
+		obj = jep_get_data_member(struc, list);
+	}
 
 	if(obj != NULL)
 	{
@@ -2548,6 +2570,21 @@ jep_obj* jep_inc(jep_ast_node node, jep_obj* list)
 			return NULL;
 		}
 		if(obj->index >= 0)
+		{
+			o = jep_create_object();
+			
+			int cur_val = *(int*)(obj->val);
+			int new_val = cur_val + 1;
+			*(int*)(obj->val) = new_val;
+
+			jep_copy_object(o, obj);
+
+			if(node.token.postfix)
+			{
+				*(int*)(o->val) = cur_val;
+			}
+		}
+		else if(obj->index == -2)
 		{
 			o = jep_create_object();
 			
@@ -2615,6 +2652,28 @@ jep_obj* jep_dec(jep_ast_node node, jep_obj* list)
 		obj = NULL;
 		obj = jep_get_element(arr, list);
 	}
+	else if(obj->index == -2)
+	{
+		jep_ast_node struc = node.leaves[0];
+		/* handle parentheses */
+		if(struc.token.token_code == T_LPAREN)
+		{
+			while(struc.token.token_code == T_LPAREN)
+			{
+				struc = struc.leaves[0];
+				if(struc.token.token_code == T_COMMA)
+				{
+					while(struc.token.token_code == T_COMMA)
+					{
+						struc = struc.leaves[1];
+					}
+				}
+			}
+		}
+		jep_destroy_object(obj);
+		obj = NULL;
+		obj = jep_get_data_member(struc, list);
+	}
 
 	if(obj != NULL)
 	{
@@ -2627,6 +2686,21 @@ jep_obj* jep_dec(jep_ast_node node, jep_obj* list)
 			return NULL;
 		}
 		if(obj->index >= 0)
+		{
+			o = jep_create_object();
+			
+			int cur_val = *(int*)(obj->val);
+			int new_val = cur_val - 1;
+			*(int*)(obj->val) = new_val;
+
+			jep_copy_object(o, obj);
+
+			if(node.token.postfix)
+			{
+				*(int*)(o->val) = cur_val;
+			}
+		}
+		else if(obj->index == -2)
 		{
 			o = jep_create_object();
 			
@@ -2850,23 +2924,7 @@ jep_obj* jep_assign(jep_ast_node node, jep_obj* list)
 			}
 			else if(l->index == -2)
 			{
-				jep_ast_node mem = node.leaves[0];
-				/* handle parentheses */
-				if(mem.token.token_code == T_LPAREN)
-				{
-					while(mem.token.token_code == T_LPAREN)
-					{
-						mem = mem.leaves[0];
-						if(mem.token.token_code == T_COMMA)
-						{
-							while(mem.token.token_code == T_COMMA)
-							{
-								mem = mem.leaves[1];
-							}
-						}
-					}
-				}
-				o = jep_get_data_member(mem, list);
+				o = jep_get_data_member(node.leaves[0], list);
 			}
 			else
 			{
@@ -3355,6 +3413,34 @@ jep_obj* jep_get_data_member(jep_ast_node node, jep_obj* list)
 	{
 		struc = jep_get_object(node.leaves[0].token.val->buffer, list);
 	}
+	else if(node.leaves[0].token.token_code == T_DOUBLECOLON)
+	{
+		struc = jep_evaluate(node.leaves[0], list);
+		if(struc != NULL)
+		{
+			jep_obj* tmp = struc;
+			struc = jep_get_object(struc->ident, list);
+			jep_destroy_object(tmp);
+		}	
+	}
+	else if(node.leaves[0].token.token_code == T_LPAREN)
+	{
+		jep_ast_node paren = node.leaves[0];
+		/* handle parentheses */
+
+		while(paren.token.token_code == T_LPAREN)
+		{
+			paren = paren.leaves[0];
+			if(paren.token.token_code == T_COMMA)
+			{
+				while(paren.token.token_code == T_COMMA)
+				{
+					paren = paren.leaves[1];
+				}
+			}
+		}
+		struc = jep_get_data_member(paren, list);
+	}
 	else
 	{
 		struc = NULL;
@@ -3369,7 +3455,7 @@ jep_obj* jep_get_data_member(jep_ast_node node, jep_obj* list)
 	else if(struc->type != JEP_STRUCT)
 	{
 		printf("%s is not a struct\n",
-			node.leaves[0].token.val->buffer);
+			node.leaves[0].token.val->buffer);		
 		return NULL;
 	}
 

@@ -338,6 +338,9 @@ jep_token_stream* jep_create_token_stream()
 	ts->cap = 50;
 	ts->tok = malloc(50 * sizeof(jep_token));
 	ts->error = 0;
+	ts->dir_size = 0;
+	ts->dir_cap = 50;
+	ts->dir = malloc(50 * sizeof(jep_token));
 	return ts;
 }
 
@@ -351,8 +354,12 @@ void jep_destroy_token_stream(jep_token_stream* ts)
 	{
 		jep_destroy_string_builder(ts->tok[i].val);
 	}
-
+	for(i = 0; i < ts->dir_size; i++)
+	{
+		jep_destroy_string_builder(ts->dir[i].val);
+	}
 	free(ts->tok);
+	free(ts->dir);
 	free(ts);
 }
 
@@ -391,6 +398,59 @@ void jep_append_token(jep_token_stream* ts, jep_token t)
 	{
 		ts->tok[ts->size++] = t;
 	}
+}
+
+/**
+ * adds a directive token to a token stream
+ */
+void jep_append_directive(jep_token_stream* ts, jep_token d)
+{
+	if(ts->dir_size >= ts->dir_cap)
+	{
+		int new_cap = ts->dir_cap + ts->dir_cap / 2;
+		jep_token* new_dir = NULL;
+		new_dir = realloc(ts->dir, sizeof(jep_token) * new_cap);
+		if(new_dir != NULL)
+		{
+			ts->dir = new_dir;
+			ts->dir_cap = new_cap;
+		}
+		else
+		{
+			if(!ts->error)
+			{
+				printf("failed to reallocate memory for token stream\n");
+				ts->error = 1;
+			}
+			return;
+		}
+	}
+
+	/* check to see if we're tokenizing a file from an import statement */
+	if(ts->dir_size > 0 && ts->dir[ts->dir_size - 1].token_code == T_EOF)
+	{
+		ts->dir[ts->dir_size - 1] = d;
+	}
+	else
+	{
+		ts->dir[ts->dir_size++] = d;
+	}
+}
+
+/**
+ * checks if a token stream already contains a directive
+ */
+int jep_has_directive(jep_token_stream* ts, const char* dir)
+{
+	int i;
+	for (i = 0; i < ts->dir_size; i++)
+	{
+		if(!strcmp(ts->dir[i].val->buffer, dir))
+		{
+			return 1;
+		}
+	}
+	return 0;
 }
 
 /**
@@ -457,12 +517,48 @@ void jep_tokenize_file(jep_token_stream* ts, const char* file_name)
 		/* skip line comments */
 		if((s[i] == '/' && s[i+1] == '/') || s[i] == '#')
 		{
-			i += 2;
-			col += 2;
-			while(!(s[i] == '\n') && i < sb->size)
+			if(s[i] == '#' && s[i+1] == '{')
 			{
-				i++;
-				col++;
+				i += 2;
+				col += 2;
+				jep_string_builder* dir = jep_create_string_builder();
+				while(s[i] != '\n' && s[i] != '}' && i < sb->size)
+				{
+					jep_append_char(dir, s[i]);
+					i++;
+					col++;
+				}
+				if(s[i] != '\n')
+				{
+					while(s[i] != '\n' && i < sb->size)
+					{
+						i++;
+						col++;
+					}
+				}
+				if(!jep_has_directive(ts, dir->buffer))
+				{
+					jep_token dir_tok = 
+					{
+						dir, T_DIRECTIVE, 0, row, col, 0, 0, file_name
+					};
+					jep_append_directive(ts, dir_tok);	
+				}
+				else
+				{
+					// stop tokenizing the file if the directive
+					// already exists
+					jep_destroy_string_builder(dir);
+					return;
+				}
+			}
+			else
+			{
+				while(s[i] != '\n' && i < sb->size)
+				{
+					i++;
+					col++;
+				}
 			}
 		}
 			
@@ -738,5 +834,10 @@ void jep_print_tokens(jep_token_stream* ts, FILE* f)
 			default:
 				break;
 		}
+	}
+	fprintf(f, "\n---------------\ndirectives\n---------------\n");
+	for(i = 0; i < ts->dir_size; i++)
+	{
+		fprintf(f, "%s\n", ts->dir[i].val->buffer);
 	}
 }

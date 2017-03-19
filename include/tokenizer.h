@@ -34,6 +34,7 @@
 #define T_BYTE 6
 #define T_CHARACTER 7
 #define T_STRING 8
+#define T_DIRECTIVE 9
 
 /* single character symbol token codes */
 #define T_PLUS 1
@@ -125,7 +126,10 @@ typedef struct TokenStream
 	jep_token* tok; /* the tokens                           */
 	int size;       /* the amount of tokens in the stream   */
 	int cap;        /* the maximum amount of tokens allowed */
-	int error;      /* error flag */
+	int error;      /* error flag                           */
+	int dir_cap;    /* capacity for directive tokens        */
+	int dir_size;   /* amount of directive tokens           */
+	jep_token* dir; /* the directive tokens                 */
 }jep_token_stream;
 
 /**
@@ -154,6 +158,16 @@ void jep_destroy_token_stream(jep_token_stream* ts);
 void jep_append_token(jep_token_stream* tb, jep_token t);
 
 /**
+ * adds a directive token to a token stream
+ */
+void jep_append_directive(jep_token_stream* ts, jep_token d);
+
+/**
+ * checks if a token stream already contains a directive
+ */
+int jep_has_directive(jep_token_stream* ts, const char* dir);
+
+/**
  * tokenizes the contents of a file
  */
 void jep_tokenize_file(jep_token_stream* ts, const char* file_name);
@@ -162,5 +176,10 @@ void jep_tokenize_file(jep_token_stream* ts, const char* file_name);
  * prints the tokens
  */
 void jep_print_tokens(jep_token_stream* ts, FILE* f);
+
+/**
+ * prints the directives
+ */
+void jep_print_directives(jep_token_stream* ts, FILE* f);
 
 #endif /* JEP_TOKENIZER_H */

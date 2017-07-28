@@ -16,7 +16,6 @@ function floor(n) {
 	t = typeof(n);
 
 	if(t != "int" && t != "long" && t != "double") {
-		writeln("cannot floor an object of type " + t);
 		return null;
 	}
 
@@ -54,7 +53,6 @@ function ceil(n) {
 	t = typeof(n);
 
 	if(t != "int" && t != "long" && t != "double") {
-		writeln("cannot ceil an object of type " + t);
 		return null;
 	}
 

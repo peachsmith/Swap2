@@ -32,37 +32,37 @@
 /**
  * gets the path of an import
  */
-char* jep_get_import(const char* path)
+char *jep_get_import(const char *path)
 {
 	errno = 0;
 	char app_path[1024];
 	char *import_path = NULL;
 
-	if(path == NULL)
+	if (path == NULL)
 	{
 		return import_path;
 	}
 
 	size_t p_len = strlen(path);
 
-	if(p_len < 1)
+	if (p_len < 1)
 	{
 		return import_path;
 	}
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-	
+
 	/* get the path to the application */
 	GetModuleFileName(NULL, app_path, 1024);
 
-	if(errno)
+	if (errno)
 	{
 		return import_path;
 	}
 
 	/* remove the application name from the path */
 	int i = strlen(app_path);
-	for(; app_path[i] != '\\' && app_path[i] != '/' && i > 0; i--)
+	for (; app_path[i] != '\\' && app_path[i] != '/' && i > 0; i--)
 	{
 		app_path[i] = '\0';
 	}
@@ -80,8 +80,8 @@ char* jep_get_import(const char* path)
 
 	ssize_t len;
 
-	len = readlink("/proc/self/exe", app_path, sizeof(app_path)-1);
-	if(len == -1)
+	len = readlink("/proc/self/exe", app_path, sizeof(app_path) - 1);
+	if (len == -1)
 	{
 		return import_path;
 	}
@@ -90,7 +90,7 @@ char* jep_get_import(const char* path)
 
 	/* remove the application name from the path */
 	int i = strlen(app_path);
-	for(; app_path[i] != '/' && i > 0; i--)
+	for (; app_path[i] != '/' && i > 0; i--)
 	{
 		app_path[i] = '\0';
 	}

@@ -2,6 +2,7 @@
 [function] int ()
 [function] double ()
 [function] typeof ()
+[function] len ()
 [int] a: 4
 [int] b: 5
 [int] c: 8

@@ -17,278 +17,276 @@
 */
 #include "native.h"
 
-#define JEP_NATIVE_COUNT 13
+#define JEP_NATIVE_COUNT 14
 
 /* native function identifiers */
-const char *natives[] = 
-{
-	"write", "writeln", "readln", "fopen", "freadln", "fwriteln", "fwrite",
-	"freadb", "fwriteb", "byte", "int", "double", "typeof"
-};
+const char *natives[] =
+	{
+		"write", "writeln", "readln", "fopen", "freadln", "fwriteln", "fwrite",
+		"freadb", "fwriteb", "byte", "int", "double", "typeof", "len"};
 
 /* native function forward declarations */
-static jep_obj* jep_write(const char*);
-static jep_obj* jep_writeln(const char*);
-static jep_obj* jep_readln();
-static jep_obj* jep_fopen(const char*, const char*);
-static jep_obj* jep_freadln(FILE*);
-static jep_obj* jep_fwriteln(FILE*, const char*);
-static jep_obj* jep_fwrite(FILE*, const char*);
-static jep_obj* jep_freadb(FILE*, size_t);
-static jep_obj* jep_fwriteb(FILE*, const unsigned char*, size_t);
-static jep_obj* jep_int(jep_obj* obj);
-static jep_obj* jep_double(jep_obj* obj);
-static jep_obj* jep_typeof(jep_obj* obj);
+static jep_obj *jep_write(const char *);
+static jep_obj *jep_writeln(const char *);
+static jep_obj *jep_readln();
+static jep_obj *jep_fopen(const char *, const char *);
+static jep_obj *jep_freadln(FILE *);
+static jep_obj *jep_fwriteln(FILE *, const char *);
+static jep_obj *jep_fwrite(FILE *, const char *);
+static jep_obj *jep_freadb(FILE *, size_t);
+static jep_obj *jep_fwriteb(FILE *, const unsigned char *, size_t);
+static jep_obj *jep_int(jep_obj *obj);
+static jep_obj *jep_double(jep_obj *obj);
+static jep_obj *jep_typeof(jep_obj *obj);
+static jep_obj *jep_len(jep_obj *obj);
 
 /* calls a native function */
-jep_obj* jep_call_native(const char* ident, jep_obj* args)
+jep_obj *jep_call_native(const char *ident, jep_obj *args)
 {
-	jep_obj* o = NULL;
+	jep_obj *o = NULL;
 	int native = -1;
 	int i;
-	for(i = 0; i < JEP_NATIVE_COUNT; i++)
+	for (i = 0; i < JEP_NATIVE_COUNT; i++)
 	{
-		if(!strcmp(ident, natives[i]))
+		if (!strcmp(ident, natives[i]))
 		{
 			native = i;
 		}
 	}
 
-	if(native == -1)
+	if (native == -1)
 	{
 		printf("error: invalid native identifier\n");
 		return o;
 	}
 
-	if(native == 0 || native == 1) /* write or writeln */
+	if (native == 0 || native == 1) /* write or writeln */
 	{
-		if(args == NULL || args->size != 1)
+		if (args == NULL || args->size != 1)
 		{
 			printf("invalid number of arguments\n");
 			return o;
 		}
 
-		jep_obj* data = args->head;
+		jep_obj *data = args->head;
 
-		char* str = jep_to_string(data);
+		char *str = jep_to_string(data);
 
-		if(native == 0)
+		if (native == 0)
 		{
-			o = jep_write(str);	
+			o = jep_write(str);
 		}
 		else
 		{
 			o = jep_writeln(str);
 		}
 
-		if(str != NULL)
+		if (str != NULL)
 		{
 			free(str);
 		}
 	}
-	else if(native == 2) /* readln */
+	else if (native == 2) /* readln */
 	{
-		if(args != NULL && args->size > 0)
+		if (args != NULL && args->size > 0)
 		{
 			printf("invalid number of arguments\n");
 			return o;
 		}
 		o = jep_readln();
 	}
-	else if(native == 3) /* open a file */
+	else if (native == 3) /* open a file */
 	{
-		if(args == NULL || args->size != 2)
+		if (args == NULL || args->size != 2)
 		{
 			printf("invalid number of arguments for fopen\n");
 			return o;
 		}
-		jep_obj* path_obj = args->head;
-		if(path_obj->type != JEP_STRING 
-			|| path_obj->next == NULL
-			|| path_obj->next->type != JEP_STRING)
+		jep_obj *path_obj = args->head;
+		if (path_obj->type != JEP_STRING || path_obj->next == NULL || path_obj->next->type != JEP_STRING)
 		{
 			printf("invalid argument type for fopen\n");
 			return o;
 		}
-		char* path_str = (char*)(path_obj->val);
-		if(path_str != NULL)
+		char *path_str = (char *)(path_obj->val);
+		if (path_str != NULL)
 		{
-			o = jep_fopen(path_str, (char*)(path_obj->next->val));
+			o = jep_fopen(path_str, (char *)(path_obj->next->val));
 		}
 	}
-	else if(native == 4) /* freadln */
+	else if (native == 4) /* freadln */
 	{
-		if(args == NULL || args->size != 1)
+		if (args == NULL || args->size != 1)
 		{
 			printf("invalid number of arguments\n");
 			return o;
 		}
 
-		jep_obj* arg = args->head;
+		jep_obj *arg = args->head;
 
-		if(arg == NULL || arg->val == NULL)
+		if (arg == NULL || arg->val == NULL)
 		{
 			printf("could not read from file\n");
 			return o;
 		}
 
-		jep_file* file_obj = (jep_file*)(arg->val);
+		jep_file *file_obj = (jep_file *)(arg->val);
 
-		if(file_obj->file == NULL || !file_obj->open)
+		if (file_obj->file == NULL || !file_obj->open)
 		{
 			printf("could not read from file\n");
 			return o;
 		}
-		if(file_obj->mode != JEP_READ)
+		if (file_obj->mode != JEP_READ)
 		{
 			printf("the file is not open for reading\n");
 			return o;
 		}
 		o = jep_freadln(file_obj->file);
 	}
-	else if(native == 5) /* fwriteln */
+	else if (native == 5) /* fwriteln */
 	{
-		if(args == NULL || args->size != 2)
+		if (args == NULL || args->size != 2)
 		{
 			printf("invalid number of arguments\n");
 			return o;
 		}
 
-		jep_obj* arg = args->head;
+		jep_obj *arg = args->head;
 
-		if(arg == NULL || arg->val == NULL || arg->next == NULL)
+		if (arg == NULL || arg->val == NULL || arg->next == NULL)
 		{
 			printf("could not write to file\n");
 			return o;
 		}
 
-		jep_file* file_obj = (jep_file*)(arg->val);
-		jep_obj* data = arg->next;
+		jep_file *file_obj = (jep_file *)(arg->val);
+		jep_obj *data = arg->next;
 
-		if(file_obj->file == NULL || !file_obj->open)
+		if (file_obj->file == NULL || !file_obj->open)
 		{
 			printf("could not write to file\n");
 			return o;
 		}
-		if(file_obj->mode != JEP_APPEND)
+		if (file_obj->mode != JEP_APPEND)
 		{
 			printf("the file is not open for appending\n");
 			return o;
 		}
 
-		char* str = jep_to_string(data);
+		char *str = jep_to_string(data);
 
 		o = jep_fwriteln(file_obj->file, str);
 
-		if(str != NULL)
+		if (str != NULL)
 		{
 			free(str);
 		}
 	}
-	else if(native == 6) /* fwrite */
+	else if (native == 6) /* fwrite */
 	{
-		if(args == NULL || args->size != 2)
+		if (args == NULL || args->size != 2)
 		{
 			printf("invalid number of arguments\n");
 			return o;
 		}
 
-		jep_obj* arg = args->head;
+		jep_obj *arg = args->head;
 
-		if(arg == NULL || arg->val == NULL || arg->next == NULL)
+		if (arg == NULL || arg->val == NULL || arg->next == NULL)
 		{
 			printf("could not write to file\n");
 			return o;
 		}
 
-		jep_file* file_obj = (jep_file*)(arg->val);
-		jep_obj* data = arg->next;
+		jep_file *file_obj = (jep_file *)(arg->val);
+		jep_obj *data = arg->next;
 
-		if(file_obj->file == NULL || !file_obj->open)
+		if (file_obj->file == NULL || !file_obj->open)
 		{
 			printf("could not write to file\n");
 			return o;
 		}
-		if(file_obj->mode != JEP_APPEND)
+		if (file_obj->mode != JEP_APPEND)
 		{
 			printf("the file is not open for appending\n");
 			return o;
 		}
 
-		char* str = jep_to_string(data);
+		char *str = jep_to_string(data);
 
 		o = jep_fwrite(file_obj->file, str);
 
-		if(str != NULL)
+		if (str != NULL)
 		{
 			free(str);
 		}
 	}
-	else if(native == 7) /* freadb */
+	else if (native == 7) /* freadb */
 	{
-		if(args == NULL || args->size != 2)
+		if (args == NULL || args->size != 2)
 		{
 			printf("invalid number of arguments\n");
 			return o;
 		}
 
-		jep_obj* arg = args->head;
+		jep_obj *arg = args->head;
 
-		if(arg == NULL || arg->val == NULL || arg->next == NULL)
+		if (arg == NULL || arg->val == NULL || arg->next == NULL)
 		{
 			printf("could not read from file\n");
 			return o;
 		}
 
-		jep_file* file_obj = (jep_file*)(arg->val);
-		jep_obj* size = arg->next;
-		
-		if(size->type != JEP_INT)
+		jep_file *file_obj = (jep_file *)(arg->val);
+		jep_obj *size = arg->next;
+
+		if (size->type != JEP_INT)
 		{
 			printf("invalid buffer size for binary file read\n");
 			return o;
 		}
 
-		int n = *((int*)(size->val));
+		int n = *((int *)(size->val));
 
-		if(file_obj->file == NULL || !file_obj->open)
+		if (file_obj->file == NULL || !file_obj->open)
 		{
 			printf("could not read from file\n");
 			return o;
 		}
-		if(file_obj->mode != JEP_READ_BINARY)
+		if (file_obj->mode != JEP_READ_BINARY)
 		{
 			printf("the file is not open for binary reading\n");
 			return o;
 		}
 		o = jep_freadb(file_obj->file, n);
 	}
-	else if(native == 8) /* fwriteb */
+	else if (native == 8) /* fwriteb */
 	{
-		if(args == NULL || args->size != 2)
+		if (args == NULL || args->size != 2)
 		{
 			printf("invalid number of arguments\n");
 			return o;
 		}
 
-		jep_obj* arg = args->head;
+		jep_obj *arg = args->head;
 
-		if(arg == NULL || arg->val == NULL || arg->next == NULL)
+		if (arg == NULL || arg->val == NULL || arg->next == NULL)
 		{
 			printf("could not write to file\n");
 			return o;
 		}
 
-		jep_file* file_obj = (jep_file*)(arg->val);
-		jep_obj* data = arg->next;
-		unsigned char* byte_array = NULL;
+		jep_file *file_obj = (jep_file *)(arg->val);
+		jep_obj *data = arg->next;
+		unsigned char *byte_array = NULL;
 
-		if(file_obj->file == NULL || !file_obj->open)
+		if (file_obj->file == NULL || !file_obj->open)
 		{
 			printf("could not write to file\n");
 			return o;
 		}
-		if(file_obj->mode != JEP_APPEND_BINARY)
+		if (file_obj->mode != JEP_APPEND_BINARY)
 		{
 			printf("the file is not open for binary appending\n");
 			return o;
@@ -296,7 +294,7 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 
 		/* jep_obj* bytes = jep_get_bytes(data); */
 
-		if(data == NULL)
+		if (data == NULL)
 		{
 			printf("could not covnert data into binary\n");
 			return o;
@@ -305,34 +303,33 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 		{
 			byte_array = NULL;
 			size_t s = data->size;
-			jep_obj* b = ((jep_obj*)(data->val))->head;
+			jep_obj *b = ((jep_obj *)(data->val))->head;
 			byte_array = malloc(s);
 			unsigned int i;
-			for(i = 0; i < s && b != NULL; i++, b = b->next)
+			for (i = 0; i < s && b != NULL; i++, b = b->next)
 			{
-				byte_array[i] = *((unsigned char*)(b->val));
+				byte_array[i] = *((unsigned char *)(b->val));
 			}
-			
+
 			o = jep_fwriteb(file_obj->file, byte_array, s);
 		}
 
-		if(byte_array != NULL)
+		if (byte_array != NULL)
 		{
 			free(byte_array);
 		}
 	}
-	else if(native == 9) /* byte */
+	else if (native == 9) /* byte */
 	{
-		if(args == NULL || args->size != 1)
+		if (args == NULL || args->size != 1)
 		{
 			printf("invalid number of arguments\n");
 			return o;
 		}
 
-		jep_obj* arg = args->head;
+		jep_obj *arg = args->head;
 
-		if(arg == NULL || arg->val == NULL 
-			|| (arg->type != JEP_INT && arg->type != JEP_LONG))
+		if (arg == NULL || arg->val == NULL || (arg->type != JEP_INT && arg->type != JEP_LONG))
 		{
 			printf("invalid argument for byte truncation\n");
 			return o;
@@ -340,14 +337,14 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 
 		unsigned char *b = malloc(1);
 
-		if(arg->type == JEP_INT)
+		if (arg->type == JEP_INT)
 		{
-			int i = *((int*)(arg->val));
+			int i = *((int *)(arg->val));
 			*b = i & UCHAR_MAX;
 		}
-		else if(arg->type == JEP_LONG)
+		else if (arg->type == JEP_LONG)
 		{
-			long int i = *((long int*)(arg->val));
+			long int i = *((long int *)(arg->val));
 			*b = i & UCHAR_MAX;
 		}
 
@@ -355,9 +352,9 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 		o->type = JEP_BYTE;
 		o->val = b;
 	}
-	else if(native == 10) /* int */
+	else if (native == 10) /* int */
 	{
-		if(args == NULL || args->size != 1)
+		if (args == NULL || args->size != 1)
 		{
 			printf("invalid number of arguments\n");
 			return o;
@@ -365,9 +362,9 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 
 		return jep_int(args->head);
 	}
-	else if(native == 11) /* double */
+	else if (native == 11) /* double */
 	{
-		if(args == NULL || args->size != 1)
+		if (args == NULL || args->size != 1)
 		{
 			printf("invalid number of arguments\n");
 			return o;
@@ -375,9 +372,9 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 
 		return jep_double(args->head);
 	}
-	else if(native == 12) /* typeof */
+	else if (native == 12) /* typeof */
 	{
-		if(args == NULL || args->size != 1)
+		if (args == NULL || args->size != 1)
 		{
 			printf("invalid number of arguments\n");
 			return o;
@@ -385,38 +382,48 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args)
 
 		return jep_typeof(args->head);
 	}
+	else if (native == 13) /* len */
+	{
+		if (args == NULL || args->size != 1)
+		{
+			printf("invalid number of arguments\n");
+			return o;
+		}
+
+		return jep_len(args->head);
+	}
 	else
 	{
 		printf("native is somehow: %d\n", native);
 	}
-	
+
 	return o;
 }
 
 /* writes a string to standard out */
-static jep_obj* jep_write(const char* buffer)
+static jep_obj *jep_write(const char *buffer)
 {
-	if(buffer != NULL)
+	if (buffer != NULL)
 	{
-		fputs(buffer, stdout);	
+		fputs(buffer, stdout);
 	}
 	return NULL;
 }
 
 /* writes a string to standard out appended by a newline */
-static jep_obj* jep_writeln(const char* buffer)
+static jep_obj *jep_writeln(const char *buffer)
 {
-	if(buffer != NULL)
+	if (buffer != NULL)
 	{
-		puts(buffer);	
+		puts(buffer);
 	}
 	return NULL;
 }
 
 /* reads a string from standard in */
-static jep_obj* jep_readln()
+static jep_obj *jep_readln()
 {
-	jep_obj* o = NULL;
+	jep_obj *o = NULL;
 
 	o = jep_freadln(stdin);
 
@@ -426,32 +433,32 @@ static jep_obj* jep_readln()
 /**
  * opens a file
  */
-static jep_obj* jep_fopen(const char* path_str, const char* mode)
+static jep_obj *jep_fopen(const char *path_str, const char *mode)
 {
-	FILE* file = fopen(path_str, mode);
-	jep_obj* o = NULL;
+	FILE *file = fopen(path_str, mode);
+	jep_obj *o = NULL;
 	o = jep_create_object();
 	o->type = JEP_NULL;
 
-	if(file != NULL)
+	if (file != NULL)
 	{
-		jep_file* file_val = malloc(sizeof(jep_file));
+		jep_file *file_val = malloc(sizeof(jep_file));
 		file_val->file = file;
 		file_val->open = 1;
 		file_val->refs = 1;
-		if(!strcmp(mode, "r"))
+		if (!strcmp(mode, "r"))
 		{
 			file_val->mode = JEP_READ;
 		}
-		else if(!strcmp(mode, "a"))
+		else if (!strcmp(mode, "a"))
 		{
 			file_val->mode = JEP_APPEND;
 		}
-		else if(!strcmp(mode, "rb"))
+		else if (!strcmp(mode, "rb"))
 		{
 			file_val->mode = JEP_READ_BINARY;
 		}
-		else if(!strcmp(mode, "ab"))
+		else if (!strcmp(mode, "ab"))
 		{
 			file_val->mode = JEP_APPEND_BINARY;
 		}
@@ -459,7 +466,7 @@ static jep_obj* jep_fopen(const char* path_str, const char* mode)
 		{
 			file_val->mode = 0;
 		}
-		
+
 		o->type = JEP_FILE;
 		o->val = file_val;
 	}
@@ -467,28 +474,29 @@ static jep_obj* jep_fopen(const char* path_str, const char* mode)
 	return o;
 }
 
-static jep_obj* jep_freadln(FILE* file)
+static jep_obj *jep_freadln(FILE *file)
 {
-	jep_obj* o = NULL;
+	jep_obj *o = NULL;
 
 	size_t size = 0;
-	size_t len  = 0;
+	size_t len = 0;
 	size_t last = 0;
 	char *buffer = NULL;
 
-	do {
+	do
+	{
 
 		size += BUFSIZ;
 		buffer = realloc(buffer, size);
 
-		if (buffer == NULL) 
+		if (buffer == NULL)
 		{
 			printf("failed to reallocate buffer for reading\n");
 			return NULL;
 		}
-		if(fgets(buffer + last, size, file) == NULL)
+		if (fgets(buffer + last, size, file) == NULL)
 		{
-			if(buffer != NULL)
+			if (buffer != NULL)
 			{
 				free(buffer);
 			}
@@ -496,18 +504,18 @@ static jep_obj* jep_freadln(FILE* file)
 			o = jep_create_object();
 
 			/* check if EOF or just empty line */
-			if(feof(file))
+			if (feof(file))
 			{
 				o->type = JEP_NULL;
 			}
 			else
 			{
 				/* create an empty string */
-				char* empty = malloc(1);
+				char *empty = malloc(1);
 				empty[0] = '\0';
 				o->type = JEP_STRING;
 				o->val = empty;
-			}	
+			}
 
 			return o;
 		}
@@ -515,25 +523,25 @@ static jep_obj* jep_freadln(FILE* file)
 		last = len - 1;
 	} while (!feof(file) && buffer[last] != '\n');
 
-	if(buffer != NULL)
+	if (buffer != NULL)
 	{
 		/* remove the newline from the end */
-		if(buffer[last] == '\n')
+		if (buffer[last] == '\n')
 		{
 			buffer[last] = '\0';
 		}
 
 		o = jep_create_object();
 		o->type = JEP_STRING;
-		o->val = (void*)(buffer);
+		o->val = (void *)(buffer);
 	}
 
 	return o;
 }
 
-static jep_obj* jep_fwriteln(FILE* file, const char* data)
+static jep_obj *jep_fwriteln(FILE *file, const char *data)
 {
-	jep_obj* o = NULL;
+	jep_obj *o = NULL;
 
 	fprintf(file, "%s\n", data);
 	fflush(file);
@@ -541,9 +549,9 @@ static jep_obj* jep_fwriteln(FILE* file, const char* data)
 	return o;
 }
 
-static jep_obj* jep_fwrite(FILE* file, const char* data)
+static jep_obj *jep_fwrite(FILE *file, const char *data)
 {
-	jep_obj* o = NULL;
+	jep_obj *o = NULL;
 
 	fprintf(file, "%s", data);
 	fflush(file);
@@ -551,14 +559,14 @@ static jep_obj* jep_fwrite(FILE* file, const char* data)
 	return o;
 }
 
-static jep_obj* jep_freadb(FILE* file, size_t n)
+static jep_obj *jep_freadb(FILE *file, size_t n)
 {
-	jep_obj* byte_array = NULL;
-	jep_obj* bytes = NULL;
+	jep_obj *byte_array = NULL;
+	jep_obj *bytes = NULL;
 	unsigned char *data = malloc(n);
 	size_t read = fread(data, n, 1, file);
 
-	if(read)
+	if (read)
 	{
 		byte_array = jep_create_object();
 		byte_array->type = JEP_ARRAY;
@@ -567,11 +575,11 @@ static jep_obj* jep_freadb(FILE* file, size_t n)
 		bytes->type = JEP_LIST;
 
 		unsigned int i;
-		for(i = 0; i < n; i++)
+		for (i = 0; i < n; i++)
 		{
-			jep_obj* byte = jep_create_object();
+			jep_obj *byte = jep_create_object();
 			byte->type = JEP_BYTE;
-			unsigned char* c = malloc(1);
+			unsigned char *c = malloc(1);
 			*c = data[i];
 			byte->val = c;
 			jep_add_object(bytes, byte);
@@ -586,78 +594,78 @@ static jep_obj* jep_freadb(FILE* file, size_t n)
 	return byte_array;
 }
 
-static jep_obj* jep_fwriteb(FILE* file, const unsigned char* data, size_t n)
+static jep_obj *jep_fwriteb(FILE *file, const unsigned char *data, size_t n)
 {
-	jep_obj* written = NULL;
+	jep_obj *written = NULL;
 
 	size_t read = fwrite(data, n, 1, file);
 	fflush(file);
 
 	written = jep_create_object();
 	written->type = JEP_INT;
-	int* i = malloc(sizeof(int));
+	int *i = malloc(sizeof(int));
 	*i = (int)read;
 	written->val = i;
 
 	return written;
 }
 
-static jep_obj* jep_int(jep_obj* obj)
+static jep_obj *jep_int(jep_obj *obj)
 {
-	jep_obj* i = NULL;
-	
-	if(obj->type == JEP_INT)
+	jep_obj *i = NULL;
+
+	if (obj->type == JEP_INT)
 	{
 		i = jep_create_object();
 		jep_copy_object(i, obj);
 		return i;
 	}
-	else if(obj->type == JEP_LONG)
+	else if (obj->type == JEP_LONG)
 	{
 		i = jep_create_object();
 		i->type = JEP_INT;
 		i->val = malloc(sizeof(int));
-		*(int*)(i->val) = (int)(*(long*)(obj->val));
+		*(int *)(i->val) = (int)(*(long *)(obj->val));
 		return i;
 	}
-	else if(obj->type == JEP_DOUBLE)
+	else if (obj->type == JEP_DOUBLE)
 	{
 		i = jep_create_object();
 		i->type = JEP_INT;
 		i->val = malloc(sizeof(int));
-		*(int*)(i->val) = (int)(*(double*)(obj->val));
+		*(int *)(i->val) = (int)(*(double *)(obj->val));
 		return i;
 	}
-	else if(obj->type == JEP_CHARACTER)
+	else if (obj->type == JEP_CHARACTER)
 	{
 		i = jep_create_object();
 		i->type = JEP_INT;
 		i->val = malloc(sizeof(int));
-		*(int*)(i->val) = (int)(*(char*)(obj->val) - '0');
+		*(int *)(i->val) = (int)(*(char *)(obj->val) - '0');
 		return i;
 	}
-	else if(obj->type == JEP_STRING)
+	else if (obj->type == JEP_STRING)
 	{
-		if(obj->val == NULL)
+		if (obj->val == NULL)
 		{
 			printf("invalid integer format\n");
 			return i;
 		}
 
 		int neg = 0;
-		char* s;
-		char* endptr;
+		char *s;
+		char *endptr;
 		long int l;
-		void* val;
-		
+		void *val;
+
 		errno = 0;
 		endptr = NULL;
 		s = NULL;
 
-		s = (char*)(obj->val);
+		s = (char *)(obj->val);
 
 		/* allow for signed integers */
-		if(*s == '-')
+		if (*s == '-')
 		{
 			s++;
 			neg++;
@@ -666,30 +674,29 @@ static jep_obj* jep_int(jep_obj* obj)
 		/* attempt to convert the string to a long int */
 		l = strtol(s, &endptr, 10);
 
-		if(errno == ERANGE)
+		if (errno == ERANGE)
 		{
 			printf("value to large to fit in an integer\n");
 		}
-		else if((endptr != s && *endptr != '\0') 
-			|| (strlen(s) > 1 && *s == '0') || !isdigit(*s))
+		else if ((endptr != s && *endptr != '\0') || (strlen(s) > 1 && *s == '0') || !isdigit(*s))
 		{
 			printf("invalid integer format\n");
 		}
-		else if(l >= INT_MIN && l <= INT_MAX)
+		else if (l >= INT_MIN && l <= INT_MAX)
 		{
 			/* cast the value as an int if it will fit */
-			int* l_ptr = malloc(sizeof(int));
-			if(neg)
+			int *l_ptr = malloc(sizeof(int));
+			if (neg)
 			{
-				*l_ptr = -(int)l;	
+				*l_ptr = -(int)l;
 			}
 			else
 			{
-				*l_ptr = (int)l;	
+				*l_ptr = (int)l;
 			}
-			val = (void*)l_ptr;
+			val = (void *)l_ptr;
 			i = jep_create_object();
-			i->val = (void*)val;
+			i->val = (void *)val;
 			i->type = JEP_INT;
 		}
 		else
@@ -708,62 +715,62 @@ static jep_obj* jep_int(jep_obj* obj)
 	return i;
 }
 
-static jep_obj* jep_double(jep_obj* obj)
+static jep_obj *jep_double(jep_obj *obj)
 {
-	jep_obj* i = NULL;
-	
-	if(obj->type == JEP_INT)
+	jep_obj *i = NULL;
+
+	if (obj->type == JEP_INT)
 	{
 		i = jep_create_object();
 		i->type = JEP_DOUBLE;
 		i->val = malloc(sizeof(double));
-		*(double*)(i->val) = (double)(*(int*)(obj->val));
+		*(double *)(i->val) = (double)(*(int *)(obj->val));
 		return i;
 	}
-	else if(obj->type == JEP_LONG)
+	else if (obj->type == JEP_LONG)
 	{
 		i = jep_create_object();
 		i->type = JEP_DOUBLE;
 		i->val = malloc(sizeof(double));
-		*(double*)(i->val) = (double)(*(long*)(obj->val));
+		*(double *)(i->val) = (double)(*(long *)(obj->val));
 		return i;
 	}
-	else if(obj->type == JEP_DOUBLE)
+	else if (obj->type == JEP_DOUBLE)
 	{
 		i = jep_create_object();
 		jep_copy_object(i, obj);
 		return i;
 	}
-	else if(obj->type == JEP_CHARACTER)
+	else if (obj->type == JEP_CHARACTER)
 	{
 		i = jep_create_object();
 		i->type = JEP_DOUBLE;
 		i->val = malloc(sizeof(double));
-		*(double*)(i->val) = (double)(*(char*)(obj->val) - '0');
+		*(double *)(i->val) = (double)(*(char *)(obj->val) - '0');
 		return i;
 	}
-	else if(obj->type == JEP_STRING)
+	else if (obj->type == JEP_STRING)
 	{
-		if(obj->val == NULL)
+		if (obj->val == NULL)
 		{
 			printf("invalid integer format\n");
 			return i;
 		}
 
 		int neg = 0;
-		char* s;
-		char* endptr;
+		char *s;
+		char *endptr;
 		double d;
-		void* val;
-		
+		void *val;
+
 		errno = 0;
 		endptr = NULL;
 		s = NULL;
 
-		s = (char*)(obj->val);
+		s = (char *)(obj->val);
 
 		/* allow for signed integers */
-		if(*s == '-')
+		if (*s == '-')
 		{
 			s++;
 			neg++;
@@ -772,30 +779,29 @@ static jep_obj* jep_double(jep_obj* obj)
 		/* attempt to convert the string to a double */
 		d = strtod(s, &endptr);
 
-		if(errno == ERANGE)
+		if (errno == ERANGE)
 		{
 			printf("value to large to fit in a double\n");
 		}
-		else if((endptr != s && *endptr != '\0') 
-			|| (strlen(s) > 1 && *s == '0') || !isdigit(*s))
+		else if ((endptr != s && *endptr != '\0') || (strlen(s) > 1 && *s == '0') || !isdigit(*s))
 		{
 			printf("invalid integer format\n");
 		}
 		else
 		{
 			/* cast the value as an int if it will fit */
-			double* l_ptr = malloc(sizeof(double));
-			if(neg)
+			double *l_ptr = malloc(sizeof(double));
+			if (neg)
 			{
-				*l_ptr = -d;	
+				*l_ptr = -d;
 			}
 			else
 			{
 				*l_ptr = d;
 			}
-			val = (void*)l_ptr;
+			val = (void *)l_ptr;
 			i = jep_create_object();
-			i->val = (void*)val;
+			i->val = (void *)val;
 			i->type = JEP_DOUBLE;
 		}
 
@@ -810,81 +816,121 @@ static jep_obj* jep_double(jep_obj* obj)
 	return i;
 }
 
-static jep_obj* jep_typeof(jep_obj* obj)
+static jep_obj *jep_typeof(jep_obj *obj)
 {
-	if(obj == NULL)
+	if (obj == NULL)
 	{
 		return NULL;
 	}
 
-	jep_obj* type = jep_create_object();
+	jep_obj *type = jep_create_object();
 	type->type = JEP_STRING;
-	char* str = NULL;
+	char *str = NULL;
 
-	switch(obj->type)
+	switch (obj->type)
 	{
-		case JEP_INT:
-			str = malloc(4);
-			strcpy(str, "int");
-			break;
+	case JEP_INT:
+		str = malloc(4);
+		strcpy(str, "int");
+		break;
 
-		case JEP_LONG:
-			str = malloc(5);
-			strcpy(str, "long");
-			break;
+	case JEP_LONG:
+		str = malloc(5);
+		strcpy(str, "long");
+		break;
 
-		case JEP_DOUBLE:
-			str = malloc(7);
-			strcpy(str, "double");
-			break;
+	case JEP_DOUBLE:
+		str = malloc(7);
+		strcpy(str, "double");
+		break;
 
-		case JEP_CHARACTER:
-			str = malloc(5);
-			strcpy(str, "char");
-			break;
+	case JEP_CHARACTER:
+		str = malloc(5);
+		strcpy(str, "char");
+		break;
 
-		case JEP_STRING:
-			str = malloc(7);
-			strcpy(str, "string");
-			break;
+	case JEP_STRING:
+		str = malloc(7);
+		strcpy(str, "string");
+		break;
 
-		case JEP_ARRAY:
-			str = malloc(6);
-			strcpy(str, "array");
-			break;
+	case JEP_ARRAY:
+		str = malloc(6);
+		strcpy(str, "array");
+		break;
 
-		case JEP_FUNCTION:
-			str = malloc(9);
-			strcpy(str, "function");
-			break;
+	case JEP_FUNCTION:
+		str = malloc(9);
+		strcpy(str, "function");
+		break;
 
-		case JEP_STRUCTDEF:
-			str = malloc(10);
-			strcpy(str, "structdef");
-			break;
+	case JEP_STRUCTDEF:
+		str = malloc(10);
+		strcpy(str, "structdef");
+		break;
 
-		case JEP_STRUCT:
-			str = malloc(7);
-			strcpy(str, "struct");
-			break;
+	case JEP_STRUCT:
+		str = malloc(7);
+		strcpy(str, "struct");
+		break;
 
-		case JEP_REFERENCE:
-			str = malloc(10);
-			strcpy(str, "reference");
-			break;
+	case JEP_REFERENCE:
+		str = malloc(10);
+		strcpy(str, "reference");
+		break;
 
-		case JEP_NULL:
-			str = malloc(5);
-			strcpy(str, "null");
-			break;
+	case JEP_NULL:
+		str = malloc(5);
+		strcpy(str, "null");
+		break;
 
-		default:
-			str = malloc(5);
-			strcpy(str, "null");
-			break;
+	default:
+		str = malloc(5);
+		strcpy(str, "null");
+		break;
 	}
 
-	type->val = (void*)str;
+	type->val = (void *)str;
 
 	return type;
+}
+
+static jep_obj *jep_len(jep_obj *obj)
+{
+	if (obj == NULL)
+	{
+		return NULL;
+	}
+
+	jep_obj *length = jep_create_object();
+	length->type = JEP_INT;
+	length->val = malloc(sizeof(int));
+
+	*(int *)(length->val) = 0;
+
+	switch (obj->type)
+	{
+	case JEP_INT:
+	case JEP_LONG:
+	case JEP_DOUBLE:
+	case JEP_CHARACTER:
+		*(int *)(length->val) = 1;
+		break;
+
+	case JEP_STRING:
+	{
+		char *str = (char *)(obj->val);
+		*(int *)(length->val) = strlen(str);
+	}
+	break;
+
+	case JEP_ARRAY:
+		*(int *)(length->val) = obj->size;
+		break;
+
+	default:
+		break;
+	}
+
+	return length;
 }

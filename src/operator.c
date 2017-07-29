@@ -2925,6 +2925,7 @@ jep_obj *jep_assign(jep_ast_node node, jep_obj *list)
 		}
 
 		jep_copy_object(o, r);
+		o->self = o;
 
 		if (r->type == JEP_ARRAY)
 		{
@@ -3284,7 +3285,7 @@ jep_obj *jep_get_element(jep_ast_node node, jep_obj *list)
 			{
 				if (array->ident != NULL)
 				{
-					jep_obj *actual = jep_get_object(array->ident, list);
+					jep_obj *actual = array->self; //jep_get_object(array->ident, list);
 					jep_destroy_object(array);
 					array = actual;
 				}

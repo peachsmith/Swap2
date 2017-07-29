@@ -1,0 +1,45 @@
+import "io";
+
+struct Stuff {
+	data;
+}
+
+data = { 'a','b', 'c'};
+
+writeln(data[0]);
+
+data[0] = 'z';
+
+writeln(data[0]);
+
+s = new Stuff;
+
+s.data = { 13, 23, 55 };
+
+writeln(s.data[1]);
+
+s.data[1] = -80;
+
+writeln(s.data[1]);
+
+function slurp(ref){
+	::ref.data[1] = "success";
+}
+
+slurp(:s);
+
+writeln(s.data[1]);
+
+s.data[2] = { 1, 2, 3 };
+
+writeln(s.data[2][1]);
+
+s.data[2][1] = "also success";
+
+writeln(s.data[2][1]);
+
+function boop(){
+	return s.data;
+}
+
+writeln(boop()[0]);

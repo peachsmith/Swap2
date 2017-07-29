@@ -443,6 +443,8 @@ void jep_copy_object(jep_obj *dest, jep_obj *src)
 		return;
 	}
 
+	dest->self = src->self;
+
 	if (dest->val != NULL)
 	{
 		if (dest->type == JEP_ARRAY)

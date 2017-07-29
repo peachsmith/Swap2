@@ -40,4 +40,5 @@ test:
 	@$(SWAP) -o ./tests/test6.txt > ./tests/result6.txt
 	@$(SWAP) -o ./tests/test7.txt > ./tests/result7.txt
 	@$(SWAP) ./tests/test8.txt > ./tests/result8.txt
+	@$(SWAP) ./tests/test9.txt > ./tests/result9.txt
 	@$(VERIFY)

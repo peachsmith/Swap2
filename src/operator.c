@@ -3610,7 +3610,6 @@ jep_obj *jep_if(jep_ast_node node, jep_obj *list)
 			/* add a list for scope */
 			jep_obj *scope = jep_create_object();
 			scope->type = JEP_LIST;
-
 			jep_add_object(list, scope);
 
 			o = jep_evaluate(body, list);
@@ -3652,10 +3651,11 @@ jep_obj *jep_if(jep_ast_node node, jep_obj *list)
 jep_obj *jep_for(jep_ast_node node, jep_obj *list)
 {
 	jep_obj *o = NULL;
-	jep_obj *scope = jep_create_object();
-	scope->type = JEP_LIST;
+	jep_obj *scope;
+	//  = jep_create_object();
+	// scope->type = JEP_LIST;
 
-	jep_add_object(list, scope);
+	// jep_add_object(list, scope);
 
 	jep_ast_node head = node.leaves[0];
 	jep_obj *cond = NULL;
@@ -3709,6 +3709,11 @@ jep_obj *jep_for(jep_ast_node node, jep_obj *list)
 			}
 			while (val)
 			{
+				/* create the scope for this iteration */
+				scope = jep_create_object();
+				scope->type = JEP_LIST;
+				jep_add_object(list, scope);
+
 				if (node.leaf_count == 2)
 				{
 					o = jep_evaluate(node.leaves[1], list);
@@ -3717,6 +3722,7 @@ jep_obj *jep_for(jep_ast_node node, jep_obj *list)
 						jep_remove_scope(list);
 						jep_destroy_list(scope);
 						free(scope);
+						scope = NULL;
 						return o;
 					}
 					else if (o != NULL)
@@ -3735,6 +3741,12 @@ jep_obj *jep_for(jep_ast_node node, jep_obj *list)
 				{
 					val = *((int *)(cond->val));
 				}
+
+				/* destroy the scope at the end of each iteration */
+				jep_remove_scope(list);
+				jep_destroy_list(scope);
+				free(scope);
+				scope = NULL;
 			}
 		}
 		else
@@ -3746,6 +3758,11 @@ jep_obj *jep_for(jep_ast_node node, jep_obj *list)
 	{
 		while (1)
 		{
+			/* create the scope for this iteration */
+			scope = jep_create_object();
+			scope->type = JEP_LIST;
+			jep_add_object(list, scope);
+
 			if (node.leaf_count == 2)
 			{
 				o = jep_evaluate(node.leaves[1], list);
@@ -3754,6 +3771,7 @@ jep_obj *jep_for(jep_ast_node node, jep_obj *list)
 					jep_remove_scope(list);
 					jep_destroy_list(scope);
 					free(scope);
+					scope = NULL;
 					return o;
 				}
 				else if (o != NULL)
@@ -3766,12 +3784,14 @@ jep_obj *jep_for(jep_ast_node node, jep_obj *list)
 			{
 				jep_evaluate(change_node, list);
 			}
+
+			/* destroy the scope at the end of each iteration */
+			jep_remove_scope(list);
+			jep_destroy_list(scope);
+			free(scope);
+			scope = NULL;
 		}
 	}
-
-	jep_remove_scope(list);
-	jep_destroy_list(scope);
-	free(scope);
 
 	return o;
 }
@@ -3780,10 +3800,7 @@ jep_obj *jep_for(jep_ast_node node, jep_obj *list)
 jep_obj *jep_while(jep_ast_node node, jep_obj *list)
 {
 	jep_obj *o = NULL;
-	jep_obj *scope = jep_create_object();
-	scope->type = JEP_LIST;
-
-	jep_add_object(list, scope);
+	jep_obj *scope = NULL;
 
 	jep_ast_node head = node.leaves[0];
 	jep_obj *cond = NULL;
@@ -3801,6 +3818,11 @@ jep_obj *jep_while(jep_ast_node node, jep_obj *list)
 		}
 		while (val)
 		{
+			/* create the scope for this iteration */
+			scope = jep_create_object();
+			scope->type = JEP_LIST;
+			jep_add_object(list, scope);
+
 			if (node.leaf_count == 2)
 			{
 				o = jep_evaluate(node.leaves[1], list);
@@ -3809,6 +3831,7 @@ jep_obj *jep_while(jep_ast_node node, jep_obj *list)
 					jep_remove_scope(list);
 					jep_destroy_list(scope);
 					free(scope);
+					scope = NULL;
 					return o;
 				}
 				else if (o != NULL)
@@ -3823,16 +3846,18 @@ jep_obj *jep_while(jep_ast_node node, jep_obj *list)
 			{
 				val = *((int *)(cond->val));
 			}
+
+			/* destroy the scope at the end of each iteration */
+			jep_remove_scope(list);
+			jep_destroy_list(scope);
+			free(scope);
+			scope = NULL;
 		}
 	}
 	else
 	{
 		printf("invalid loop condition expression\n");
 	}
-
-	jep_remove_scope(list);
-	jep_destroy_list(scope);
-	free(scope);
 
 	return o;
 }

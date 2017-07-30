@@ -41,6 +41,7 @@ jep_obj *jep_evaluate(jep_ast_node ast, jep_obj *list)
 		{
 			o = jep_create_object();
 			jep_copy_object(o, e);
+			jep_copy_self(o, e);
 			o->ident = e->ident;
 		}
 		return o;
@@ -2845,14 +2846,7 @@ jep_obj *jep_assign(jep_ast_node node, jep_obj *list)
 		return NULL;
 	}
 
-	if (node.leaves[0].token.token_code == T_DOUBLECOLON)
-	{
-		l = jep_evaluate(node.leaves[0].leaves[0], list);
-	}
-	else
-	{
-		l = jep_evaluate(node.leaves[0], list);
-	}
+	l = jep_evaluate(node.leaves[0], list);
 
 	r = jep_evaluate(node.leaves[1], list);
 
@@ -2864,41 +2858,8 @@ jep_obj *jep_assign(jep_ast_node node, jep_obj *list)
 		}
 		else
 		{
-			if (l->index == -1)
-			{
-				if (l->type == JEP_REFERENCE)
-				{
-					o = (jep_obj *)(l->val);
-				}
-				else
-				{
-					o = jep_get_object(l->ident, list);
-				}
-			}
-			else if (l->index == -2)
-			{
-				o = jep_get_data_member(node.leaves[0], list);
-			}
-			else
-			{
-				jep_ast_node arr = node.leaves[0];
-				/* handle parentheses */
-				if (arr.token.token_code == T_LPAREN)
-				{
-					while (arr.token.token_code == T_LPAREN)
-					{
-						arr = arr.leaves[0];
-						if (arr.token.token_code == T_COMMA)
-						{
-							while (arr.token.token_code == T_COMMA)
-							{
-								arr = arr.leaves[1];
-							}
-						}
-					}
-				}
-				o = jep_get_element(arr, list);
-			}
+			/* assign the actual object to o */
+			o = l->self;
 		}
 
 		if (o == NULL)
@@ -2925,7 +2886,6 @@ jep_obj *jep_assign(jep_ast_node node, jep_obj *list)
 		}
 
 		jep_copy_object(o, r);
-		o->self = o;
 
 		if (r->type == JEP_ARRAY)
 		{
@@ -3157,6 +3117,7 @@ jep_obj *jep_brace(jep_ast_node node, jep_obj *list)
 /* evaluates an array subscript */
 jep_obj *jep_subscript(jep_ast_node node, jep_obj *list)
 {
+
 	jep_obj *o = NULL;
 	if (node.leaf_count != 2 && node.leaf_count != 1)
 	{
@@ -3216,7 +3177,8 @@ jep_obj *jep_subscript(jep_ast_node node, jep_obj *list)
 		}
 		else if (array->type != JEP_ARRAY)
 		{
-			printf("cannot access index of non array object\n");
+			printf("cannot access index of non array object: ");
+			jep_print_object(array);
 		}
 		else if (array->size > 0)
 		{
@@ -3232,6 +3194,7 @@ jep_obj *jep_subscript(jep_ast_node node, jep_obj *list)
 					jep_copy_object(o, elem);
 					o->array_ident = elem->array_ident;
 					o->index = elem->index;
+					jep_copy_self(o, elem);
 				}
 				elem = elem->next;
 			}
@@ -3285,7 +3248,7 @@ jep_obj *jep_get_element(jep_ast_node node, jep_obj *list)
 			{
 				if (array->ident != NULL)
 				{
-					jep_obj *actual = array->self; //jep_get_object(array->ident, list);
+					jep_obj *actual = array->self;
 					jep_destroy_object(array);
 					array = actual;
 				}
@@ -3482,6 +3445,7 @@ jep_obj *jep_function(jep_ast_node node, jep_obj *list)
 
 	jep_add_object(list, func);
 	jep_copy_object(copy, func);
+	copy->self = func->self;
 
 	return copy;
 }
@@ -3546,36 +3510,14 @@ jep_obj *jep_reference(jep_ast_node node, jep_obj *list)
 
 	if (v != NULL)
 	{
-		if (v->index != -1)
-		{
-			jep_ast_node arr = node.leaves[0];
-			/* handle parentheses */
-			if (arr.token.token_code == T_LPAREN)
-			{
-				while (arr.token.token_code == T_LPAREN)
-				{
-					arr = arr.leaves[0];
-					if (arr.token.token_code == T_COMMA)
-					{
-						while (arr.token.token_code == T_COMMA)
-						{
-							arr = arr.leaves[1];
-						}
-					}
-				}
-			}
-			jep_obj *elem = jep_get_element(arr, list);
-			o = jep_create_object();
-			o->type = JEP_REFERENCE;
-			o->val = elem;
-		}
-		else if (v->ident != NULL)
-		{
-			jep_obj *ref = jep_get_object(v->ident, list);
-			o = jep_create_object();
-			o->type = JEP_REFERENCE;
-			o->val = ref;
-		}
+		jep_obj *ref = jep_create_object();
+		jep_copy_object(ref, v);
+		jep_copy_self(ref, v);
+
+		o = jep_create_object();
+		o->type = JEP_REFERENCE;
+		o->val = ref;
+
 		jep_destroy_object(v);
 	}
 
@@ -3594,10 +3536,10 @@ jep_obj *jep_dereference(jep_ast_node node, jep_obj *list)
 		if (v->type == JEP_REFERENCE)
 		{
 			jep_obj *ref = (jep_obj *)(v->val);
-			/* o = v; */
 			o = jep_create_object();
 			o->ident = ref->ident;
 			jep_copy_object(o, ref);
+			jep_copy_self(o, ref);
 		}
 		else
 		{
@@ -4013,6 +3955,7 @@ jep_obj *jep_new(jep_ast_node node, jep_obj *list)
 		mem->ident = def_mem->ident;
 		mem->index = -2;
 		jep_add_object(members, mem);
+
 		def_mem = def_mem->next;
 	}
 
@@ -4069,6 +4012,7 @@ jep_obj *jep_member(jep_ast_node node, jep_obj *list)
 				jep_copy_object(mem, m);
 				mem->index = -2;
 				mem->ident = m->ident;
+				jep_copy_self(mem, m);
 			}
 			m = m->next;
 		}

@@ -789,7 +789,7 @@ void jep_parse(jep_token_stream *ts, jep_ast_node *root)
  * priority of the top of the operator stack is less than or equal to the
  * current operator on the stream
  */
-static void jep_attach(jep_stack *exp, jep_stack *opr, jep_ast_node *root, jep_ast_node **nodes)
+static void jep_attach(jep_stack *exp, jep_stack *opr, jep_ast_node *root, jep_ast_node *nodes)
 {
 	// printf("attaching some operands to operators\n");
 	jep_ast_node *r; /* right operand     */
@@ -797,9 +797,7 @@ static void jep_attach(jep_stack *exp, jep_stack *opr, jep_ast_node *root, jep_a
 	jep_ast_node *o; /* operator          */
 	jep_token *cur;  /* the current token */
 
-	cur = &(*nodes)->token;
-
-	// printf(" current: %s\n", cur->val->buffer);
+	cur = &(nodes->token);
 
 	do
 	{
@@ -834,7 +832,7 @@ static void jep_attach(jep_stack *exp, jep_stack *opr, jep_ast_node *root, jep_a
 				jep_err(ERR_EXPRESSION, *cur, root, cur->val->buffer);
 			}
 		}
-	} while (opr->size && jep_priority(opr->top) > jep_priority(*nodes) && opr->top->token.token_code != 15);
+	} while (opr->size && jep_priority(opr->top) > jep_priority(nodes));
 }
 
 /**
@@ -981,7 +979,7 @@ static jep_ast_node *jep_expression(jep_ast_node *root, jep_ast_node **nodes)
 				{
 					if (jep_prioritize(l_brac, opr.top))
 					{
-						jep_attach(&exp, &opr, root, nodes);
+						jep_attach(&exp, &opr, root, l_brac);
 						jep_push(&opr, l_brac);
 					}
 					else
@@ -1034,7 +1032,7 @@ static jep_ast_node *jep_expression(jep_ast_node *root, jep_ast_node **nodes)
 				{
 					if (jep_prioritize(l_brac, opr.top))
 					{
-						jep_attach(&exp, &opr, root, nodes);
+						jep_attach(&exp, &opr, root, l_brac);
 						jep_push(&opr, l_brac);
 					}
 					else
@@ -1080,7 +1078,7 @@ static jep_ast_node *jep_expression(jep_ast_node *root, jep_ast_node **nodes)
 			}
 			else if (jep_prioritize(*nodes, opr.top))
 			{
-				jep_attach(&exp, &opr, root, nodes);
+				jep_attach(&exp, &opr, root, *nodes);
 				jep_push(&opr, *nodes);
 			}
 			else

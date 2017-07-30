@@ -100,6 +100,9 @@ jep_obj *jep_get_object(const char *ident, jep_obj *list);
 /* copies the value of one obect into another */
 void jep_copy_object(jep_obj *dest, jep_obj *src);
 
+/* copies the value of the self pointer of an object */
+void jep_copy_self(jep_obj *dest, jep_obj *src);
+
 /* frees the memory in a list of objects */
 void jep_destroy_list(jep_obj *list);
 

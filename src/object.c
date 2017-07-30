@@ -444,8 +444,6 @@ void jep_copy_object(jep_obj *dest, jep_obj *src)
 		return;
 	}
 
-	dest->self = src->self;
-
 	if (dest->val != NULL)
 	{
 		if (dest->type == JEP_ARRAY)
@@ -516,12 +514,6 @@ void jep_copy_object(jep_obj *dest, jep_obj *src)
 	{
 		char *c = malloc(sizeof(char));
 		*c = *(char *)(src->val);
-		dest->val = (void *)c;
-	}
-	else if (src->type == JEP_BYTE)
-	{
-		unsigned char *c = malloc(sizeof(unsigned char));
-		*c = *(unsigned char *)(src->val);
 		dest->val = (void *)c;
 	}
 	else if (src->type == JEP_STRING)
@@ -610,6 +602,45 @@ void jep_copy_object(jep_obj *dest, jep_obj *src)
 	else if (src->type == JEP_NULL)
 	{
 		dest->val = NULL;
+	}
+}
+
+/* copies the value of the self pointer of an object */
+void jep_copy_self(jep_obj *dest, jep_obj *src)
+{
+	if (dest == NULL || src == NULL)
+	{
+		return;
+	}
+
+	if (dest->type != src->type)
+	{
+		return;
+	}
+
+	dest->self = src->self;
+
+	if (dest->type == JEP_ARRAY || dest->type == JEP_STRUCT)
+	{
+		jep_obj *src_array = (jep_obj *)(src->val);
+		jep_obj *dest_array = (jep_obj *)(dest->val);
+		if (src_array != NULL && src_array->size > 0)
+		{
+			jep_obj *src_e = src_array->head;   /* source */
+			jep_obj *dest_e = dest_array->head; /* destination */
+			while (src_e != NULL && dest_e != NULL)
+			{
+				jep_copy_self(dest_e, src_e);
+				dest_e = dest_e->next;
+				src_e = src_e->next;
+			}
+		}
+	}
+	else if (dest->type == JEP_REFERENCE)
+	{
+		jep_obj *src_ref = (jep_obj *)(src->val);
+		jep_obj *dest_ref = (jep_obj *)(dest->val);
+		jep_copy_self(dest_ref, src_ref);
 	}
 }
 

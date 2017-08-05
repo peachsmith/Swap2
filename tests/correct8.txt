@@ -2,7 +2,7 @@ i before function call: global variable
 j before function call: global variable
 k before function call: global variable
 i has been initialized locally to like, literally darf
-j has been initialized locally to [arg]
+j has been initialized locally to [null]
 k has been initialized locally to [array]
 1
 2

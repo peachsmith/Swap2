@@ -4123,6 +4123,12 @@ jep_obj *jep_evaluate_local(jep_ast_node ast, jep_obj *list, int mod)
 		return o;
 	}
 
+	/*
+	 * modifiers
+	 * 1 - local
+	 * 2 - constant
+	 */
+
 	if (ast.token.type == T_IDENTIFIER)
 	{
 		/* get the current scope */
@@ -4140,12 +4146,21 @@ jep_obj *jep_evaluate_local(jep_ast_node ast, jep_obj *list, int mod)
 			if (mod & 3)
 			{
 				jep_obj *local = jep_create_object();
-				local->type = JEP_ARGUMENT;
+				local->type = JEP_NULL;
 				local->ident = ast.token.val->buffer;
 				jep_add_object(scope, local);
 				jep_obj *con = jep_get_object(local->ident, scope);
 				con->mod = mod;
 			}
+		}
+		else if (mod & 1 && !(mod & 2))
+		{
+			jep_obj *local = jep_create_object();
+			local->type = JEP_NULL;
+			local->ident = ast.token.val->buffer;
+			jep_add_object(scope, local);
+			jep_obj *con = jep_get_object(local->ident, scope);
+			con->mod = mod;
 		}
 		else
 		{
@@ -4174,14 +4189,14 @@ jep_obj *jep_evaluate_local(jep_ast_node ast, jep_obj *list, int mod)
 		}
 
 		/* get any existing object in the current scope */
-		jep_obj *existing = jep_get_object(ast.token.val->buffer, scope);
+		jep_obj *existing = jep_get_object(ast.leaves[0].token.val->buffer, scope);
 
 		if (existing == NULL)
 		{
 			if (mod & 3)
 			{
 				jep_obj *local = jep_create_object();
-				local->type = JEP_ARGUMENT;
+				local->type = JEP_NULL;
 				local->ident = ast.leaves[0].token.val->buffer;
 				jep_add_object(scope, local);
 				o = jep_assign(ast, list);
@@ -4189,10 +4204,20 @@ jep_obj *jep_evaluate_local(jep_ast_node ast, jep_obj *list, int mod)
 				con->mod = mod;
 			}
 		}
+		else if (mod & 1 && !(mod & 2))
+		{
+			jep_obj *local = jep_create_object();
+			local->type = JEP_NULL;
+			local->ident = ast.leaves[0].token.val->buffer;
+			jep_add_object(scope, local);
+			o = jep_assign(ast, list);
+			jep_obj *con = jep_get_object(local->ident, scope);
+			con->mod = mod;
+		}
 		else
 		{
 			printf("the object %s has already been declared in this scope\n",
-				   ast.token.val->buffer);
+				   ast.leaves[0].token.val->buffer);
 		}
 	}
 

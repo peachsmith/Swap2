@@ -28,6 +28,7 @@
 #endif
 
 #include "import.h"
+#include "native.h"
 
 /**
  * gets the path of an import
@@ -50,7 +51,7 @@ char *jep_get_import(const char *path)
 		return import_path;
 	}
 
-#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+#if defined(_WIN32) || defined(__CYGWIN__)
 
 	/* get the path to the application */
 	GetModuleFileName(NULL, app_path, 1024);

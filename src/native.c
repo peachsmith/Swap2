@@ -56,6 +56,12 @@ jep_obj *jep_call_native(const char *ident, jep_obj *args)
 */
 jep_lib jep_load_lib(const char* lib_name)
 {
+	char* app_path = jep_get_path();
+	if (app_path != NULL)
+	{
+		printf("app path: %s\n", app_path);
+		free(app_path);
+	}
 	jep_lib lib = NULL;
 
 #if defined(_WIN32) || defined(__CYGWIN__)
@@ -89,4 +95,54 @@ jep_func jep_get_func(jep_lib lib, const char* func_name)
 #endif
 
 	return func;
+}
+
+/**
+* gets the full path to the executable
+*/
+char* jep_get_path()
+{
+	errno = 0;
+	int app_path_size = 1024;
+	char* app_path = malloc(app_path_size);
+
+#if defined(_WIN32) || defined(__CYGWIN__)
+
+	/* get the path to the application */
+	GetModuleFileName(NULL, app_path, app_path_size);
+
+	if (errno)
+	{
+		free(app_path);
+		return NULL;
+	}
+
+	/* remove the application name from the path */
+	int i = strlen(app_path);
+	for (; app_path[i] != '\\' && app_path[i] != '/' && i > 0; i--)
+	{
+		app_path[i] = '\0';
+	}
+
+#elif defined(__linux__)
+	ssize_t len;
+
+	len = readlink("/proc/self/exe", app_path, app_path_size - 1);
+	if (len == -1)
+	{
+		free(app_path);
+		return NULL;
+	}
+
+	app_path[len] = '\0';
+
+	/* remove the application name from the path */
+	int i = strlen(app_path);
+	for (; app_path[i] != '/' && i > 0; i--)
+	{
+		app_path[i] = '\0';
+	}
+#endif
+
+	return app_path;
 }

@@ -22,7 +22,7 @@
 
 #if defined(_WIN32) || defined(__CYGWIN__)
 #include <windows.h>
-#define SWAP_NATIVE_LIB ".\\SwapNative.dll"
+#define SWAP_NATIVE_LIB "SwapNative.dll"
 typedef HINSTANCE jep_lib;
 typedef jep_obj* (__cdecl *jep_func)(jep_obj*);
 #endif
@@ -46,5 +46,10 @@ void jep_free_lib(jep_lib lib);
 * loads a function from a shared library
 */
 jep_func jep_get_func(jep_lib lib, const char* func_name);
+
+/**
+ * gets the full path to the executable
+ */
+char* jep_get_path();
 
 #endif

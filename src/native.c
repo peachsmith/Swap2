@@ -60,6 +60,8 @@ jep_lib jep_load_lib(const char* lib_name)
 
 #if defined(_WIN32) || defined(__CYGWIN__)
 	lib = LoadLibrary(TEXT(lib_name));
+#elif defined(__linux__) || defined(__unix__)
+	lib = dlopen (lib_name, RTLD_LAZY);
 #endif
 
 	return lib;
@@ -73,6 +75,8 @@ void jep_free_lib(jep_lib lib)
 
 #if defined(_WIN32) || defined(__CYGWIN__)
 	FreeLibrary(lib);
+#elif defined(__linux__) || defined(__unix__)
+	dlclose (lib);
 #endif
 
 }
@@ -86,6 +90,8 @@ jep_func jep_get_func(jep_lib lib, const char* func_name)
 
 #if defined(_WIN32) || defined(__CYGWIN__)
 	func = (jep_func)GetProcAddress(lib, func_name);
+#elif defined(__linux__) || defined(__unix__)
+	func = dlsym(lib, func_name);
 #endif
 
 	return func;

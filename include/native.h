@@ -26,6 +26,7 @@
 	typedef HINSTANCE jep_lib;
 	typedef jep_obj* (__cdecl *jep_func)(jep_obj*);
 #elif defined(__linux__) || defined(__unix__)
+#	include <unistd.h>
 #	include <dlfcn.h>
 #	define SWAP_NATIVE_LIB "libSwapNative.so"
 	typedef void* jep_lib;

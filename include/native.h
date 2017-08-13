@@ -21,10 +21,15 @@
 #include "object.h"
 
 #if defined(_WIN32) || defined(__CYGWIN__)
-#include <windows.h>
-#define SWAP_NATIVE_LIB "SwapNative.dll"
-typedef HINSTANCE jep_lib;
-typedef jep_obj* (__cdecl *jep_func)(jep_obj*);
+#	include <windows.h>
+#	define SWAP_NATIVE_LIB "SwapNative.dll"
+	typedef HINSTANCE jep_lib;
+	typedef jep_obj* (__cdecl *jep_func)(jep_obj*);
+#elif defined(__linux__) || defined(__unix__)
+#	include <dlfcn.h>
+#	define SWAP_NATIVE_LIB "libSwapNative.so"
+	typedef void* jep_lib;
+	typedef jep_obj* (*jep_func)(jep_obj*);
 #endif
 
 /**

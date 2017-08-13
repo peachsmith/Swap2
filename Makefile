@@ -8,7 +8,7 @@ SHARED=libSwapNative.so
 all: build clean
 
 build:
-	gcc -Iinclude src/SwapNative.c src/object.c src/ast.c -shared -o $(SHARED)
+	gcc -fpic -Iinclude src/SwapNative.c src/object.c src/ast.c -shared -o $(SHARED)
 	gcc $(FLAGS) src/stringbuilder.c
 	gcc $(FLAGS) src/import.c
 	gcc $(FLAGS) src/tokenizer.c
@@ -18,7 +18,10 @@ build:
 	gcc $(FLAGS) src/operator.c
 	gcc $(FLAGS) src/native.c
 	gcc $(FLAGS) src/main.c
-	gcc main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap
+#Unix-like systems
+	gcc main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap -ldl
+#Windows
+#gcc main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap
 
 debug:
 	gcc -g $(FLAGS) src/stringbuilder.c
@@ -30,7 +33,10 @@ debug:
 	gcc -g $(FLAGS) src/operator.c
 	gcc -g $(FLAGS) src/native.c
 	gcc -g $(FLAGS) src/main.c
-	gcc main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap
+#Unix-like systems
+	gcc main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap -ldl
+#Windows
+#gcc main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap
 
 clean:
 	rm *.o

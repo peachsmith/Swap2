@@ -2,9 +2,13 @@ FLAGS=-c -Wall -O2 -Iinclude
 SWAP=./swap
 VERIFY=./verify.sh
 
+# change to SwapNative.dll when using Cygwin on Windows
+SHARED=libSwapNative.so
+
 all: build clean
 
 build:
+	gcc -Iinclude src/SwapNative.c src/object.c src/ast.c -shared -o $(SHARED)
 	gcc $(FLAGS) src/stringbuilder.c
 	gcc $(FLAGS) src/import.c
 	gcc $(FLAGS) src/tokenizer.c

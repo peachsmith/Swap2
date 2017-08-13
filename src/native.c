@@ -22,7 +22,21 @@ jep_obj *jep_call_native(const char *ident, jep_obj *args)
 {
 	jep_obj *o = NULL;
 
-	jep_lib lib = jep_load_lib(SWAP_NATIVE_LIB);
+	char* app_path = jep_get_path();
+	if (app_path == NULL)
+	{
+		return NULL;
+	}
+
+	size_t a_len = strlen(app_path);
+	size_t l_len = strlen(SWAP_NATIVE_LIB);
+
+	char* lib_path = malloc(a_len + l_len + 1);
+	strcpy(lib_path, app_path);
+	strcat(lib_path, SWAP_NATIVE_LIB);
+	lib_path[a_len + l_len] = '\0';
+
+	jep_lib lib = jep_load_lib(lib_path);
 	if (lib != NULL)
 	{
 		size_t ident_len = strlen(ident);
@@ -33,7 +47,7 @@ jep_obj *jep_call_native(const char *ident, jep_obj *args)
 
 		if (func != NULL)
 		{
-			return func(args);
+			o = func(args);
 		}
 		else
 		{
@@ -48,6 +62,9 @@ jep_obj *jep_call_native(const char *ident, jep_obj *args)
 		printf("could not load shared library\n");
 	}
 
+	free(app_path);
+	free(lib_path);
+
 	return o;
 }
 
@@ -56,18 +73,12 @@ jep_obj *jep_call_native(const char *ident, jep_obj *args)
 */
 jep_lib jep_load_lib(const char* lib_name)
 {
-	char* app_path = jep_get_path();
-	if (app_path != NULL)
-	{
-		printf("app path: %s\n", app_path);
-		free(app_path);
-	}
 	jep_lib lib = NULL;
 
 #if defined(_WIN32) || defined(__CYGWIN__)
 	lib = LoadLibrary(TEXT(lib_name));
 #elif defined(__linux__) || defined(__unix__)
-	lib = dlopen (lib_name, RTLD_LAZY);
+	lib = dlopen(lib_name, RTLD_LAZY);
 #endif
 
 	return lib;
@@ -82,7 +93,7 @@ void jep_free_lib(jep_lib lib)
 #if defined(_WIN32) || defined(__CYGWIN__)
 	FreeLibrary(lib);
 #elif defined(__linux__) || defined(__unix__)
-	dlclose (lib);
+	dlclose(lib);
 #endif
 
 }

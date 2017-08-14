@@ -1,19 +1,19 @@
 /*
-    Functions for building an abstract syntax tree
-    Copyright (C) 2016 John Powell
+	Functions for building an abstract syntax tree
+	Copyright (C) 2016 John Powell
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "parser.h"
 
@@ -41,27 +41,27 @@ static void jep_err(int err, jep_token tok, jep_ast_node *root, char *val)
 	if (err == ERR_EXPRESSION)
 	{
 		printf("expected expression before '%s' at %d,%d\n",
-			   val, tok.row, tok.column);
+			val, tok.row, tok.column);
 	}
 	else if (err == ERR_IDENTIFIER)
 	{
 		printf("expected identifier at %s %d,%d but found %s\n",
-			   tok.file, tok.row, tok.column, tok.val->buffer);
+			tok.file, tok.row, tok.column, tok.val->buffer);
 	}
 	else if (err == ERR_UNEXPECTED)
 	{
 		printf("unexpected token '%s' at %s %d,%d\n",
-			   tok.val->buffer, tok.file, tok.row, tok.column);
+			tok.val->buffer, tok.file, tok.row, tok.column);
 	}
 	else if (err == ERR_EXPECTED)
 	{
 		printf("expected '%s' at %s %d,%d but found '%s'\n",
-			   val, tok.file, tok.row, tok.column, tok.val->buffer);
+			val, tok.file, tok.row, tok.column, tok.val->buffer);
 	}
 	else if (err == ERR_UNIQUE)
 	{
 		printf("expected unique argument at %d,%d but found '%s'\n",
-			   tok.row, tok.column, tok.val->buffer);
+			tok.row, tok.column, tok.val->buffer);
 	}
 }
 
@@ -197,7 +197,7 @@ static int jep_priority(jep_ast_node *node)
 	case T_NEW:
 		return 8;
 
-	/* this used to be 9, but it might need to stay as 8 */
+		/* this used to be 9, but it might need to stay as 8 */
 	case T_INCREMENT:
 	case T_DECREMENT:
 		return 8;
@@ -462,7 +462,7 @@ static jep_ast_node *jep_while(jep_ast_node *root, jep_ast_node **nodes)
 	wh_node = (*nodes)++;
 	if ((*nodes)->token.token_code != T_LPAREN)
 	{
-		jep_err(ERR_EXPECTED, (*nodes)->token, root, "}");
+		jep_err(ERR_EXPECTED, (*nodes)->token, root, "(");
 		return NULL;
 	}
 
@@ -532,7 +532,7 @@ static jep_ast_node *jep_for(jep_ast_node *root, jep_ast_node **nodes)
 	fo_node = (*nodes)++;
 	if ((*nodes)->token.token_code != T_LPAREN)
 	{
-		jep_err(ERR_EXPECTED, (*nodes)->token, root, "}");
+		jep_err(ERR_EXPECTED, (*nodes)->token, root, "(");
 		return NULL;
 	}
 
@@ -607,6 +607,129 @@ static jep_ast_node *jep_for(jep_ast_node *root, jep_ast_node **nodes)
 	}
 
 	return fo_node;
+}
+
+/**
+* parses a try block
+*/
+static jep_ast_node *jep_try(jep_ast_node *root, jep_ast_node **nodes)
+{
+	jep_ast_node *try_node;   /* the try keyword                      */
+	jep_ast_node *try_body;   /* the block of code to be tried        */
+	jep_ast_node *catch_node; /* the catch keyword                    */
+	jep_ast_node *exception;  /* the exception to be caught           */
+	jep_ast_node *catch_body; /* the code that handles the exception  */
+
+	try_node = (*nodes)++;
+	if ((*nodes)->token.token_code != T_LBRACE)
+	{
+		jep_err(ERR_EXPECTED, (*nodes)->token, root, "{");
+		return NULL;
+	}
+
+	try_body = (*nodes)++;
+	try_body->error = 0;
+	jep_block(try_body, nodes);
+	root->error = try_body->error;
+
+	if (!jep_accept(T_RBRACE, nodes) && !root->error)
+	{
+		jep_err(ERR_EXPECTED, (*nodes)->token, root, "}");
+		return NULL;
+	}
+	else
+	{
+		jep_add_leaf_node(try_node, try_body);
+	}
+
+	if ((*nodes)->token.token_code != T_CATCH)
+	{
+		jep_err(ERR_EXPECTED, (*nodes)->token, root, "catch");
+		return NULL;
+	}
+
+	catch_node = (*nodes)++;
+
+	if ((*nodes)->token.token_code != T_LPAREN)
+	{
+		jep_err(ERR_EXPECTED, (*nodes)->token, root, "(");
+		return NULL;
+	}
+
+	/* skip the left parenthesis */
+	(*nodes)++;
+
+	if ((*nodes)->token.type != T_IDENTIFIER)
+	{
+		jep_err(ERR_EXPECTED, (*nodes)->token, root, "identifier");
+		return NULL;
+	}
+
+	exception = (*nodes)++;
+
+	if ((*nodes)->token.token_code != T_RPAREN)
+	{
+		jep_err(ERR_EXPECTED, (*nodes)->token, root, ")");
+		return NULL;
+	}
+
+	/* skip the right parenthesis */
+	(*nodes)++;
+
+	jep_add_leaf_node(catch_node, exception);
+
+	if ((*nodes)->token.token_code == T_LBRACE)
+	{
+		catch_body = (*nodes)++;
+		catch_body->error = 0;
+		jep_block(catch_body, nodes);
+		root->error = catch_body->error;
+		if (!jep_accept(T_RBRACE, nodes) && !root->error)
+		{
+			jep_err(ERR_EXPECTED, (*nodes)->token, root, "}");
+		}
+		else
+		{
+			jep_add_leaf_node(catch_node, catch_body);
+		}
+	}
+	else
+	{
+		catch_body = jep_statement(root, nodes);
+		if (catch_body != NULL && !root->error)
+		{
+			jep_add_leaf_node(catch_node, catch_body);
+		}
+	}
+
+	jep_add_leaf_node(try_node, catch_node);
+
+	return try_node;
+}
+
+/**
+* parses a throw statement
+*/
+static jep_ast_node *jep_throw(jep_ast_node *root, jep_ast_node **nodes)
+{
+	jep_ast_node *throw_node; /* the throw keyword                    */
+	jep_ast_node *exception;  /* the thrown object                    */
+
+	throw_node = (*nodes)++;
+
+	exception = jep_statement(root, nodes);
+
+	jep_add_leaf_node(throw_node, exception);
+
+	return throw_node;
+}
+
+/**
+* parses a switch statement
+*/
+static jep_ast_node *jep_switch(jep_ast_node *root, jep_ast_node **nodes)
+{
+	return NULL;
 }
 
 /**
@@ -1189,9 +1312,9 @@ static jep_ast_node *jep_modifier(jep_ast_node *root, jep_ast_node **nodes)
 			if (mod & 1)
 			{
 				printf("duplicate modifier %s detected at %d,%d\n",
-					   next->token.val->buffer,
-					   next->token.row,
-					   next->token.column);
+					next->token.val->buffer,
+					next->token.row,
+					next->token.column);
 				root->error = 1;
 				return NULL;
 			}
@@ -1205,9 +1328,9 @@ static jep_ast_node *jep_modifier(jep_ast_node *root, jep_ast_node **nodes)
 			if (mod & 2)
 			{
 				printf("duplicate modifier %s detected at %d,%d\n",
-					   next->token.val->buffer,
-					   next->token.row,
-					   next->token.column);
+					next->token.val->buffer,
+					next->token.row,
+					next->token.column);
 				root->error = 1;
 				return NULL;
 			}
@@ -1258,6 +1381,14 @@ static jep_ast_node *jep_statement(jep_ast_node *root, jep_ast_node **nodes)
 	else if ((*nodes)->token.token_code == T_FOR)
 	{
 		statement = jep_for(root, nodes);
+	}
+	else if ((*nodes)->token.token_code == T_TRY)
+	{
+		statement = jep_try(root, nodes);
+	}
+	else if ((*nodes)->token.token_code == T_THROW)
+	{
+		statement = jep_throw(root, nodes);
 	}
 	else if ((*nodes)->token.token_code == T_FUNCTION)
 	{

@@ -1,19 +1,19 @@
 /*
-    Functions for tokenizing a string of characters
-    Copyright (C) 2016 John Powell
+	Functions for tokenizing a string of characters
+	Copyright (C) 2016 John Powell
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "tokenizer.h"
 #include "import.h"
@@ -22,40 +22,41 @@
  * one-character symbols
  */
 const char *symbols[] =
-	{
-		"+", "-", "/", "*", ";", ",", "(", ")", "[", "]", "{",
-		"}", "<", ">", "=", ".", "&", "|", "^", "!", "%", ":"};
+{
+	"+", "-", "/", "*", ";", ",", "(", ")", "[", "]", "{",
+	"}", "<", ">", "=", ".", "&", "|", "^", "!", "%", ":" };
 
 /**
  * two-character symbols
  */
 const char *symbols2[] =
-	{
-		"++", "--", "+=", "-=", "*=", "/=", "%=", "==", "<=",
-		">=", ">>", "<<", "&=", "|=", "^=", "&&", "||", "!=",
-		"::"};
+{
+	"++", "--", "+=", "-=", "*=", "/=", "%=", "==", "<=",
+	">=", ">>", "<<", "&=", "|=", "^=", "&&", "||", "!=",
+	"::" };
 
 /**
  * three-character symbols
  */
 const char *symbols3[] =
-	{
-		"<<=", ">>="};
+{
+	"<<=", ">>=" };
 
 /**
  * keywords
  */
 const char *keywords[] =
-	{
-		"if", "else", "for", "while", "function", "return", "import", "null",
-		"struct", "local", "const", "new"};
+{
+	"if", "else", "for", "while", "function", "return", "import", "null",
+	"struct", "local", "const", "new", "try", "catch", "throw", "switch",
+	"case", "default" };
 
 /**
  * escape characters
  */
 const char escapes[] =
-	{
-		'a', 'b', 'f', 'n', 'r', 't', 'v', '\\', '\'', '"', '?'};
+{
+	'a', 'b', 'f', 'n', 'r', 't', 'v', '\\', '\'', '"', '?' };
 
 /**
  * checks for an escape character
@@ -162,7 +163,7 @@ static int jep_is_symbol3(const char *s)
 static int jep_is_keyword(const char *s)
 {
 	int i;
-	for (i = 0; i < 12; i++)
+	for (i = 0; i < 18; i++)
 	{
 		if (!strcmp(s, keywords[i]))
 		{
@@ -229,7 +230,7 @@ static void jep_classify_token(jep_token *t)
 			/* detect new*/
 			t->type = T_SYMBOL;
 		}
-		else if (code > 8)
+		else if (code == 9 || code == 10)
 		{
 			/* detect modifiers */
 			t->type = T_MODIFIER;
@@ -324,7 +325,7 @@ void jep_destroy_token(jep_token *t)
 }
 
 /**
- * creates a new token stream 
+ * creates a new token stream
  */
 jep_token_stream *jep_create_token_stream()
 {
@@ -534,8 +535,8 @@ void jep_tokenize_file(jep_token_stream *ts, const char *file_name)
 				if (!jep_has_directive(ts, dir->buffer))
 				{
 					jep_token dir_tok =
-						{
-							dir, T_DIRECTIVE, 0, row, col, 0, 0, file_name};
+					{
+						dir, T_DIRECTIVE, 0, row, col, 0, 0, file_name };
 					jep_append_directive(ts, dir_tok);
 				}
 				else
@@ -561,8 +562,8 @@ void jep_tokenize_file(jep_token_stream *ts, const char *file_name)
 		{
 			jep_string_builder *val = jep_create_string_builder();
 			jep_token ident =
-				{
-					val, T_IDENTIFIER, 0, row, col, 0, 0, file_name};
+			{
+				val, T_IDENTIFIER, 0, row, col, 0, 0, file_name };
 			do
 			{
 				jep_append_char(ident.val, s[i++]);
@@ -581,8 +582,8 @@ void jep_tokenize_file(jep_token_stream *ts, const char *file_name)
 		{
 			jep_string_builder *val = jep_create_string_builder();
 			jep_token c =
-				{
-					val, T_CHARACTER, 0, row, col, 0, 0, file_name};
+			{
+				val, T_CHARACTER, 0, row, col, 0, 0, file_name };
 			i++;
 			col++;
 			do
@@ -617,8 +618,8 @@ void jep_tokenize_file(jep_token_stream *ts, const char *file_name)
 		{
 			jep_string_builder *val = jep_create_string_builder();
 			jep_token str =
-				{
-					val, T_STRING, 0, row, col, 0, 0, file_name};
+			{
+				val, T_STRING, 0, row, col, 0, 0, file_name };
 			i++;
 			col++;
 			while (s[i] != '"' && i < sb->size)
@@ -653,9 +654,9 @@ void jep_tokenize_file(jep_token_stream *ts, const char *file_name)
 		{
 			jep_string_builder *val = jep_create_string_builder();
 			jep_token sym =
-				{
-					val, T_SYMBOL, 0, row, col, 0, 0, file_name};
-			char symbol[] = {s[i], '\0', '\0', '\0'};
+			{
+				val, T_SYMBOL, 0, row, col, 0, 0, file_name };
+			char symbol[] = { s[i], '\0', '\0', '\0' };
 			if (i < sb->size - 1)
 			{
 				symbol[1] = s[i + 1];
@@ -713,8 +714,8 @@ void jep_tokenize_file(jep_token_stream *ts, const char *file_name)
 		{
 			jep_string_builder *val = jep_create_string_builder();
 			jep_token num =
-				{
-					val, T_NUMBER, 0, row, col, 0, 0, file_name};
+			{
+				val, T_NUMBER, 0, row, col, 0, 0, file_name };
 			int dec = 0;
 			do
 			{
@@ -755,8 +756,8 @@ void jep_tokenize_file(jep_token_stream *ts, const char *file_name)
 
 	/* append an END token */
 	jep_token end_token =
-		{
-			jep_create_string_builder(), T_END, T_EOF, row, col, 0, 0, file_name};
+	{
+		jep_create_string_builder(), T_END, T_EOF, row, col, 0, 0, file_name };
 	jep_append_string(end_token.val, "EOF");
 	jep_append_token(ts, end_token);
 
@@ -780,43 +781,43 @@ void jep_print_tokens(jep_token_stream *ts, FILE *f)
 		{
 		case T_SYMBOL:
 			fprintf(f, "%-12s %-7d %-7d %-12d %s\n", "[symbol]",
-					ts->tok[i].row, ts->tok[i].column,
-					ts->tok[i].token_code, ts->tok[i].val->buffer);
+				ts->tok[i].row, ts->tok[i].column,
+				ts->tok[i].token_code, ts->tok[i].val->buffer);
 			break;
 		case T_IDENTIFIER:
 			fprintf(f, "%-12s %-7d %-7d %-12d %s\n", "[identifier]",
-					ts->tok[i].row, ts->tok[i].column,
-					ts->tok[i].token_code, ts->tok[i].val->buffer);
+				ts->tok[i].row, ts->tok[i].column,
+				ts->tok[i].token_code, ts->tok[i].val->buffer);
 			break;
 		case T_CHARACTER:
 			fprintf(f, "%-12s %-7d %-7d %-12d %s\n", "[character]",
-					ts->tok[i].row, ts->tok[i].column,
-					ts->tok[i].token_code, ts->tok[i].val->buffer);
+				ts->tok[i].row, ts->tok[i].column,
+				ts->tok[i].token_code, ts->tok[i].val->buffer);
 			break;
 		case T_STRING:
 			fprintf(f, "%-12s %-7d %-7d %-12d %s\n", "[string]",
-					ts->tok[i].row, ts->tok[i].column,
-					ts->tok[i].token_code, ts->tok[i].val->buffer);
+				ts->tok[i].row, ts->tok[i].column,
+				ts->tok[i].token_code, ts->tok[i].val->buffer);
 			break;
 		case T_NUMBER:
 			fprintf(f, "%-12s %-7d %-7d %-12d %s\n", "[number]",
-					ts->tok[i].row, ts->tok[i].column,
-					ts->tok[i].token_code, ts->tok[i].val->buffer);
+				ts->tok[i].row, ts->tok[i].column,
+				ts->tok[i].token_code, ts->tok[i].val->buffer);
 			break;
 		case T_KEYWORD:
 			fprintf(f, "%-12s %-7d %-7d %-12d %s\n", "[keyword]",
-					ts->tok[i].row, ts->tok[i].column,
-					ts->tok[i].token_code, ts->tok[i].val->buffer);
+				ts->tok[i].row, ts->tok[i].column,
+				ts->tok[i].token_code, ts->tok[i].val->buffer);
 			break;
 		case T_MODIFIER:
 			fprintf(f, "%-12s %-7d %-7d %-12d %s\n", "[modifier]",
-					ts->tok[i].row, ts->tok[i].column,
-					ts->tok[i].token_code, ts->tok[i].val->buffer);
+				ts->tok[i].row, ts->tok[i].column,
+				ts->tok[i].token_code, ts->tok[i].val->buffer);
 			break;
 		case T_END:
 			fprintf(f, "%-12s %-7d %-7d %-12d %s\n", "[end]",
-					ts->tok[i].row, ts->tok[i].column,
-					ts->tok[i].token_code, ts->tok[i].val->buffer);
+				ts->tok[i].row, ts->tok[i].column,
+				ts->tok[i].token_code, ts->tok[i].val->buffer);
 			break;
 		default:
 			break;

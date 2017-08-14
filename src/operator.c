@@ -1,19 +1,19 @@
 /*
-    Functions for performing operations dictated by an abstract syntax tree
-    Copyright (C) 2016 John Powell
+	Functions for performing operations dictated by an abstract syntax tree
+	Copyright (C) 2016 John Powell
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "operator.h"
 
@@ -67,6 +67,14 @@ jep_obj *jep_evaluate(jep_ast_node ast, jep_obj *list)
 		else if (ast.token.token_code == T_WHILE)
 		{
 			return jep_while(ast, list);
+		}
+		else if (ast.token.token_code == T_TRY)
+		{
+			return jep_try(ast, list);
+		}
+		else if (ast.token.token_code == T_THROW)
+		{
+			return jep_throw(ast, list);
 		}
 		else if (ast.token.token_code == T_NULL)
 		{
@@ -240,7 +248,7 @@ jep_obj *jep_evaluate(jep_ast_node ast, jep_obj *list)
 
 	default:
 		printf("unrecognized token: %s\n",
-			   ast.token.val->buffer);
+			ast.token.val->buffer);
 		break;
 	}
 
@@ -2693,17 +2701,17 @@ jep_obj *jep_dec(jep_ast_node node, jep_obj *list)
 /* performs an addition assignmnet */
 jep_obj *jep_add_assign(jep_ast_node node, jep_obj *list)
 {
-	jep_token equals = {NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL};
+	jep_token equals = { NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL };
 
-	jep_token operator= {NULL, 0, T_PLUS, 0, 0, 0, 0, NULL};
+	jep_token operator={ NULL, 0, T_PLUS, 0, 0, 0, 0, NULL };
 
-	jep_ast_node operands[] = {node.leaves[0], node.leaves[1]};
+	jep_ast_node operands[] = { node.leaves[0], node.leaves[1] };
 
-	jep_ast_node operation = {operator, 2, 0, operands, 0, 0, 0, 0 };
+	jep_ast_node operation = { operator, 2, 0, operands, 0, 0, 0, 0 };
 
-	jep_ast_node asign_operands[] = {node.leaves[0], operation};
+	jep_ast_node asign_operands[] = { node.leaves[0], operation };
 
-	jep_ast_node assignment = {equals, 2, 0, asign_operands, 0, 0, 0, 0};
+	jep_ast_node assignment = { equals, 2, 0, asign_operands, 0, 0, 0, 0 };
 
 	return jep_evaluate(assignment, list);
 }
@@ -2711,17 +2719,17 @@ jep_obj *jep_add_assign(jep_ast_node node, jep_obj *list)
 /* performs a subtraction assignment */
 jep_obj *jep_sub_assign(jep_ast_node node, jep_obj *list)
 {
-	jep_token equals = {NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL};
+	jep_token equals = { NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL };
 
-	jep_token operator= {NULL, 0, T_MINUS, 0, 0, 0, 0, NULL};
+	jep_token operator={ NULL, 0, T_MINUS, 0, 0, 0, 0, NULL };
 
-	jep_ast_node operands[] = {node.leaves[0], node.leaves[1]};
+	jep_ast_node operands[] = { node.leaves[0], node.leaves[1] };
 
-	jep_ast_node operation = {operator, 2, 0, operands, 0, 0, 0, 0 };
+	jep_ast_node operation = { operator, 2, 0, operands, 0, 0, 0, 0 };
 
-	jep_ast_node asign_operands[] = {node.leaves[0], operation};
+	jep_ast_node asign_operands[] = { node.leaves[0], operation };
 
-	jep_ast_node assignment = {equals, 2, 0, asign_operands, 0, 0, 0, 0};
+	jep_ast_node assignment = { equals, 2, 0, asign_operands, 0, 0, 0, 0 };
 
 	return jep_evaluate(assignment, list);
 }
@@ -2729,17 +2737,17 @@ jep_obj *jep_sub_assign(jep_ast_node node, jep_obj *list)
 /* performs a multiplication assignment */
 jep_obj *jep_mul_assign(jep_ast_node node, jep_obj *list)
 {
-	jep_token equals = {NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL};
+	jep_token equals = { NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL };
 
-	jep_token operator= {NULL, 0, T_STAR, 0, 0, 0, 0, NULL};
+	jep_token operator={ NULL, 0, T_STAR, 0, 0, 0, 0, NULL };
 
-	jep_ast_node operands[] = {node.leaves[0], node.leaves[1]};
+	jep_ast_node operands[] = { node.leaves[0], node.leaves[1] };
 
-	jep_ast_node operation = {operator, 2, 0, operands, 0, 0, 0, 0 };
+	jep_ast_node operation = { operator, 2, 0, operands, 0, 0, 0, 0 };
 
-	jep_ast_node asign_operands[] = {node.leaves[0], operation};
+	jep_ast_node asign_operands[] = { node.leaves[0], operation };
 
-	jep_ast_node assignment = {equals, 2, 0, asign_operands, 0, 0, 0, 0};
+	jep_ast_node assignment = { equals, 2, 0, asign_operands, 0, 0, 0, 0 };
 
 	return jep_evaluate(assignment, list);
 }
@@ -2747,17 +2755,17 @@ jep_obj *jep_mul_assign(jep_ast_node node, jep_obj *list)
 /* performs a division assignment */
 jep_obj *jep_div_assign(jep_ast_node node, jep_obj *list)
 {
-	jep_token equals = {NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL};
+	jep_token equals = { NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL };
 
-	jep_token operator= {NULL, 0, T_FSLASH, 0, 0, 0, 0, NULL};
+	jep_token operator={ NULL, 0, T_FSLASH, 0, 0, 0, 0, NULL };
 
-	jep_ast_node operands[] = {node.leaves[0], node.leaves[1]};
+	jep_ast_node operands[] = { node.leaves[0], node.leaves[1] };
 
-	jep_ast_node operation = {operator, 2, 0, operands, 0, 0, 0, 0 };
+	jep_ast_node operation = { operator, 2, 0, operands, 0, 0, 0, 0 };
 
-	jep_ast_node asign_operands[] = {node.leaves[0], operation};
+	jep_ast_node asign_operands[] = { node.leaves[0], operation };
 
-	jep_ast_node assignment = {equals, 2, 0, asign_operands, 0, 0, 0, 0};
+	jep_ast_node assignment = { equals, 2, 0, asign_operands, 0, 0, 0, 0 };
 
 	return jep_evaluate(assignment, list);
 }
@@ -2765,17 +2773,17 @@ jep_obj *jep_div_assign(jep_ast_node node, jep_obj *list)
 /* performs a modulus assignment */
 jep_obj *jep_mod_assign(jep_ast_node node, jep_obj *list)
 {
-	jep_token equals = {NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL};
+	jep_token equals = { NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL };
 
-	jep_token operator= {NULL, 0, T_MODULUS, 0, 0, 0, 0, NULL};
+	jep_token operator={ NULL, 0, T_MODULUS, 0, 0, 0, 0, NULL };
 
-	jep_ast_node operands[] = {node.leaves[0], node.leaves[1]};
+	jep_ast_node operands[] = { node.leaves[0], node.leaves[1] };
 
-	jep_ast_node operation = {operator, 2, 0, operands, 0, 0, 0, 0 };
+	jep_ast_node operation = { operator, 2, 0, operands, 0, 0, 0, 0 };
 
-	jep_ast_node asign_operands[] = {node.leaves[0], operation};
+	jep_ast_node asign_operands[] = { node.leaves[0], operation };
 
-	jep_ast_node assignment = {equals, 2, 0, asign_operands, 0, 0, 0, 0};
+	jep_ast_node assignment = { equals, 2, 0, asign_operands, 0, 0, 0, 0 };
 
 	return jep_evaluate(assignment, list);
 }
@@ -2783,17 +2791,17 @@ jep_obj *jep_mod_assign(jep_ast_node node, jep_obj *list)
 /* performs a bitwise and assignment on an integer */
 jep_obj *jep_and_assign(jep_ast_node node, jep_obj *list)
 {
-	jep_token equals = {NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL};
+	jep_token equals = { NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL };
 
-	jep_token operator= {NULL, 0, T_BITAND, 0, 0, 0, 0, NULL};
+	jep_token operator={ NULL, 0, T_BITAND, 0, 0, 0, 0, NULL };
 
-	jep_ast_node operands[] = {node.leaves[0], node.leaves[1]};
+	jep_ast_node operands[] = { node.leaves[0], node.leaves[1] };
 
-	jep_ast_node operation = {operator, 2, 0, operands, 0, 0, 0, 0 };
+	jep_ast_node operation = { operator, 2, 0, operands, 0, 0, 0, 0 };
 
-	jep_ast_node asign_operands[] = {node.leaves[0], operation};
+	jep_ast_node asign_operands[] = { node.leaves[0], operation };
 
-	jep_ast_node assignment = {equals, 2, 0, asign_operands, 0, 0, 0, 0};
+	jep_ast_node assignment = { equals, 2, 0, asign_operands, 0, 0, 0, 0 };
 
 	return jep_evaluate(assignment, list);
 }
@@ -2801,17 +2809,17 @@ jep_obj *jep_and_assign(jep_ast_node node, jep_obj *list)
 /* performs a bitwise and assignment on an integer */
 jep_obj *jep_or_assign(jep_ast_node node, jep_obj *list)
 {
-	jep_token equals = {NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL};
+	jep_token equals = { NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL };
 
-	jep_token operator= {NULL, 0, T_BITOR, 0, 0, 0, 0, NULL};
+	jep_token operator={ NULL, 0, T_BITOR, 0, 0, 0, 0, NULL };
 
-	jep_ast_node operands[] = {node.leaves[0], node.leaves[1]};
+	jep_ast_node operands[] = { node.leaves[0], node.leaves[1] };
 
-	jep_ast_node operation = {operator, 2, 0, operands, 0, 0, 0, 0 };
+	jep_ast_node operation = { operator, 2, 0, operands, 0, 0, 0, 0 };
 
-	jep_ast_node asign_operands[] = {node.leaves[0], operation};
+	jep_ast_node asign_operands[] = { node.leaves[0], operation };
 
-	jep_ast_node assignment = {equals, 2, 0, asign_operands, 0, 0, 0, 0};
+	jep_ast_node assignment = { equals, 2, 0, asign_operands, 0, 0, 0, 0 };
 
 	return jep_evaluate(assignment, list);
 }
@@ -2819,17 +2827,17 @@ jep_obj *jep_or_assign(jep_ast_node node, jep_obj *list)
 /* performs a bitwise exclusive or assignment on an integer */
 jep_obj *jep_xor_assign(jep_ast_node node, jep_obj *list)
 {
-	jep_token equals = {NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL};
+	jep_token equals = { NULL, 0, T_EQUALS, 0, 0, 0, 0, NULL };
 
-	jep_token operator= {NULL, 0, T_BITXOR, 0, 0, 0, 0, NULL};
+	jep_token operator={ NULL, 0, T_BITXOR, 0, 0, 0, 0, NULL };
 
-	jep_ast_node operands[] = {node.leaves[0], node.leaves[1]};
+	jep_ast_node operands[] = { node.leaves[0], node.leaves[1] };
 
-	jep_ast_node operation = {operator, 2, 0, operands, 0, 0, 0, 0 };
+	jep_ast_node operation = { operator, 2, 0, operands, 0, 0, 0, 0 };
 
-	jep_ast_node asign_operands[] = {node.leaves[0], operation};
+	jep_ast_node asign_operands[] = { node.leaves[0], operation };
 
-	jep_ast_node assignment = {equals, 2, 0, asign_operands, 0, 0, 0, 0};
+	jep_ast_node assignment = { equals, 2, 0, asign_operands, 0, 0, 0, 0 };
 
 	return jep_evaluate(assignment, list);
 }
@@ -2848,7 +2856,21 @@ jep_obj *jep_assign(jep_ast_node node, jep_obj *list)
 
 	l = jep_evaluate(node.leaves[0], list);
 
+	if (l != NULL && l->ret & JEP_EXCEPTION)
+	{
+		return l;
+	}
+
 	r = jep_evaluate(node.leaves[1], list);
+
+	if (r != NULL && r->ret & JEP_EXCEPTION)
+	{
+		if (l != NULL)
+		{
+			jep_destroy_object(l);
+		}
+		return r;
+	}
 
 	if (l != NULL || node.leaves[0].token.type == T_IDENTIFIER)
 	{
@@ -3254,7 +3276,7 @@ jep_obj *jep_get_element(jep_ast_node node, jep_obj *list)
 				}
 				else
 				{
-					/* 
+					/*
 					 * if an array doens't have an array
 					 * identifier, then it is most likely
 					 * a local object
@@ -3364,13 +3386,13 @@ jep_obj *jep_get_data_member(jep_ast_node node, jep_obj *list)
 	if (struc == NULL)
 	{
 		printf("could not obtain object with identifier %s\n",
-			   node.leaves[0].token.val->buffer);
+			node.leaves[0].token.val->buffer);
 		return NULL;
 	}
 	else if (struc->type != JEP_STRUCT)
 	{
 		printf("%s is not a struct\n",
-			   node.leaves[0].token.val->buffer);
+			node.leaves[0].token.val->buffer);
 		return NULL;
 	}
 
@@ -3397,7 +3419,7 @@ jep_obj *jep_get_data_member(jep_ast_node node, jep_obj *list)
 		if (mem == NULL)
 		{
 			printf("%s does not have a member with the identifier %s\n",
-				   struc->ident, node.leaves[1].token.val->buffer);
+				struc->ident, node.leaves[1].token.val->buffer);
 		}
 	}
 	else
@@ -3862,6 +3884,84 @@ jep_obj *jep_while(jep_ast_node node, jep_obj *list)
 	return o;
 }
 
+/* evaluates a try/catch block */
+jep_obj* jep_try(jep_ast_node node, jep_obj* list)
+{
+	jep_obj *o = NULL;
+	jep_obj *scope = NULL;
+
+	jep_ast_node try_body = node.leaves[0];
+	jep_ast_node ex = node.leaves[1].leaves[0];
+	jep_ast_node catch_body = node.leaves[1].leaves[1];
+
+	/* create the scope for the try block */
+	scope = jep_create_object();
+	scope->type = JEP_LIST;
+	jep_add_object(list, scope);
+
+	/* evaluate the body of the try block */
+	o = jep_evaluate(try_body, list);
+
+	/* destroy the scope for the try block */
+	jep_remove_scope(list);
+	jep_destroy_list(scope);
+	free(scope);
+	scope = NULL;
+
+	if (o != NULL && !o->ret)
+	{
+		jep_destroy_object(o);
+		o = NULL;
+	}
+	else if (o != NULL)
+	{
+		if (o->ret & JEP_EXCEPTION)
+		{
+			jep_obj *exception = jep_create_object();
+			exception->ident = ex.token.val->buffer;
+			jep_copy_object(exception, o);
+			jep_destroy_object(o);
+			o = NULL;
+
+			/* create the scope for the catch block */
+			scope = jep_create_object();
+			scope->type = JEP_LIST;
+			jep_add_object(list, scope);
+
+			/* add the exception to the scope */
+			jep_add_object(list, exception);
+
+			/* evaluate the body of the catch block */
+			o = jep_evaluate(catch_body, list);
+
+			/* destroy the scope for the catch block */
+			jep_remove_scope(list);
+			jep_destroy_list(scope);
+			free(scope);
+			scope = NULL;
+		}
+	}
+
+	if (o != NULL && !o->ret)
+	{
+		jep_destroy_object(o);
+		o = NULL;
+	}
+
+	return o;
+}
+
+/* evaluates a throw statement */
+jep_obj* jep_throw(jep_ast_node node, jep_obj* list)
+{
+	jep_obj *o = NULL;
+
+	o = jep_evaluate(node.leaves[0], list);
+	o->ret = JEP_RETURN | JEP_EXCEPTION;
+
+	return o;
+}
+
 /* checks if a struct has a data member with the specfied identifier */
 int jep_has_data_member(jep_obj *members, const char *ident)
 {
@@ -3909,7 +4009,7 @@ jep_obj *jep_struct(jep_ast_node node, jep_obj *list)
 		for (i = 0; i < node.leaves[1].leaf_count && !dup; i++)
 		{
 			if (!jep_has_data_member(members,
-									 node.leaves[1].leaves[i].token.val->buffer))
+				node.leaves[1].leaves[i].token.val->buffer))
 			{
 				jep_obj *mem = jep_create_object();
 				mem->type = JEP_NULL;
@@ -3960,7 +4060,7 @@ jep_obj *jep_new(jep_ast_node node, jep_obj *list)
 	if (struct_def == NULL || struct_def->type != JEP_STRUCTDEF)
 	{
 		printf("no structure definition of type %s\n",
-			   node.token.val->buffer);
+			node.token.val->buffer);
 		return new_obj;
 	}
 
@@ -4007,13 +4107,13 @@ jep_obj *jep_member(jep_ast_node node, jep_obj *list)
 	if (struc == NULL)
 	{
 		printf("could not obtain object with identifier %s\n",
-			   node.leaves[0].token.val->buffer);
+			node.leaves[0].token.val->buffer);
 		return NULL;
 	}
 	else if (struc->type != JEP_STRUCT)
 	{
 		printf("%s is not a struct\n",
-			   node.leaves[0].token.val->buffer);
+			node.leaves[0].token.val->buffer);
 		return NULL;
 	}
 
@@ -4044,7 +4144,7 @@ jep_obj *jep_member(jep_ast_node node, jep_obj *list)
 		if (mem == NULL)
 		{
 			printf("%s does not have a member with the identifier %s\n",
-				   struc->ident, node.leaves[1].token.val->buffer);
+				struc->ident, node.leaves[1].token.val->buffer);
 		}
 	}
 	else
@@ -4072,45 +4172,53 @@ jep_obj *jep_modifier(jep_ast_node node, jep_obj *list)
 
 	if (exp.leaf_count > 0 && exp.token.token_code == T_COMMA)
 	{
-		jep_mod_sequence(exp, list, mod);
+		o = jep_mod_sequence(exp, list, mod);
 	}
 	else
 	{
-		jep_evaluate_local(exp, list, mod);
+		o = jep_evaluate_local(exp, list, mod);
 	}
 
 	return o;
 }
 
 /* evaluates a comma-delimited sequence of modified expressions */
-void jep_mod_sequence(jep_ast_node node, jep_obj *list, int mod)
+jep_obj* jep_mod_sequence(jep_ast_node node, jep_obj *list, int mod)
 {
+	jep_obj *o = NULL;
 	jep_ast_node l = node.leaves[0]; /* left operand  */
 	jep_ast_node r = node.leaves[1]; /* right operand */
 
 	/*
 	 * modified expressions can only be assignments or declarations.
-	 * each node in the sequence must be either an identifier, or an 
+	 * each node in the sequence must be either an identifier, or an
 	 * assignment with an identifier as its left operand.
 	 */
 
 	if (l.token.token_code == T_COMMA)
 	{
-		jep_mod_sequence(l, list, mod);
+		o = jep_mod_sequence(l, list, mod);
 	}
 	else
 	{
-		jep_evaluate_local(l, list, mod);
+		o = jep_evaluate_local(l, list, mod);
+	}
+
+	if (o != NULL && o->ret & JEP_EXCEPTION)
+	{
+		return o;
 	}
 
 	if (r.token.token_code == T_COMMA)
 	{
-		jep_mod_sequence(r, list, mod);
+		o = jep_mod_sequence(r, list, mod);
 	}
 	else
 	{
-		jep_evaluate_local(r, list, mod);
+		o = jep_evaluate_local(r, list, mod);
 	}
+
+	return o;
 }
 
 /* evaluates an AST node within a certain scope*/
@@ -4165,7 +4273,7 @@ jep_obj *jep_evaluate_local(jep_ast_node ast, jep_obj *list, int mod)
 		else
 		{
 			printf("the object %s has already been declared in this scope\n",
-				   ast.token.val->buffer);
+				ast.token.val->buffer);
 		}
 	}
 	else if (ast.token.token_code == T_EQUALS)
@@ -4178,7 +4286,7 @@ jep_obj *jep_evaluate_local(jep_ast_node ast, jep_obj *list, int mod)
 		if (ast.leaves[0].token.type != T_IDENTIFIER)
 		{
 			printf("invalid local declaration. expected identifier, found %s\n",
-				   ast.leaves[0].token.val->buffer);
+				ast.leaves[0].token.val->buffer);
 		}
 
 		/* get the current scope */
@@ -4200,6 +4308,10 @@ jep_obj *jep_evaluate_local(jep_ast_node ast, jep_obj *list, int mod)
 				local->ident = ast.leaves[0].token.val->buffer;
 				jep_add_object(scope, local);
 				o = jep_assign(ast, list);
+				if (o != NULL && (o->ret & JEP_EXCEPTION))
+				{
+					return o;
+				}
 				jep_obj *con = jep_get_object(local->ident, scope);
 				con->mod = mod;
 			}
@@ -4211,13 +4323,17 @@ jep_obj *jep_evaluate_local(jep_ast_node ast, jep_obj *list, int mod)
 			local->ident = ast.leaves[0].token.val->buffer;
 			jep_add_object(scope, local);
 			o = jep_assign(ast, list);
+			if (o != NULL && (o->ret & JEP_EXCEPTION))
+			{
+				return o;
+			}
 			jep_obj *con = jep_get_object(local->ident, scope);
 			con->mod = mod;
 		}
 		else
 		{
 			printf("the object %s has already been declared in this scope\n",
-				   ast.leaves[0].token.val->buffer);
+				ast.leaves[0].token.val->buffer);
 		}
 	}
 

@@ -206,7 +206,14 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_int(jep_obj *args)
 		}
 		else if ((endptr != s && *endptr != '\0') || (strlen(s) > 1 && *s == '0') || !isdigit(*s))
 		{
-			printf("invalid integer format\n");
+			//printf("invalid integer format\n");
+			i = jep_create_object();
+			i->type = JEP_STRING;
+			i->ret = JEP_RETURN | JEP_EXCEPTION;
+			i->val = malloc(23);
+			strcpy(i->val, "invalid integer format");
+			((char*)(i->val))[22] = '\0';
+			return i;
 		}
 		else if (l >= INT_MIN && l <= INT_MAX)
 		{

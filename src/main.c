@@ -1,19 +1,19 @@
 /*
-    The swap interpreter.
-    Copyright (C) 2016 John Powell
+	The swap interpreter.
+	Copyright (C) 2016 John Powell
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "ast.h"
 #include "parser.h"
@@ -29,12 +29,12 @@
 #define MAX_FLAGS 5
 
 const char *flags[MAX_FLAGS] =
-	{
-		"-t",		/* print tokens  */
-		"-a",		/* print ast     */
-		"-o",		/* print objects */
-		"-v",		/* version info  */
-		"--version" /* version info  */
+{
+	"-t",		/* print tokens  */
+	"-a",		/* print ast     */
+	"-o",		/* print objects */
+	"-v",		/* version info  */
+	"--version" /* version info  */
 };
 
 /**
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 	jep_token_stream *ts = NULL;
 	jep_ast_node *nodes = NULL;
 	jep_ast_node *root = NULL;
-	int flags[MAX_FLAGS] = {0, 0, 0, 0, 0};
+	int flags[MAX_FLAGS] = { 0, 0, 0, 0, 0 };
 	int i;
 	char *file_name = NULL;
 
@@ -186,11 +186,17 @@ int main(int argc, char **argv)
 			/* traverse and interpret the AST */
 			jep_obj *o;
 			int i;
-			for (i = 0; i < root->leaf_count; i++)
+			int exception = 0;
+			for (i = 0; i < root->leaf_count && !exception; i++)
 			{
 				o = jep_evaluate(root->leaves[i], list);
 				if (o != NULL)
 				{
+					if (o->ret & JEP_EXCEPTION)
+					{
+						printf("unhandled exception: %s\n", (char*)(o->val));
+						exception = 1;
+					}
 					jep_destroy_object(o);
 					o = NULL;
 				}

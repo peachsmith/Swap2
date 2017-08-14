@@ -155,6 +155,12 @@ jep_obj* jep_for(jep_ast_node node, jep_obj* list);
 /* evaluates a while loop */
 jep_obj* jep_while(jep_ast_node node, jep_obj* list);
 
+/* evaluates a try/catch block */
+jep_obj* jep_try(jep_ast_node node, jep_obj* list);
+
+/* evaluates a throw statement */
+jep_obj* jep_throw(jep_ast_node node, jep_obj* list);
+
 /* checks if a struct has a data member with the specfied identifier */
 int jep_has_data_member(jep_obj* members, const char* ident);
 
@@ -171,7 +177,7 @@ jep_obj* jep_member(jep_ast_node node, jep_obj* list);
 jep_obj* jep_modifier(jep_ast_node node, jep_obj* list);
 
 /* evaluates a comma-delimited sequence of modified expressions */
-void jep_mod_sequence(jep_ast_node node, jep_obj* list, int mod);
+jep_obj* jep_mod_sequence(jep_ast_node node, jep_obj* list, int mod);
 
 /* evaluates an AST node within a certain scope*/
 jep_obj* jep_evaluate_local(jep_ast_node ast, jep_obj* list, int mod);

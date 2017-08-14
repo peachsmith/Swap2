@@ -8,7 +8,7 @@ SHARED=libSwapNative.so
 all: build clean
 
 build:
-	gcc -fpic -Iinclude src/SwapNative.c src/object.c src/ast.c -shared -o $(SHARED)
+	gcc -Iinclude src/SwapNative.c src/object.c src/ast.c -shared -o $(SHARED)
 	gcc $(FLAGS) src/stringbuilder.c
 	gcc $(FLAGS) src/import.c
 	gcc $(FLAGS) src/tokenizer.c

@@ -24,6 +24,10 @@
 #include <limits.h>
 #include "ast.h"
 
+/* return flags */
+#define JEP_RETURN 1
+#define JEP_EXCEPTION 2
+
 /* types of jep_objects */
 #define JEP_BYTE 1
 #define JEP_INT 2
@@ -62,10 +66,10 @@ typedef struct Object
 	struct Object *next; /* next object                   */
 	struct Object *head; /* beginning of list             */
 	struct Object *tail; /* end of list                   */
-	int size;			 /* number of objects in the list */
-	int ret;			 /* return flag                   */
-	int index;			 /* index in an array             */
-	int mod;			 /* modifier flags                */
+	int size;            /* number of objects in the list */
+	unsigned char ret;   /* return flag                   */
+	int index;           /* index in an array             */
+	int mod;             /* modifier flags                */
 	char *array_ident;   /* array identifier              */
 	struct Object *self; /* the actual object             */
 } jep_obj;

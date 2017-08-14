@@ -99,9 +99,15 @@
 #define T_LOCAL 53
 #define T_CONST 54
 #define T_NEW 55
+#define T_TRY 56
+#define T_CATCH 57
+#define T_THROW 58
+#define T_SWITCH 59
+#define T_CASE 60
+#define T_DEFAULT 61
 
 /* end of file */
-#define T_EOF 56
+#define T_EOF 62
 
 /**
  * a single token

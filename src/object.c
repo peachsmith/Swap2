@@ -485,6 +485,7 @@ void jep_copy_object(jep_obj *dest, jep_obj *src)
 	}
 
 	dest->type = src->type;
+	dest->ret = src->ret;
 
 	if (src->type == JEP_BYTE)
 	{

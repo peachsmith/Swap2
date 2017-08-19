@@ -1,19 +1,19 @@
 /*
-    Functions for object creation and manipulation
-    Copyright (C) 2016 John Powell
+	Functions for object creation and manipulation
+	Copyright (C) 2016 John Powell
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "object.h"
 #include "tokenizer.h"
@@ -354,6 +354,141 @@ jep_obj *jep_get_bytes(jep_obj *o)
 	byte_array->size = bytes->size;
 
 	return byte_array;
+}
+
+/* compares the values of two objects */
+int jep_compare_object(jep_obj *a, jep_obj *b)
+{
+	int equal = 0;
+
+	if (a == NULL || b == NULL)
+	{
+		return 0;
+	}
+
+	if (a->type != b->type)
+	{
+		return equal;
+	}
+
+	switch (a->type)
+	{
+	case JEP_STRING:
+	{
+		if (!strcmp((char*)a->val, (char*)b->val))
+		{
+			equal = 1;
+		}
+	}
+	break;
+
+	case JEP_INT:
+	{
+		if (*(int*)a->val == *(int*)b->val)
+		{
+			equal = 1;
+		}
+	}
+	break;
+
+	case JEP_LONG:
+	{
+		if (*(long int*)a->val == *(long int*)b->val)
+		{
+			equal = 1;
+		}
+	}
+	break;
+
+	case JEP_DOUBLE:
+	{
+		if (*(double*)a->val == *(double*)b->val)
+		{
+			equal = 1;
+		}
+	}
+	break;
+
+	case JEP_CHARACTER:
+	{
+		if (*(char*)a->val == *(char*)b->val)
+		{
+			equal = 1;
+		}
+	}
+	break;
+
+	case JEP_BYTE:
+	{
+		if (*(unsigned char*)a->val == *(unsigned char*)b->val)
+		{
+			equal = 1;
+		}
+	}
+	break;
+
+	case JEP_STRUCTDEF:
+	case JEP_FUNCTION:
+	case JEP_FILE:
+	{
+		if ((long int)a->self == (long int)b->self)
+		{
+			equal = 1;
+		}
+	}
+	break;
+
+	case JEP_ARRAY:
+	case JEP_STRUCT:
+	{
+		if (a->size != b->size)
+		{
+			equal = 0;
+		}
+		else if (a->size == 0)
+		{
+			equal = 1;
+		}
+		else
+		{
+			jep_obj* a_data = ((jep_obj*)a->val)->head;
+			jep_obj* b_data = ((jep_obj*)b->val)->head;
+
+			int inner_equal = 1;
+			while (a_data != NULL && inner_equal)
+			{
+				inner_equal = jep_compare_object(a_data, b_data);
+				a_data = a_data->next;
+				b_data = b_data->next;
+			}
+			if (inner_equal)
+			{
+				equal = 1;
+			}
+		}
+	}
+	break;
+
+	case JEP_REFERENCE:
+	{
+		jep_obj* a_ref = (jep_obj*)a->val;
+		jep_obj* b_ref = (jep_obj*)b->val;
+		equal = jep_compare_object(a_ref, b_ref);
+	}
+	break;
+
+	case JEP_NULL:
+	{
+		equal = 1;
+	}
+	break;
+
+	default:
+		break;
+	}
+
+
+	return equal;
 }
 
 /* allocates memory for a new object */

@@ -21,6 +21,7 @@ static int jep_accept(int, jep_ast_node **);
 static jep_ast_node *jep_expression(jep_ast_node *, jep_ast_node **);
 static jep_ast_node *jep_statement(jep_ast_node *, jep_ast_node **);
 static void jep_block(jep_ast_node *, jep_ast_node **);
+static void jep_case_block(jep_ast_node *root, jep_ast_node **nodes);
 
 /**
  * sets the error flag for the root of an AST.
@@ -373,8 +374,8 @@ static jep_ast_node *jep_struct(jep_ast_node *root, jep_ast_node **nodes)
 static jep_ast_node *jep_if(jep_ast_node *root, jep_ast_node **nodes)
 {
 	jep_ast_node *if_node; /* the node containing the if token */
-	jep_ast_node *con;	 /* the condition                    */
-	jep_ast_node *body;	/* the body of the if statement     */
+	jep_ast_node *con;	   /* the condition                    */
+	jep_ast_node *body;	   /* the body of the if statement     */
 
 	if_node = (*nodes)++;
 	if (if_node->token.token_code == T_IF && (*nodes)->token.token_code != T_LPAREN)
@@ -448,6 +449,221 @@ static jep_ast_node *jep_if(jep_ast_node *root, jep_ast_node **nodes)
 	}
 
 	return if_node;
+}
+
+/**
+* parses a switch statement
+*/
+static jep_ast_node *jep_switch(jep_ast_node *root, jep_ast_node **nodes)
+{
+	jep_ast_node *switch_node; /* the switch keyword                   */
+	jep_ast_node *exp;         /* the expression to be switched        */
+	jep_ast_node *body;        /* the body of the switch statement     */
+	int complete = 0;
+
+	switch_node = (*nodes)++;
+	if ((*nodes)->token.token_code != T_LPAREN)
+	{
+		jep_err(ERR_EXPECTED, (*nodes)->token, root, "(");
+		return NULL;
+	}
+
+	if (switch_node->token.token_code == T_SWITCH)
+	{
+		exp = (*nodes)++;
+		jep_ast_node *p = jep_expression(root, nodes);
+		if (!jep_accept(T_RPAREN, nodes))
+		{
+			jep_err(ERR_EXPECTED, (*nodes)->token, root, ")");
+			return NULL;
+		}
+
+		if (p == NULL)
+		{
+			jep_err(ERR_EXPRESSION, (*nodes)->token, root, ")");
+			return NULL;
+		}
+		else
+		{
+			jep_add_leaf_node(exp, p);
+		}
+
+		if (exp != NULL && !root->error)
+		{
+			jep_add_leaf_node(switch_node, exp);
+		}
+	}
+
+	if ((*nodes)->token.token_code != T_LBRACE)
+	{
+		jep_err(ERR_EXPECTED, (*nodes)->token, root, "{");
+		return NULL;
+	}
+
+	body = (*nodes)++;
+	body->error = 0;
+
+	while (!complete)
+	{
+		jep_ast_node *case_node = (*nodes)++;
+
+		if (case_node->token.token_code == T_DEFAULT)
+		{
+			complete = 1;
+		}
+		else if (case_node->token.token_code != T_CASE)
+		{
+			jep_err(ERR_EXPECTED, (*nodes)->token, root, "case");
+			return NULL;
+		}
+
+		if (case_node->token.token_code == T_CASE)
+		{
+			/* switch will only support numbers, characters, and strings */
+			if ((*nodes)->token.type != T_CHARACTER && (*nodes)->token.type != T_STRING && (*nodes)->token.type != T_NUMBER)
+			{
+				jep_err(ERR_EXPECTED, (*nodes)->token, root, "number, character, or string");
+				return NULL;
+			}
+
+			jep_ast_node *case_val = (*nodes)++;
+
+			jep_add_leaf_node(case_node, case_val);
+
+			if (!jep_accept(T_COLON, nodes))
+			{
+				jep_err(ERR_EXPECTED, (*nodes)->token, root, ":");
+				return NULL;
+			}
+		}
+		else if (case_node->token.token_code == T_DEFAULT)
+		{
+			if (!jep_accept(T_COLON, nodes))
+			{
+				jep_err(ERR_EXPECTED, (*nodes)->token, root, ":");
+				return NULL;
+			}
+		}
+		else
+		{
+			jep_err(ERR_UNEXPECTED, (*nodes)->token, root, NULL);
+			return NULL;
+		}
+
+		while ((*nodes)->token.token_code == T_CASE)
+		{
+			jep_ast_node *cn = (*nodes)++;
+
+			if (cn->token.token_code == T_DEFAULT)
+			{
+				if (complete)
+				{
+					jep_err(ERR_UNEXPECTED, (*nodes)->token, root, NULL);
+					return NULL;
+				}
+
+				complete = 1;
+
+				jep_add_leaf_node(case_node, cn);
+
+				if (!jep_accept(T_COLON, nodes))
+				{
+					jep_err(ERR_EXPECTED, (*nodes)->token, root, ":");
+					return NULL;
+				}
+			}
+			else
+			{
+				/* switch will only support numbers, characters, and strings for now */
+				if ((*nodes)->token.type != T_CHARACTER && (*nodes)->token.type != T_STRING && (*nodes)->token.type != T_NUMBER && (*nodes)->token.type != T_IDENTIFIER)
+				{
+					jep_err(ERR_EXPECTED, (*nodes)->token, root, "number, character, or string");
+					return NULL;
+				}
+
+				jep_ast_node *cv = (*nodes)++;
+
+				if (!jep_accept(T_COLON, nodes))
+				{
+					jep_err(ERR_EXPECTED, (*nodes)->token, root, ":");
+					return NULL;
+				}
+
+				jep_add_leaf_node(case_node, cv);
+			}
+		}
+
+		if ((*nodes)->token.token_code == T_DEFAULT)
+		{
+			if (complete)
+			{
+				jep_err(ERR_UNEXPECTED, (*nodes)->token, root, NULL);
+				return NULL;
+			}
+
+			complete = 1;
+
+			jep_ast_node *default_node = (*nodes)++;
+			jep_add_leaf_node(case_node, default_node);
+
+			if (!jep_accept(T_COLON, nodes))
+			{
+				jep_err(ERR_EXPECTED, (*nodes)->token, root, ":");
+				return NULL;
+			}
+		}
+
+		int curly_fries = 0;
+
+		/* skip the curly braces of a case block */
+		if ((*nodes)->token.token_code == T_LBRACE)
+		{
+			(*nodes)++;
+			curly_fries = 1;
+		}
+
+		if (case_node->token.token_code == T_DEFAULT)
+		{
+			jep_case_block(case_node, nodes);
+		}
+		else
+		{
+			jep_case_block(&(case_node->leaves[case_node->leaf_count - 1]), nodes);
+		}
+
+		if (curly_fries)
+		{
+			if (!jep_accept(T_RBRACE, nodes) && !root->error)
+			{
+				jep_err(ERR_EXPECTED, (*nodes)->token, root, "}");
+			}
+		}
+
+		/* ensure each case or default block ends with break; */
+		if (!jep_accept(T_BREAK, nodes))
+		{
+			jep_err(ERR_EXPECTED, (*nodes)->token, root, "break");
+		}
+		if (!jep_accept(T_SEMICOLON, nodes))
+		{
+			jep_err(ERR_EXPECTED, (*nodes)->token, root, ";");
+		}
+
+		jep_add_leaf_node(body, case_node);
+	}
+
+	root->error = body->error;
+
+	if (!jep_accept(T_RBRACE, nodes) && !root->error)
+	{
+		jep_err(ERR_EXPECTED, (*nodes)->token, root, "}");
+	}
+	else
+	{
+		jep_add_leaf_node(switch_node, body);
+	}
+
+	return switch_node;
 }
 
 /**
@@ -722,14 +938,6 @@ static jep_ast_node *jep_throw(jep_ast_node *root, jep_ast_node **nodes)
 	jep_add_leaf_node(throw_node, exception);
 
 	return throw_node;
-}
-
-/**
-* parses a switch statement
-*/
-static jep_ast_node *jep_switch(jep_ast_node *root, jep_ast_node **nodes)
-{
-	return NULL;
 }
 
 /**
@@ -1374,6 +1582,10 @@ static jep_ast_node *jep_statement(jep_ast_node *root, jep_ast_node **nodes)
 	{
 		statement = jep_if(root, nodes);
 	}
+	else if ((*nodes)->token.token_code == T_SWITCH)
+	{
+		statement = jep_switch(root, nodes);
+	}
 	else if ((*nodes)->token.token_code == T_WHILE)
 	{
 		statement = jep_while(root, nodes);
@@ -1429,6 +1641,39 @@ static jep_ast_node *jep_statement(jep_ast_node *root, jep_ast_node **nodes)
 static void jep_block(jep_ast_node *root, jep_ast_node **nodes)
 {
 	while ((*nodes)->token.token_code != T_RBRACE && !root->error)
+	{
+		if ((*nodes)->token.token_code == T_LBRACE)
+		{
+			jep_ast_node *l_brace = (*nodes)++;
+			l_brace->error = 0;
+			jep_block(l_brace, nodes);
+			root->error = l_brace->error;
+			if (!jep_accept(T_RBRACE, nodes) && !root->error)
+			{
+				jep_err(ERR_EXPECTED, (*nodes)->token, root, "}");
+			}
+			else
+			{
+				jep_add_leaf_node(root, l_brace);
+			}
+		}
+		else
+		{
+			jep_ast_node *stm = jep_statement(root, nodes);
+			if (stm != NULL && !root->error)
+			{
+				jep_add_leaf_node(root, stm);
+			}
+		}
+	}
+}
+
+/**
+* parses a block of code in a case of a switch statement
+*/
+static void jep_case_block(jep_ast_node *root, jep_ast_node **nodes)
+{
+	while ((*nodes)->token.token_code != T_BREAK && (*nodes)->token.token_code != T_RBRACE && !root->error)
 	{
 		if ((*nodes)->token.token_code == T_LBRACE)
 		{

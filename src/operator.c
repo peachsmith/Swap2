@@ -60,6 +60,10 @@ jep_obj *jep_evaluate(jep_ast_node ast, jep_obj *list)
 		{
 			return jep_if(ast, list);
 		}
+		else if (ast.token.token_code == T_SWITCH)
+		{
+			return jep_switch(ast, list);
+		}
 		else if (ast.token.token_code == T_FOR)
 		{
 			return jep_for(ast, list);
@@ -3665,6 +3669,90 @@ jep_obj *jep_if(jep_ast_node node, jep_obj *list)
 		}
 		jep_destroy_object(c);
 	}
+
+	return o;
+}
+
+/* evaluates a switch statement */
+jep_obj* jep_switch(jep_ast_node node, jep_obj* list)
+{
+	jep_obj *o = NULL;
+
+	jep_ast_node exp;  /* the switch expression            */
+	jep_ast_node body; /* the body of the switch statement */
+
+	exp = node.leaves[0].leaves[0];
+	body = node.leaves[1];
+
+	jep_obj *check = jep_evaluate(exp, list);
+
+	if (check == NULL)
+	{
+		return o;
+	}
+
+	if (check->ret && check->ret & JEP_EXCEPTION)
+	{
+		return check;
+	}
+
+	/* add a list for scope */
+	jep_obj *scope = jep_create_object();
+	scope->type = JEP_LIST;
+	jep_add_object(list, scope);
+
+	int match = 0;
+	int i;
+	for (i = 0; i < body.leaf_count && !match; i++)
+	{
+		int j;
+		for (j = 0; j < body.leaves[i].leaf_count && !match; j++)
+		{
+			if (body.leaves[i].token.token_code == T_DEFAULT)
+			{
+				match = 1;
+				o = jep_brace(body.leaves[i], list);
+			}
+			else
+			{
+				if (body.leaves[i].leaves[j].token.token_code == T_DEFAULT)
+				{
+					match = 1;
+					o = jep_brace(body.leaves[i].leaves[j], list);
+				}
+				else
+				{
+					jep_obj *cond = jep_evaluate(body.leaves[i].leaves[j], list);
+					if (cond != NULL && cond->ret && cond->ret & JEP_EXCEPTION)
+					{
+						/* remove the argument list from the main list */
+						jep_remove_scope(list);
+						jep_destroy_list(scope);
+						free(scope);
+
+						jep_destroy_object(check);
+
+						return cond;
+					}
+
+					if (jep_compare_object(check, cond))
+					{
+						match = 1;
+						o = jep_brace(body.leaves[i].leaves[body.leaves[i].leaf_count - 1], list);
+					}
+
+					jep_destroy_object(cond);
+				}
+			}
+		}
+	}
+
+	/* remove the argument list from the main list */
+	jep_remove_scope(list);
+	jep_destroy_list(scope);
+	free(scope);
+
+	jep_destroy_object(check);
 
 	return o;
 }

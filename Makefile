@@ -1,6 +1,7 @@
 FLAGS=-c -Wall -O2 -Iinclude
 SWAP=./swap
 VERIFY=./verify.sh
+CC=gcc
 
 # change to SwapNative.dll when using Cygwin on Windows
 SHARED=libSwapNative.so
@@ -8,35 +9,38 @@ SHARED=libSwapNative.so
 all: build clean
 
 build:
-	gcc -Iinclude src/SwapNative.c src/object.c src/ast.c -shared -o $(SHARED)
-	gcc $(FLAGS) src/stringbuilder.c
-	gcc $(FLAGS) src/import.c
-	gcc $(FLAGS) src/tokenizer.c
-	gcc $(FLAGS) src/parser.c
-	gcc $(FLAGS) src/object.c
-	gcc $(FLAGS) src/ast.c
-	gcc $(FLAGS) src/operator.c
-	gcc $(FLAGS) src/native.c
-	gcc $(FLAGS) src/main.c
+	$(CC) $(FLAGS) src/SwapNative.c
+	$(CC) $(FLAGS) src/stringbuilder.c
+	$(CC) $(FLAGS) src/import.c
+	$(CC) $(FLAGS) src/tokenizer.c
+	$(CC) $(FLAGS) src/parser.c
+	$(CC) $(FLAGS) src/object.c
+	$(CC) $(FLAGS) src/ast.c
+	$(CC) $(FLAGS) src/operator.c
+	$(CC) $(FLAGS) src/native.c
+	$(CC) $(FLAGS) src/main.c
+	$(CC) SwapNative.o object.o ast.o -shared -o $(SHARED)
 #Unix-like systems
-	gcc main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap -ldl
+	$(CC) main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap -ldl
 #Windows
-#gcc main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap
+#$(CC) main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap
 
 debug:
-	gcc -g $(FLAGS) src/stringbuilder.c
-	gcc -g $(FLAGS) src/import.c
-	gcc -g $(FLAGS) src/tokenizer.c
-	gcc -g $(FLAGS) src/parser.c
-	gcc -g $(FLAGS) src/object.c
-	gcc -g $(FLAGS) src/ast.c
-	gcc -g $(FLAGS) src/operator.c
-	gcc -g $(FLAGS) src/native.c
-	gcc -g $(FLAGS) src/main.c
+	$(CC) -g $(FLAGS) src/SwapNative.c
+	$(CC) -g $(FLAGS) src/stringbuilder.c
+	$(CC) -g $(FLAGS) src/import.c
+	$(CC) -g $(FLAGS) src/tokenizer.c
+	$(CC) -g $(FLAGS) src/parser.c
+	$(CC) -g $(FLAGS) src/object.c
+	$(CC) -g $(FLAGS) src/ast.c
+	$(CC) -g $(FLAGS) src/operator.c
+	$(CC) -g $(FLAGS) src/native.c
+	$(CC) -g $(FLAGS) src/main.c
+	$(CC) SwapNative.o object.o ast.o -shared -o $(SHARED)
 #Unix-like systems
-	gcc main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap -ldl
+	$(CC) main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap -ldl
 #Windows
-#gcc main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap
+#$(CC) main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap
 
 clean:
 	rm *.o

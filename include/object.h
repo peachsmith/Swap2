@@ -97,6 +97,9 @@ char *jep_to_string(jep_obj *o);
 /* converts an object into an array of bytes */
 jep_obj *jep_get_bytes(jep_obj *o);
 
+/* compares the values of two objects */
+int jep_compare_object(jep_obj *a, jep_obj *b);
+
 /* adds an object to a list */
 void jep_add_object(jep_obj *list, jep_obj *o);
 

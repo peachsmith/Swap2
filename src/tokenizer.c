@@ -49,7 +49,7 @@ const char *keywords[] =
 {
 	"if", "else", "for", "while", "function", "return", "import", "null",
 	"struct", "local", "const", "new", "try", "catch", "throw", "switch",
-	"case", "default" };
+	"case", "break", "default" };
 
 /**
  * escape characters
@@ -163,7 +163,7 @@ static int jep_is_symbol3(const char *s)
 static int jep_is_keyword(const char *s)
 {
 	int i;
-	for (i = 0; i < 18; i++)
+	for (i = 0; i < 19; i++)
 	{
 		if (!strcmp(s, keywords[i]))
 		{

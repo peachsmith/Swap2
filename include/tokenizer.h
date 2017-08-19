@@ -104,10 +104,11 @@
 #define T_THROW 58
 #define T_SWITCH 59
 #define T_CASE 60
-#define T_DEFAULT 61
+#define T_BREAK 61
+#define T_DEFAULT 62
 
 /* end of file */
-#define T_EOF 62
+#define T_EOF 63
 
 /**
  * a single token

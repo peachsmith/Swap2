@@ -1122,7 +1122,6 @@ void jep_parse(jep_token_stream *ts, jep_ast_node *root)
  */
 static void jep_attach(jep_stack *exp, jep_stack *opr, jep_ast_node *root, jep_ast_node *nodes)
 {
-	// printf("attaching some operands to operators\n");
 	jep_ast_node *r; /* right operand     */
 	jep_ast_node *l; /* left operand      */
 	jep_ast_node *o; /* operator          */
@@ -1136,24 +1135,24 @@ static void jep_attach(jep_stack *exp, jep_stack *opr, jep_ast_node *root, jep_a
 
 		if (o != NULL && o->token.unary)
 		{
-			// printf(" operator: %s", o->token.val->buffer);
 			r = jep_pop(exp);
 			if (r != NULL)
 			{
-				// printf(" operand: %s\n", r->token.val->buffer);
+				if (o->token.token_code == T_NEW && r->token.token_code == T_LBRACE && exp->size)
+				{
+					l = jep_pop(exp);
+					jep_add_leaf_node(o, l);
+				}
 				jep_add_leaf_node(o, r);
 				jep_push(exp, o);
 			}
 		}
 		else if (o != NULL)
 		{
-			// printf(" operator: %s", o->token.val->buffer);
 			r = jep_pop(exp);
 			l = jep_pop(exp);
 			if (r != NULL && l != NULL)
 			{
-				// printf(" right operand: %s", r->token.val->buffer);
-				// printf(" left operand: %s\n", l->token.val->buffer);
 				jep_add_leaf_node(o, l);
 				jep_add_leaf_node(o, r);
 				jep_push(exp, o);
@@ -1172,7 +1171,6 @@ static void jep_attach(jep_stack *exp, jep_stack *opr, jep_ast_node *root, jep_a
  */
 static void jep_attach_all(jep_stack *exp, jep_stack *opr, jep_ast_node *root, jep_ast_node **nodes)
 {
-	// printf("attaching ALL operands to operators\n");
 	jep_ast_node *r; /* right operand     */
 	jep_ast_node *l; /* left operand      */
 	jep_ast_node *o; /* operator          */
@@ -1186,24 +1184,24 @@ static void jep_attach_all(jep_stack *exp, jep_stack *opr, jep_ast_node *root, j
 
 		if (o != NULL && o->token.unary)
 		{
-			// printf(" operator: %s", o->token.val->buffer);
 			r = jep_pop(exp);
 			if (r != NULL)
 			{
-				// printf(" right operand: %s\n", r->token.val->buffer);
+				if (o->token.token_code == T_NEW && r->token.token_code == T_LBRACE && exp->size)
+				{
+					l = jep_pop(exp);
+					jep_add_leaf_node(o, l);
+				}
 				jep_add_leaf_node(o, r);
 				jep_push(exp, o);
 			}
 		}
 		else if (o != NULL)
 		{
-			// printf(" operator: %s", o->token.val->buffer);
 			r = jep_pop(exp);
 			l = jep_pop(exp);
 			if (r != NULL && l != NULL)
 			{
-				// printf(" right operand: %s", r->token.val->buffer);
-				// printf(" left operand: %s\n", l->token.val->buffer);
 				jep_add_leaf_node(o, l);
 				jep_add_leaf_node(o, r);
 				jep_push(exp, o);
@@ -1221,10 +1219,10 @@ static void jep_attach_all(jep_stack *exp, jep_stack *opr, jep_ast_node *root, j
  */
 static jep_ast_node *jep_expression(jep_ast_node *root, jep_ast_node **nodes)
 {
-	jep_stack exp;	 /* expresion stack   */
-	jep_stack opr;	 /* operator stack    */
+	jep_stack exp;	   /* expresion stack   */
+	jep_stack opr;	   /* operator stack    */
 	jep_token *prev;   /* previous token    */
-	jep_token *cur;	/* current token     */
+	jep_token *cur;	   /* current token     */
 	jep_token *next;   /* next token        */
 	jep_ast_node *ast; /* the resulting AST */
 

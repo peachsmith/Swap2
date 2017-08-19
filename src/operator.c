@@ -4136,8 +4136,9 @@ jep_obj *jep_new(jep_ast_node node, jep_obj *list)
 	jep_obj *def_members;
 	jep_obj *def_mem;
 	jep_obj *members;
+	jep_obj* init = NULL;
 
-	if (node.leaf_count != 1)
+	if (node.leaf_count != 1 && node.leaf_count != 2)
 	{
 		return new_obj;
 	}
@@ -4152,6 +4153,12 @@ jep_obj *jep_new(jep_ast_node node, jep_obj *list)
 		return new_obj;
 	}
 
+	/* get the values from a structure initialization */
+	if (node.leaf_count == 2)
+	{
+		init = jep_evaluate(node.leaves[1], list);
+	}
+
 	new_obj = jep_create_object();
 	new_obj->type = JEP_STRUCT;
 
@@ -4161,15 +4168,35 @@ jep_obj *jep_new(jep_ast_node node, jep_obj *list)
 	def_members = (jep_obj *)(struct_def->val);
 
 	def_mem = def_members->head;
-	while (def_mem != NULL)
+	if (init != NULL && init->size > 0)
 	{
-		jep_obj *mem = jep_create_object();
-		mem->type = JEP_NULL;
-		mem->ident = def_mem->ident;
-		mem->index = -2;
-		jep_add_object(members, mem);
+		jep_obj* init_obj = ((jep_obj*)(init->val))->head;
+		while (def_mem != NULL && init_obj != NULL)
+		{
+			jep_obj *mem = jep_create_object();
+			mem->ident = def_mem->ident;
+			jep_copy_object(mem, init_obj);
+			mem->index = -2;
+			jep_add_object(members, mem);
 
-		def_mem = def_mem->next;
+			def_mem = def_mem->next;
+			init_obj = init_obj->next;
+		}
+
+		jep_destroy_object(init);
+	}
+	else
+	{
+		while (def_mem != NULL)
+		{
+			jep_obj *mem = jep_create_object();
+			mem->type = JEP_NULL;
+			mem->ident = def_mem->ident;
+			mem->index = -2;
+			jep_add_object(members, mem);
+
+			def_mem = def_mem->next;
+		}
 	}
 
 	new_obj->val = members;

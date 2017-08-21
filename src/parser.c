@@ -190,17 +190,14 @@ static int jep_priority(jep_ast_node *node)
 	case T_LPAREN:
 	case T_LSQUARE:
 	case T_PERIOD:
+	case T_INCREMENT:
+	case T_DECREMENT:
 		return 7;
 
 	case T_NOT:
 	case T_COLON:
 	case T_DOUBLECOLON:
 	case T_NEW:
-		return 8;
-
-		/* this used to be 9, but it might need to stay as 8 */
-	case T_INCREMENT:
-	case T_DECREMENT:
 		return 8;
 
 	default:

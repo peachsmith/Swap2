@@ -4,7 +4,7 @@ VERIFY=./verify.sh
 CC=gcc
 
 # change to SwapNative.dll when using Cygwin on Windows
-SHARED=SwapNative.dll
+SHARED=libSwapNative.so
 
 all: build clean
 

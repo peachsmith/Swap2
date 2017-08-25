@@ -39,6 +39,11 @@
 jep_obj* jep_call_native(const char* ident, jep_obj* args);
 
 /**
+* calls a function from a shared library
+*/
+jep_obj* jep_call_shared(jep_lib lib, const char* ident, jep_obj* args);
+
+/**
  * loads a shared library
  */
 jep_lib jep_load_lib(const char* lib_name);
@@ -56,6 +61,6 @@ jep_func jep_get_func(jep_lib lib, const char* func_name);
 /**
  * gets the full path to the executable
  */
-char* jep_get_path();
+char* jep_get_app_path();
 
 #endif

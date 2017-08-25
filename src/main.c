@@ -152,6 +152,35 @@ int main(int argc, char **argv)
 			jep_obj *list = jep_create_object();
 			list->type = JEP_LIST;
 
+			/* load the main native library */
+			char* app_path = jep_get_app_path();
+
+			size_t a_len = strlen(app_path);
+			size_t l_len = strlen(SWAP_NATIVE_LIB);
+
+			char* lib_path = malloc(a_len + l_len + 1);
+			strcpy(lib_path, app_path);
+			strcat(lib_path, SWAP_NATIVE_LIB);
+			lib_path[a_len + l_len] = '\0';
+
+			jep_lib native_lib = jep_load_lib(lib_path);
+
+			free(app_path);
+			free(lib_path);
+
+			if (native_lib != NULL)
+			{
+				jep_obj *l_native = jep_create_object();
+				l_native->type = JEP_NULL;
+				l_native->ident = " SwapNative"; /* prevent code from obtaining a reference to this */
+				l_native->val = native_lib;
+				jep_add_object(list, l_native);
+			}
+			else
+			{
+				printf("could not load native shared library\n");
+			}
+
 			/* add built in functions */
 			jep_obj *f_byte = jep_create_object();
 			f_byte->type = JEP_FUNCTION;
@@ -200,6 +229,11 @@ int main(int argc, char **argv)
 					jep_destroy_object(o);
 					o = NULL;
 				}
+			}
+
+			if (native_lib != NULL)
+			{
+				jep_free_lib(native_lib);
 			}
 
 			if (flags[JEP_OBJ])

@@ -22,7 +22,7 @@ jep_obj *jep_call_native(const char *ident, jep_obj *args)
 {
 	jep_obj *o = NULL;
 
-	char* app_path = jep_get_path();
+	char* app_path = jep_get_app_path();
 	if (app_path == NULL)
 	{
 		return NULL;
@@ -64,6 +64,32 @@ jep_obj *jep_call_native(const char *ident, jep_obj *args)
 
 	free(app_path);
 	free(lib_path);
+
+	return o;
+}
+
+/**
+* calls a function from a shared library
+*/
+jep_obj* jep_call_shared(jep_lib lib, const char* ident, jep_obj* args)
+{
+	jep_obj* o = NULL;
+	size_t ident_len = strlen(ident);
+	char* native_ident = malloc(ident_len + 6);
+	strcpy(native_ident, "jep_");
+	strcat(native_ident, ident);
+	jep_func func = jep_get_func(lib, native_ident);
+
+	if (func != NULL)
+	{
+		o = func(args);
+	}
+	else
+	{
+		printf("could not load function %s from shared library\n", native_ident);
+	}
+
+	free(native_ident);
 
 	return o;
 }
@@ -117,7 +143,7 @@ jep_func jep_get_func(jep_lib lib, const char* func_name)
 /**
 * gets the full path to the executable
 */
-char* jep_get_path()
+char* jep_get_app_path()
 {
 	errno = 0;
 	int app_path_size = 1024;

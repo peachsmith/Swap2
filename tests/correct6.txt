@@ -1,3 +1,4 @@
+[null]  SwapNative
 [function] byte ()
 [function] int ()
 [function] double ()

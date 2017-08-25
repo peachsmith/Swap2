@@ -4,11 +4,12 @@ VERIFY=./verify.sh
 CC=gcc
 
 # change to SwapNative.dll when using Cygwin on Windows
-SHARED=libSwapNative.so
+SHARED=SwapNative.dll
 
 all: build clean
 
 build:
+	$(CC) -Iinclude src/SwapNative.c src/object.c src/ast.c -fpic -shared -o $(SHARED)
 	$(CC) $(FLAGS) src/SwapNative.c
 	$(CC) $(FLAGS) src/stringbuilder.c
 	$(CC) $(FLAGS) src/import.c
@@ -19,13 +20,13 @@ build:
 	$(CC) $(FLAGS) src/operator.c
 	$(CC) $(FLAGS) src/native.c
 	$(CC) $(FLAGS) src/main.c
-	$(CC) SwapNative.o object.o ast.o -shared -o $(SHARED)
 #Unix-like systems
 	$(CC) main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap -ldl
 #Windows
 #$(CC) main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap
 
 debug:
+	$(CC) -Iinclude src/SwapNative.c src/object.c src/ast.c -g -fpic -shared -o $(SHARED)
 	$(CC) -g $(FLAGS) src/SwapNative.c
 	$(CC) -g $(FLAGS) src/stringbuilder.c
 	$(CC) -g $(FLAGS) src/import.c
@@ -36,7 +37,6 @@ debug:
 	$(CC) -g $(FLAGS) src/operator.c
 	$(CC) -g $(FLAGS) src/native.c
 	$(CC) -g $(FLAGS) src/main.c
-	$(CC) SwapNative.o object.o ast.o -shared -o $(SHARED)
 #Unix-like systems
 	$(CC) main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap -ldl
 #Windows

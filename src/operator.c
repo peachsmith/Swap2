@@ -3034,7 +3034,9 @@ jep_obj *jep_paren(jep_ast_node node, jep_obj *list)
 		/* native function call */
 		if (func->size == 1)
 		{
-			return jep_call_native(func->ident, arg_list);
+			jep_obj* l_native = jep_get_object(" SwapNative", list);
+
+			return jep_call_shared((jep_lib)(l_native->val), func->ident, arg_list);
 		}
 
 		jep_ast_node body = *((jep_ast_node *)(func->head->next->val));

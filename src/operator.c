@@ -2536,6 +2536,7 @@ jep_obj *jep_inc(jep_ast_node node, jep_obj *list)
 		if ((obj->ident == NULL && obj->index == -1) || (obj->type != JEP_INT && obj->type != JEP_BYTE && obj->type != JEP_LONG) || obj->val == NULL)
 		{
 			printf("invalid operand\n");
+			jep_destroy_object(obj);
 			return NULL;
 		}
 		if (obj->index >= 0)
@@ -2584,6 +2585,8 @@ jep_obj *jep_inc(jep_ast_node node, jep_obj *list)
 				*(int *)(o->val) = cur_val;
 			}
 		}
+
+		jep_destroy_object(obj);
 	}
 
 	return o;
@@ -2649,6 +2652,7 @@ jep_obj *jep_dec(jep_ast_node node, jep_obj *list)
 		if ((obj->ident == NULL && obj->index == -1) || (obj->type != JEP_INT && obj->type != JEP_BYTE && obj->type != JEP_LONG) || obj->val == NULL)
 		{
 			printf("invalid operand\n");
+			jep_destroy_object(obj);
 			return NULL;
 		}
 		if (obj->index >= 0)
@@ -2697,6 +2701,7 @@ jep_obj *jep_dec(jep_ast_node node, jep_obj *list)
 				*(int *)(o->val) = cur_val;
 			}
 		}
+		jep_destroy_object(obj);
 	}
 
 	return o;
@@ -3927,6 +3932,8 @@ jep_obj *jep_while(jep_ast_node node, jep_obj *list)
 		if (cond != NULL && cond->val != NULL)
 		{
 			val = *((int *)(cond->val));
+			jep_destroy_object(cond);
+			cond = NULL;
 		}
 		while (val)
 		{
@@ -3941,8 +3948,7 @@ jep_obj *jep_while(jep_ast_node node, jep_obj *list)
 				if (o != NULL && o->ret)
 				{
 					jep_remove_scope(list);
-					jep_destroy_list(scope);
-					free(scope);
+					jep_destroy_object(scope);
 					scope = NULL;
 					return o;
 				}
@@ -3957,12 +3963,13 @@ jep_obj *jep_while(jep_ast_node node, jep_obj *list)
 			if (cond != NULL && cond->val != NULL)
 			{
 				val = *((int *)(cond->val));
+				jep_destroy_object(cond);
+				cond = NULL;
 			}
 
 			/* destroy the scope at the end of each iteration */
 			jep_remove_scope(list);
-			jep_destroy_list(scope);
-			free(scope);
+			jep_destroy_object(scope);
 			scope = NULL;
 		}
 	}

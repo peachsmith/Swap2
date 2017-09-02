@@ -242,7 +242,7 @@ int main(int argc, char **argv)
 			}
 
 			/* destroy all remaining objects */
-			jep_destroy_list(list);
+			jep_destroy_object(list);
 		}
 
 		/* destroy the AST */
@@ -269,6 +269,8 @@ int main(int argc, char **argv)
 
 	/* destroy the tokens */
 	jep_destroy_token_stream(ts);
+
+	print_call_counts();
 
 	return 0;
 }

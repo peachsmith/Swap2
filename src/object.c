@@ -18,6 +18,9 @@
 #include "object.h"
 #include "tokenizer.h"
 
+static int creation = 0;
+static int destruction = 0;
+
 static void jep_print_array(jep_obj *array)
 {
 	printf("{ ");
@@ -99,42 +102,42 @@ static void jep_free_array(jep_obj *array)
 		while (elem != NULL)
 		{
 			prev = elem->prev;
-			if (elem->type == JEP_INT)
-			{
-				free(elem->val);
-			}
-			else if (elem->type == JEP_LONG)
-			{
-				free(elem->val);
-			}
-			else if (elem->type == JEP_DOUBLE)
-			{
-				free(elem->val);
-			}
-			else if (elem->type == JEP_CHARACTER)
-			{
-				free(elem->val);
-			}
-			else if (elem->type == JEP_BYTE)
-			{
-				free(elem->val);
-			}
-			else if (elem->type == JEP_STRING)
-			{
-				free(elem->val);
-			}
-			else if (elem->type == JEP_ARRAY)
-			{
-				/* frees the memory used by an array */
-				jep_free_array(elem);
-			}
-			else if (elem->type == JEP_STRUCT || elem->type == JEP_STRUCTDEF)
-			{
-				jep_destroy_list((jep_obj *)(elem->val));
-				free(elem->val);
-			}
-
-			free(elem);
+			//if (elem->type == JEP_INT)
+			//{
+			//	free(elem->val);
+			//}
+			//else if (elem->type == JEP_LONG)
+			//{
+			//	free(elem->val);
+			//}
+			//else if (elem->type == JEP_DOUBLE)
+			//{
+			//	free(elem->val);
+			//}
+			//else if (elem->type == JEP_CHARACTER)
+			//{
+			//	free(elem->val);
+			//}
+			//else if (elem->type == JEP_BYTE)
+			//{
+			//	free(elem->val);
+			//}
+			//else if (elem->type == JEP_STRING)
+			//{
+			//	free(elem->val);
+			//}
+			//else if (elem->type == JEP_ARRAY)
+			//{
+			//	/* frees the memory used by an array */
+			//	jep_free_array(elem);
+			//}
+			//else if (elem->type == JEP_STRUCT || elem->type == JEP_STRUCTDEF)
+			//{
+			//	jep_destroy_list((jep_obj *)(elem->val));
+			//	free(elem->val);
+			//}
+			jep_destroy_object(elem);
+			//free(elem);
 			elem = prev;
 		}
 	}
@@ -494,6 +497,7 @@ int jep_compare_object(jep_obj *a, jep_obj *b)
 /* allocates memory for a new object */
 jep_obj *jep_create_object()
 {
+	creation++;
 	jep_obj *o = malloc(sizeof(jep_obj));
 
 	o->val = NULL;
@@ -660,8 +664,11 @@ void jep_copy_object(jep_obj *dest, jep_obj *src)
 	}
 	else if (src->type == JEP_ARRAY)
 	{
+		static int count = 0;
+		count++;
 		jep_obj *array = (jep_obj *)(src->val);
 		jep_obj *dest_array = jep_create_object();
+		dest_array->type = JEP_LIST;
 		if (array != NULL && array->size > 0)
 		{
 			jep_obj *orig = array->head; /* original */
@@ -783,6 +790,8 @@ void jep_copy_self(jep_obj *dest, jep_obj *src)
 /* frees the memory used by an object */
 void jep_destroy_object(jep_obj *obj)
 {
+	destruction++;
+
 	if (obj != NULL)
 	{
 		if (obj->type == JEP_INT && obj->val != NULL)
@@ -812,7 +821,7 @@ void jep_destroy_object(jep_obj *obj)
 		else if (obj->type == JEP_ARRAY && obj->val != NULL)
 		{
 			jep_obj *array = (jep_obj *)(obj->val);
-			jep_free_array(array);
+			jep_destroy_object(array);
 		}
 		else if (obj->type == JEP_FUNCTION)
 		{
@@ -1187,4 +1196,10 @@ void jep_remove_scope(jep_obj *list)
 			list->head = NULL;
 		}
 	}
+}
+
+void print_call_counts()
+{
+	printf("jep_create_object: %d\n", creation);
+	printf("jep_destroy_object: %d\n", destruction);
 }

@@ -136,4 +136,6 @@ void jep_print_list(jep_obj *list);
 /* removes the scope list off the tail of a list */
 void jep_remove_scope(jep_obj *list);
 
+void print_call_counts();
+
 #endif

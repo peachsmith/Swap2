@@ -270,7 +270,7 @@ int main(int argc, char **argv)
 	/* destroy the tokens */
 	jep_destroy_token_stream(ts);
 
-	print_call_counts();
+	/* print_call_counts(); */
 
 	return 0;
 }

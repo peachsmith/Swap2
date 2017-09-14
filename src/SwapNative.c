@@ -206,7 +206,6 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_int(jep_obj *args)
 		}
 		else if ((endptr != s && *endptr != '\0') || (strlen(s) > 1 && *s == '0') || !isdigit(*s))
 		{
-			//printf("invalid integer format\n");
 			i = jep_create_object();
 			i->type = JEP_STRING;
 			i->ret = JEP_RETURN | JEP_EXCEPTION;
@@ -859,4 +858,14 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_fwriteb(jep_obj* args)
 	}
 
 	return written;
+}
+
+/**
+* prints the number of times an an object was created in the native library
+*/
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_print_native_call_count()
+{
+	print_call_counts();
+
+	return NULL;
 }

@@ -111,8 +111,13 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_fwriteln(jep_obj* args);
 SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_freadb(jep_obj* args);
 
 /**
-* Writes a single byte to a file
-*/
+ * Writes a single byte to a file
+ */
 SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_fwriteb(jep_obj* args);
+
+/**
+ * prints the amount of object creation and destruciton in the native library
+ */
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_print_native_call_count();
 
 #endif

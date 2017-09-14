@@ -233,6 +233,15 @@ int main(int argc, char **argv)
 
 			if (native_lib != NULL)
 			{
+				jep_obj* l_native = jep_get_object(" SwapNative", list);
+
+				jep_obj* native_result = jep_call_shared((jep_lib)(l_native->val), "print_native_call_count", NULL);
+
+				if (native_result != NULL)
+				{
+					jep_destroy_object(native_result);
+				}
+
 				jep_free_lib(native_lib);
 			}
 
@@ -270,7 +279,7 @@ int main(int argc, char **argv)
 	/* destroy the tokens */
 	jep_destroy_token_stream(ts);
 
-	/* print_call_counts(); */
+	print_call_counts();
 
 	return 0;
 }

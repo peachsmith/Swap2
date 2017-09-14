@@ -2486,50 +2486,51 @@ jep_obj *jep_inc(jep_ast_node node, jep_obj *list)
 
 	jep_obj *o = NULL;
 	jep_obj *obj = jep_evaluate(node.leaves[0], list);
-	if (obj->index >= 0)
-	{
-		jep_ast_node arr = node.leaves[0];
-		/* handle parentheses */
-		if (arr.token.token_code == T_LPAREN)
-		{
-			while (arr.token.token_code == T_LPAREN)
-			{
-				arr = arr.leaves[0];
-				if (arr.token.token_code == T_COMMA)
-				{
-					while (arr.token.token_code == T_COMMA)
-					{
-						arr = arr.leaves[1];
-					}
-				}
-			}
-		}
-		jep_destroy_object(obj);
-		obj = NULL;
-		obj = jep_get_element(arr, list);
-	}
-	else if (obj->index == -2)
-	{
-		jep_ast_node struc = node.leaves[0];
-		/* handle parentheses */
-		if (struc.token.token_code == T_LPAREN)
-		{
-			while (struc.token.token_code == T_LPAREN)
-			{
-				struc = struc.leaves[0];
-				if (struc.token.token_code == T_COMMA)
-				{
-					while (struc.token.token_code == T_COMMA)
-					{
-						struc = struc.leaves[1];
-					}
-				}
-			}
-		}
-		jep_destroy_object(obj);
-		obj = NULL;
-		obj = jep_get_data_member(struc, list);
-	}
+
+	//if (obj->index >= 0)
+	//{
+	//	jep_ast_node arr = node.leaves[0];
+	//	/* handle parentheses */
+	//	if (arr.token.token_code == T_LPAREN)
+	//	{
+	//		while (arr.token.token_code == T_LPAREN)
+	//		{
+	//			arr = arr.leaves[0];
+	//			if (arr.token.token_code == T_COMMA)
+	//			{
+	//				while (arr.token.token_code == T_COMMA)
+	//				{
+	//					arr = arr.leaves[1];
+	//				}
+	//			}
+	//		}
+	//	}
+	//	jep_destroy_object(obj);
+	//	obj = NULL;
+	//	obj = jep_get_element(arr, list);
+	//}
+	//else if (obj->index == -2)
+	//{
+	//	jep_ast_node struc = node.leaves[0];
+	//	/* handle parentheses */
+	//	if (struc.token.token_code == T_LPAREN)
+	//	{
+	//		while (struc.token.token_code == T_LPAREN)
+	//		{
+	//			struc = struc.leaves[0];
+	//			if (struc.token.token_code == T_COMMA)
+	//			{
+	//				while (struc.token.token_code == T_COMMA)
+	//				{
+	//					struc = struc.leaves[1];
+	//				}
+	//			}
+	//		}
+	//	}
+	//	jep_destroy_object(obj);
+	//	obj = NULL;
+	//	obj = jep_get_data_member(struc, list);
+	//}
 
 	if (obj != NULL)
 	{
@@ -2539,52 +2540,52 @@ jep_obj *jep_inc(jep_ast_node node, jep_obj *list)
 			jep_destroy_object(obj);
 			return NULL;
 		}
-		if (obj->index >= 0)
+		//if (obj->index >= 0)
+		//{
+		//	o = jep_create_object();
+
+		//	int cur_val = *(int *)(obj->val);
+		//	int new_val = cur_val + 1;
+		//	*(int *)(obj->val) = new_val;
+
+		//	jep_copy_object(o, obj);
+
+		//	if (node.token.postfix)
+		//	{
+		//		*(int *)(o->val) = cur_val;
+		//	}
+		//}
+		//else if (obj->index == -2)
+		//{
+		//	o = jep_create_object();
+
+		//	int cur_val = *(int *)(obj->val);
+		//	int new_val = cur_val + 1;
+		//	*(int *)(obj->val) = new_val;
+
+		//	jep_copy_object(o, obj);
+
+		//	if (node.token.postfix)
+		//	{
+		//		*(int *)(o->val) = cur_val;
+		//	}
+		//}
+		//else
+		//{
+		jep_obj *actual = obj->self; //jep_get_object(obj->ident, list);
+		o = jep_create_object();
+
+		int cur_val = *(int *)(actual->val);
+		int new_val = cur_val + 1;
+		*(int *)(actual->val) = new_val;
+
+		jep_copy_object(o, actual);
+
+		if (node.token.postfix)
 		{
-			o = jep_create_object();
-
-			int cur_val = *(int *)(obj->val);
-			int new_val = cur_val + 1;
-			*(int *)(obj->val) = new_val;
-
-			jep_copy_object(o, obj);
-
-			if (node.token.postfix)
-			{
-				*(int *)(o->val) = cur_val;
-			}
+			*(int *)(o->val) = cur_val;
 		}
-		else if (obj->index == -2)
-		{
-			o = jep_create_object();
-
-			int cur_val = *(int *)(obj->val);
-			int new_val = cur_val + 1;
-			*(int *)(obj->val) = new_val;
-
-			jep_copy_object(o, obj);
-
-			if (node.token.postfix)
-			{
-				*(int *)(o->val) = cur_val;
-			}
-		}
-		else
-		{
-			jep_obj *actual = jep_get_object(obj->ident, list);
-			o = jep_create_object();
-
-			int cur_val = *(int *)(actual->val);
-			int new_val = cur_val + 1;
-			*(int *)(actual->val) = new_val;
-
-			jep_copy_object(o, actual);
-
-			if (node.token.postfix)
-			{
-				*(int *)(o->val) = cur_val;
-			}
-		}
+		//}
 
 		jep_destroy_object(obj);
 	}
@@ -3041,7 +3042,14 @@ jep_obj *jep_paren(jep_ast_node node, jep_obj *list)
 		{
 			jep_obj* l_native = jep_get_object(" SwapNative", list);
 
-			return jep_call_shared((jep_lib)(l_native->val), func->ident, arg_list);
+			jep_obj* native_result = jep_call_shared((jep_lib)(l_native->val), func->ident, arg_list);
+
+			if (arg_list != NULL)
+			{
+				jep_destroy_object(arg_list);
+			}
+
+			return native_result;
 		}
 
 		jep_ast_node body = *((jep_ast_node *)(func->head->next->val));
@@ -3219,7 +3227,8 @@ jep_obj *jep_subscript(jep_ast_node node, jep_obj *list)
 			jep_obj *elem = contents->head;
 			int target = *(int *)(index->val);
 			int i;
-			for (i = 0; elem != NULL; i++)
+			int found = 0;
+			for (i = 0; elem != NULL && !found; i++)
 			{
 				if (i == target)
 				{
@@ -3228,6 +3237,7 @@ jep_obj *jep_subscript(jep_ast_node node, jep_obj *list)
 					o->array_ident = elem->array_ident;
 					o->index = elem->index;
 					jep_copy_self(o, elem);
+					found = 1;
 				}
 				elem = elem->next;
 			}
@@ -3769,10 +3779,6 @@ jep_obj *jep_for(jep_ast_node node, jep_obj *list)
 {
 	jep_obj *o = NULL;
 	jep_obj *scope;
-	//  = jep_create_object();
-	// scope->type = JEP_LIST;
-
-	// jep_add_object(list, scope);
 
 	jep_ast_node head = node.leaves[0];
 	jep_obj *cond = NULL;
@@ -3783,7 +3789,11 @@ jep_obj *jep_for(jep_ast_node node, jep_obj *list)
 	if (node.loop & JEP_INDEX)
 	{
 		index_node = head.leaves[0];
-		jep_evaluate(index_node, list);
+		jep_obj* index_obj = jep_evaluate(index_node, list);
+		if (index_obj != NULL)
+		{
+			jep_destroy_object(index_obj);
+		}
 	}
 
 	if (node.loop & JEP_CONDITION)
@@ -3823,6 +3833,8 @@ jep_obj *jep_for(jep_ast_node node, jep_obj *list)
 			if (cond != NULL && cond->val != NULL)
 			{
 				val = *((int *)(cond->val));
+				jep_destroy_object(cond);
+				cond = NULL;
 			}
 			while (val)
 			{
@@ -3837,8 +3849,7 @@ jep_obj *jep_for(jep_ast_node node, jep_obj *list)
 					if (o != NULL && o->ret)
 					{
 						jep_remove_scope(list);
-						jep_destroy_list(scope);
-						free(scope);
+						jep_destroy_object(scope);
 						scope = NULL;
 						return o;
 					}
@@ -3850,19 +3861,24 @@ jep_obj *jep_for(jep_ast_node node, jep_obj *list)
 				}
 				if (node.loop & JEP_CHANGE)
 				{
-					jep_evaluate(change_node, list);
+					jep_obj* change_obj = jep_evaluate(change_node, list);
+					if (change_obj != NULL)
+					{
+						jep_destroy_object(change_obj);
+					}
 				}
 
 				cond = jep_evaluate(cond_node, list);
 				if (cond != NULL && cond->val != NULL)
 				{
 					val = *((int *)(cond->val));
+					jep_destroy_object(cond);
+					cond = NULL;
 				}
 
 				/* destroy the scope at the end of each iteration */
 				jep_remove_scope(list);
-				jep_destroy_list(scope);
-				free(scope);
+				jep_destroy_object(scope);
 				scope = NULL;
 			}
 		}
@@ -3886,9 +3902,7 @@ jep_obj *jep_for(jep_ast_node node, jep_obj *list)
 				if (o != NULL && o->ret)
 				{
 					jep_remove_scope(list);
-					jep_destroy_list(scope);
-					free(scope);
-					scope = NULL;
+					jep_destroy_object(scope);
 					return o;
 				}
 				else if (o != NULL)
@@ -3899,13 +3913,16 @@ jep_obj *jep_for(jep_ast_node node, jep_obj *list)
 			}
 			if (node.loop & JEP_CHANGE)
 			{
-				jep_evaluate(change_node, list);
+				jep_obj* change_obj = jep_evaluate(change_node, list);
+				if (change_obj != NULL)
+				{
+					jep_destroy_object(change_obj);
+				}
 			}
 
 			/* destroy the scope at the end of each iteration */
 			jep_remove_scope(list);
-			jep_destroy_list(scope);
-			free(scope);
+			jep_destroy_object(scope);
 			scope = NULL;
 		}
 	}
@@ -4033,8 +4050,7 @@ jep_obj* jep_try(jep_ast_node node, jep_obj* list)
 
 			/* destroy the scope for the catch block */
 			jep_remove_scope(list);
-			jep_destroy_list(scope);
-			free(scope);
+			jep_destroy_object(scope);
 			scope = NULL;
 		}
 	}
@@ -4238,12 +4254,14 @@ jep_obj *jep_member(jep_ast_node node, jep_obj *list)
 	{
 		printf("%s is not a struct\n",
 			node.leaves[0].token.val->buffer);
+		jep_destroy_object(struc);
 		return NULL;
 	}
 
 	if (node.leaves[1].token.type != T_IDENTIFIER)
 	{
 		printf("an identifier must be used to access data members\n");
+		jep_destroy_object(struc);
 		return NULL;
 	}
 
@@ -4253,7 +4271,8 @@ jep_obj *jep_member(jep_ast_node node, jep_obj *list)
 	if (members->size > 0)
 	{
 		jep_obj *m = members->head;
-		while (m != NULL && mem == NULL)
+		int found = 0;
+		while (m != NULL && mem == NULL && !found)
 		{
 			if (!strcmp(m->ident, node.leaves[1].token.val->buffer))
 			{
@@ -4262,6 +4281,7 @@ jep_obj *jep_member(jep_ast_node node, jep_obj *list)
 				mem->index = -2;
 				mem->ident = m->ident;
 				jep_copy_self(mem, m);
+				found = 1;
 			}
 			m = m->next;
 		}
@@ -4274,8 +4294,11 @@ jep_obj *jep_member(jep_ast_node node, jep_obj *list)
 	else
 	{
 		printf("returning NULL here for some reason\n");
+		jep_destroy_object(struc);
 		return NULL;
 	}
+
+	jep_destroy_object(struc);
 
 	return mem;
 }
@@ -4434,10 +4457,15 @@ jep_obj *jep_evaluate_local(jep_ast_node ast, jep_obj *list, int mod)
 				o = jep_assign(ast, list);
 				if (o != NULL && (o->ret & JEP_EXCEPTION))
 				{
+					jep_pop_object(scope);
+					jep_destroy_object(local);
 					return o;
 				}
-				jep_obj *con = jep_get_object(local->ident, scope);
-				con->mod = mod;
+				else if (o != NULL)
+				{
+					jep_obj *con = jep_get_object(local->ident, scope);
+					con->mod = mod;
+				}
 			}
 		}
 		else if (mod & 1 && !(mod & 2))

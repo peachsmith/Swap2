@@ -539,6 +539,23 @@ void jep_add_object(jep_obj *list, jep_obj *o)
 	}
 }
 
+/* removes the last object from a list */
+void jep_pop_object(jep_obj *list)
+{
+	if (list->size == 1)
+	{
+		list->head = NULL;
+		list->tail = NULL;
+	}
+	else if (list->size > 1)
+	{
+		list->tail = list->tail->prev;
+		list->tail->next = NULL;
+	}
+
+	list->size--;
+}
+
 /* retreives an object from a list */
 jep_obj *jep_get_object(const char *ident, jep_obj *list)
 {
@@ -855,8 +872,7 @@ void jep_destroy_object(jep_obj *obj)
 		}
 		else if (obj->type == JEP_STRUCT || obj->type == JEP_STRUCTDEF)
 		{
-			jep_destroy_list((jep_obj *)(obj->val));
-			free(obj->val);
+			jep_destroy_object((jep_obj *)(obj->val));
 		}
 		else if (obj->type == JEP_LIST)
 		{

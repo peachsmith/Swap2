@@ -303,6 +303,9 @@ jep_obj *jep_add(jep_ast_node node, jep_obj *list)
 				free(r_str);
 			}
 
+			jep_destroy_object(l);
+			jep_destroy_object(r);
+
 			return result;
 		}
 
@@ -2487,51 +2490,6 @@ jep_obj *jep_inc(jep_ast_node node, jep_obj *list)
 	jep_obj *o = NULL;
 	jep_obj *obj = jep_evaluate(node.leaves[0], list);
 
-	//if (obj->index >= 0)
-	//{
-	//	jep_ast_node arr = node.leaves[0];
-	//	/* handle parentheses */
-	//	if (arr.token.token_code == T_LPAREN)
-	//	{
-	//		while (arr.token.token_code == T_LPAREN)
-	//		{
-	//			arr = arr.leaves[0];
-	//			if (arr.token.token_code == T_COMMA)
-	//			{
-	//				while (arr.token.token_code == T_COMMA)
-	//				{
-	//					arr = arr.leaves[1];
-	//				}
-	//			}
-	//		}
-	//	}
-	//	jep_destroy_object(obj);
-	//	obj = NULL;
-	//	obj = jep_get_element(arr, list);
-	//}
-	//else if (obj->index == -2)
-	//{
-	//	jep_ast_node struc = node.leaves[0];
-	//	/* handle parentheses */
-	//	if (struc.token.token_code == T_LPAREN)
-	//	{
-	//		while (struc.token.token_code == T_LPAREN)
-	//		{
-	//			struc = struc.leaves[0];
-	//			if (struc.token.token_code == T_COMMA)
-	//			{
-	//				while (struc.token.token_code == T_COMMA)
-	//				{
-	//					struc = struc.leaves[1];
-	//				}
-	//			}
-	//		}
-	//	}
-	//	jep_destroy_object(obj);
-	//	obj = NULL;
-	//	obj = jep_get_data_member(struc, list);
-	//}
-
 	if (obj != NULL)
 	{
 		if ((obj->ident == NULL && obj->index == -1) || (obj->type != JEP_INT && obj->type != JEP_BYTE && obj->type != JEP_LONG) || obj->val == NULL)
@@ -2540,39 +2498,8 @@ jep_obj *jep_inc(jep_ast_node node, jep_obj *list)
 			jep_destroy_object(obj);
 			return NULL;
 		}
-		//if (obj->index >= 0)
-		//{
-		//	o = jep_create_object();
 
-		//	int cur_val = *(int *)(obj->val);
-		//	int new_val = cur_val + 1;
-		//	*(int *)(obj->val) = new_val;
-
-		//	jep_copy_object(o, obj);
-
-		//	if (node.token.postfix)
-		//	{
-		//		*(int *)(o->val) = cur_val;
-		//	}
-		//}
-		//else if (obj->index == -2)
-		//{
-		//	o = jep_create_object();
-
-		//	int cur_val = *(int *)(obj->val);
-		//	int new_val = cur_val + 1;
-		//	*(int *)(obj->val) = new_val;
-
-		//	jep_copy_object(o, obj);
-
-		//	if (node.token.postfix)
-		//	{
-		//		*(int *)(o->val) = cur_val;
-		//	}
-		//}
-		//else
-		//{
-		jep_obj *actual = obj->self; //jep_get_object(obj->ident, list);
+		jep_obj *actual = obj->self;
 		o = jep_create_object();
 
 		int cur_val = *(int *)(actual->val);
@@ -2585,7 +2512,6 @@ jep_obj *jep_inc(jep_ast_node node, jep_obj *list)
 		{
 			*(int *)(o->val) = cur_val;
 		}
-		//}
 
 		jep_destroy_object(obj);
 	}
@@ -2959,7 +2885,7 @@ jep_obj *jep_paren(jep_ast_node node, jep_obj *list)
 
 	jep_obj *o;		   /* function return value    */
 	jep_ast_node args; /* incoming arguments       */
-	jep_obj *func;	 /* function being called    */
+	jep_obj *func;	   /* function being called    */
 	jep_obj *arg_list; /* list of argument objects */
 
 	if (node.leaf_count == 0)
@@ -3101,8 +3027,7 @@ jep_obj *jep_paren(jep_ast_node node, jep_obj *list)
 		printf("couldn't find a function with the specified identifer\n");
 	}
 
-	jep_destroy_list(arg_list);
-	free(arg_list);
+	jep_destroy_object(arg_list);
 
 	return o;
 }
@@ -3147,7 +3072,10 @@ jep_obj *jep_brace(jep_ast_node node, jep_obj *list)
 			{
 				return o;
 			}
-			jep_destroy_object(o);
+			else if (o != NULL)
+			{
+				jep_destroy_object(o);
+			}
 			o = NULL;
 		}
 	}
@@ -3459,7 +3387,6 @@ jep_obj *jep_function(jep_ast_node node, jep_obj *list)
 	func->type = JEP_FUNCTION;
 	func->ident = node.leaves[0].token.val->buffer;
 	jep_obj *args = jep_create_object();
-	jep_obj *body = jep_create_object();
 
 	/* function arguments */
 	int i;
@@ -3471,20 +3398,20 @@ jep_obj *jep_function(jep_ast_node node, jep_obj *list)
 		jep_add_object(args, a);
 	}
 
-	if (node.leaf_count == 3)
-	{
-		/* function body */
-		jep_ast_node *n = jep_create_ast_node();
-		*n = node.leaves[2];
-		body->val = n;
-	}
-
 	jep_add_object(func, args);
 
 	if (node.leaf_count == 3)
 	{
+		/* function body */
+		jep_obj *body = jep_create_object();
+		body->type = JEP_FUNCTION_BODY;
+		jep_ast_node *n = jep_create_ast_node();
+		*n = node.leaves[2];
+		body->val = n;
 		jep_add_object(func, body);
 	}
+
+	func->head->type = JEP_LIST;
 
 	jep_add_object(list, func);
 	jep_copy_object(copy, func);
@@ -4018,8 +3945,7 @@ jep_obj* jep_try(jep_ast_node node, jep_obj* list)
 
 	/* destroy the scope for the try block */
 	jep_remove_scope(list);
-	jep_destroy_list(scope);
-	free(scope);
+	jep_destroy_object(scope);
 	scope = NULL;
 
 	if (o != NULL && !o->ret)

@@ -184,9 +184,4 @@ void jep_tokenize_file(jep_token_stream* ts, const char* file_name);
  */
 void jep_print_tokens(jep_token_stream* ts, FILE* f);
 
-/**
- * prints the directives
- */
-void jep_print_directives(jep_token_stream* ts, FILE* f);
-
 #endif /* JEP_TOKENIZER_H */

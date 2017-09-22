@@ -102,61 +102,10 @@ static void jep_free_array(jep_obj *array)
 		while (elem != NULL)
 		{
 			prev = elem->prev;
-			//if (elem->type == JEP_INT)
-			//{
-			//	free(elem->val);
-			//}
-			//else if (elem->type == JEP_LONG)
-			//{
-			//	free(elem->val);
-			//}
-			//else if (elem->type == JEP_DOUBLE)
-			//{
-			//	free(elem->val);
-			//}
-			//else if (elem->type == JEP_CHARACTER)
-			//{
-			//	free(elem->val);
-			//}
-			//else if (elem->type == JEP_BYTE)
-			//{
-			//	free(elem->val);
-			//}
-			//else if (elem->type == JEP_STRING)
-			//{
-			//	free(elem->val);
-			//}
-			//else if (elem->type == JEP_ARRAY)
-			//{
-			//	/* frees the memory used by an array */
-			//	jep_free_array(elem);
-			//}
-			//else if (elem->type == JEP_STRUCT || elem->type == JEP_STRUCTDEF)
-			//{
-			//	jep_destroy_list((jep_obj *)(elem->val));
-			//	free(elem->val);
-			//}
 			jep_destroy_object(elem);
-			//free(elem);
 			elem = prev;
 		}
 	}
-}
-
-/* frees the memory used by a function */
-static void jep_free_function(jep_obj *func)
-{
-	jep_obj *args = func->head;
-
-	/* destroy the body of non-native functions */
-	if (func->size == 2)
-	{
-		jep_obj *body = args->next;
-		free(body);
-	}
-
-	jep_destroy_list(args);
-	free(args);
 }
 
 /* creates a string representation of an object */
@@ -611,7 +560,16 @@ void jep_copy_object(jep_obj *dest, jep_obj *src)
 		}
 		else if (dest->type == JEP_FUNCTION)
 		{
-			jep_free_function(dest);
+			jep_obj *args = dest->head;
+
+			/* destroy the body of non-native functions */
+			if (dest->size == 2)
+			{
+				jep_obj *body = args->next;
+				jep_destroy_object(body);
+			}
+
+			jep_destroy_object(args);
 		}
 		else if (dest->type == JEP_REFERENCE)
 		{
@@ -722,6 +680,7 @@ void jep_copy_object(jep_obj *dest, jep_obj *src)
 		if (src->size == 2)
 		{
 			body = jep_create_object();
+			body->type = JEP_FUNCTION_BODY;
 			*n = *((jep_ast_node *)(src_args->next->val));
 			body->val = n;
 		}
@@ -732,6 +691,8 @@ void jep_copy_object(jep_obj *dest, jep_obj *src)
 		{
 			jep_add_object(dest, body);
 		}
+
+		dest->head->type = JEP_LIST;
 	}
 	else if (src->type == JEP_FILE)
 	{
@@ -842,7 +803,23 @@ void jep_destroy_object(jep_obj *obj)
 		}
 		else if (obj->type == JEP_FUNCTION)
 		{
-			jep_free_function(obj);
+			jep_obj *args = obj->head;
+
+			/* destroy the body of non-native functions */
+			if (obj->size == 2)
+			{
+				jep_obj *body = args->next;
+				jep_destroy_object(body);
+			}
+
+			if (args != NULL)
+			{
+				jep_destroy_object(args);
+			}
+		}
+		else if (obj->type == JEP_FUNCTION_BODY)
+		{
+			free(obj->val);
 		}
 		else if (obj->type == JEP_ARGUMENT)
 		{
@@ -1216,6 +1193,6 @@ void jep_remove_scope(jep_obj *list)
 
 void print_call_counts()
 {
-	printf("jep_create_object: %d\n", creation);
-	printf("jep_destroy_object: %d\n", destruction);
+	printf("objects created: %d\n", creation);
+	printf("objects destroyed: %d\n", destruction);
 }

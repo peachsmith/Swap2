@@ -37,14 +37,15 @@
 #define JEP_STRING 6
 #define JEP_ARRAY 7
 #define JEP_FUNCTION 8
-#define JEP_ARGUMENT 9
-#define JEP_LIST 10
-#define JEP_NATIVE 11
-#define JEP_REFERENCE 12
-#define JEP_FILE 13
-#define JEP_NULL 14
-#define JEP_STRUCT 15
-#define JEP_STRUCTDEF 16
+#define JEP_FUNCTION_BODY 9
+#define JEP_ARGUMENT 10
+#define JEP_LIST 11
+#define JEP_NATIVE 12
+#define JEP_REFERENCE 13
+#define JEP_FILE 14
+#define JEP_NULL 15
+#define JEP_STRUCT 16
+#define JEP_STRUCTDEF 17
 
 /* file modes */
 #define JEP_READ 1
@@ -102,6 +103,9 @@ int jep_compare_object(jep_obj *a, jep_obj *b);
 
 /* adds an object to a list */
 void jep_add_object(jep_obj *list, jep_obj *o);
+
+/* removes the last object from a list */
+void jep_pop_object(jep_obj *list);
 
 /* retreives an object from a list */
 jep_obj *jep_get_object(const char *ident, jep_obj *list);

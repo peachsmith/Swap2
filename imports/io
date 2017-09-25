@@ -57,14 +57,12 @@ function freadln(file);
 /**
  * Writes a string of text to a file.
  *
- * returns: a string
  */
 function fwrite(file, data);
 
 /**
  * Writes a string of text to a file in appended by a newline.
  *
- * returns: a string
  */
 function fwriteln(file, data);
 
@@ -84,6 +82,6 @@ function freadb(file, n);
  * file - the file object
  * buffer - the memory for the bytes
  *
- * returns: a string
+ * returns: the number of bytes written
  */
 function fwriteb(file, buffer);

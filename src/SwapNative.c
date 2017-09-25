@@ -46,10 +46,17 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_len(jep_obj *args)
 
 SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_typeof(jep_obj *args)
 {
+	jep_obj *i = NULL;
+
 	if (args == NULL || args->size != 1)
 	{
-		printf("invalid number of arguments\n");
-		return NULL;
+		i = jep_create_object();
+		i->type = JEP_STRING;
+		i->ret = JEP_RETURN | JEP_EXCEPTION;
+		i->val = malloc(28);
+		strcpy(i->val, "invalid number of arguments");
+		((char*)(i->val))[27] = '\0';
+		return i;
 	}
 
 	if (args->head == NULL)
@@ -131,14 +138,20 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_typeof(jep_obj *args)
 
 SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_int(jep_obj *args)
 {
+	jep_obj *i = NULL;
+
 	if (args == NULL || args->size != 1)
 	{
-		printf("invalid number of arguments\n");
-		return NULL;
+		i = jep_create_object();
+		i->type = JEP_STRING;
+		i->ret = JEP_RETURN | JEP_EXCEPTION;
+		i->val = malloc(28);
+		strcpy(i->val, "invalid number of arguments");
+		((char*)(i->val))[27] = '\0';
+		return i;
 	}
 
 	jep_obj *obj = args->head;
-	jep_obj *i = NULL;
 
 	if (obj->type == JEP_INT)
 	{
@@ -240,8 +253,13 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_int(jep_obj *args)
 	}
 	else
 	{
-		printf("cannot convert object to integer\n");
-		printf("must be int, long, double, character, or string\n");
+		i = jep_create_object();
+		i->type = JEP_STRING;
+		i->ret = JEP_RETURN | JEP_EXCEPTION;
+		i->val = malloc(22);
+		strcpy(i->val, "invalid argument type");
+		((char*)(i->val))[21] = '\0';
+		return i;
 	}
 
 	return i;
@@ -249,14 +267,20 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_int(jep_obj *args)
 
 SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_double(jep_obj *args)
 {
+	jep_obj *i = NULL;
+
 	if (args == NULL || args->size != 1)
 	{
-		printf("invalid number of arguments\n");
-		return NULL;
+		i = jep_create_object();
+		i->type = JEP_STRING;
+		i->ret = JEP_RETURN | JEP_EXCEPTION;
+		i->val = malloc(28);
+		strcpy(i->val, "invalid number of arguments");
+		((char*)(i->val))[27] = '\0';
+		return i;
 	}
 
 	jep_obj *obj = args->head;
-	jep_obj *i = NULL;
 
 	if (obj->type == JEP_INT)
 	{
@@ -324,7 +348,13 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_double(jep_obj *args)
 		}
 		else if ((endptr != s && *endptr != '\0') || (strlen(s) > 1 && *s == '0') || !isdigit(*s))
 		{
-			printf("invalid integer format\n");
+			i = jep_create_object();
+			i->type = JEP_STRING;
+			i->ret = JEP_RETURN | JEP_EXCEPTION;
+			i->val = malloc(22);
+			strcpy(i->val, "invalid double format");
+			((char*)(i->val))[21] = '\0';
+			return i;
 		}
 		else
 		{
@@ -348,8 +378,13 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_double(jep_obj *args)
 	}
 	else
 	{
-		printf("cannot convert object to integer\n");
-		printf("must be int, long, double, character, or string\n");
+		i = jep_create_object();
+		i->type = JEP_STRING;
+		i->ret = JEP_RETURN | JEP_EXCEPTION;
+		i->val = malloc(22);
+		strcpy(i->val, "invalid argument type");
+		((char*)(i->val))[21] = '\0';
+		return i;
 	}
 
 	return i;
@@ -357,18 +392,29 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_double(jep_obj *args)
 
 SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_byte(jep_obj *args)
 {
+	jep_obj *o = NULL;
+
 	if (args == NULL || args->size != 1)
 	{
-		printf("invalid number of arguments\n");
-		return NULL;
+		o = jep_create_object();
+		o->type = JEP_STRING;
+		o->ret = JEP_RETURN | JEP_EXCEPTION;
+		o->val = malloc(28);
+		strcpy(o->val, "invalid number of arguments");
+		((char*)(o->val))[27] = '\0';
+		return o;
 	}
 
-	jep_obj *o = NULL;
 	jep_obj *arg = args->head;
 
 	if (arg == NULL || arg->val == NULL || (arg->type != JEP_INT && arg->type != JEP_LONG && arg->type != JEP_CHARACTER))
 	{
-		printf("invalid argument for byte truncation\n");
+		o = jep_create_object();
+		o->type = JEP_STRING;
+		o->ret = JEP_RETURN | JEP_EXCEPTION;
+		o->val = malloc(22);
+		strcpy(o->val, "invalid argument type");
+		((char*)(o->val))[21] = '\0';
 		return o;
 	}
 

@@ -3382,6 +3382,27 @@ jep_obj *jep_get_data_member(jep_ast_node node, jep_obj *list)
 /* evaluates a function definition */
 jep_obj *jep_function(jep_ast_node node, jep_obj *list)
 {
+	/* get the current scope */
+	jep_obj *scope = list;
+	while (scope->tail != NULL && scope->tail->type == JEP_LIST)
+	{
+		scope = scope->tail;
+	}
+
+	jep_obj *exist = jep_get_object(node.leaves[0].token.val->buffer, scope);
+
+	if (exist != NULL)
+	{
+		jep_obj* redef_except;
+		redef_except = jep_create_object();
+		redef_except->type = JEP_STRING;
+		redef_except->ret = JEP_RETURN | JEP_EXCEPTION;
+		redef_except->val = malloc(22);
+		strcpy(redef_except->val, "function redefinition");
+		((char*)(redef_except->val))[21] = '\0';
+		return redef_except;
+	}
+
 	jep_obj *copy = jep_create_object();
 	jep_obj *func = jep_create_object();
 	func->type = JEP_FUNCTION;

@@ -2908,7 +2908,11 @@ jep_obj *jep_paren(jep_ast_node node, jep_obj *list)
 		{
 			if (node.leaves[0].token.token_code == T_COMMA)
 			{
-				jep_sequence(node.leaves[0], list, arg_list);
+				jep_obj* objects = jep_create_object();
+				objects->type = JEP_LIST;
+				jep_sequence(node.leaves[0], list, objects);
+				jep_copy_object(arg_list, objects);
+				jep_destroy_object(objects);
 			}
 			else
 			{
@@ -2932,15 +2936,19 @@ jep_obj *jep_paren(jep_ast_node node, jep_obj *list)
 		else if (args.leaf_count == 0)
 		{
 			jep_obj *a = jep_evaluate(node.leaves[0], list);
+
 			if (a != NULL)
 			{
+				jep_obj* local_a = jep_create_object();
+				jep_copy_object(local_a, a);
+				jep_destroy_object(a);
 				if (a->type == JEP_FILE && a->val != NULL)
 				{
 					/* function arguments don't count towards references */
 					jep_file *file_obj = (jep_file *)(a->val);
 					(file_obj->refs)--;
 				}
-				jep_add_object(arg_list, a);
+				jep_add_object(arg_list, local_a);
 			}
 			else
 			{
@@ -3501,13 +3509,13 @@ jep_obj *jep_reference(jep_ast_node node, jep_obj *list)
 
 	if (v != NULL)
 	{
-		jep_obj *ref = jep_create_object();
-		jep_copy_object(ref, v);
-		jep_copy_self(ref, v);
+		//jep_obj *ref = jep_create_object();
+		//jep_copy_object(ref, v);
+		//jep_copy_self(ref, v);
 
 		o = jep_create_object();
 		o->type = JEP_REFERENCE;
-		o->val = ref;
+		o->val = v->self;
 
 		jep_destroy_object(v);
 	}

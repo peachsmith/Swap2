@@ -637,10 +637,20 @@ void jep_copy_object(jep_obj *dest, jep_obj *src)
 		dest->val = malloc(len + 1);
 		strcpy(dest->val, (char *)(src->val));
 	}
+	else if (src->type == JEP_LIST)
+	{
+		dest->size = 0;
+		jep_obj* src_val = src->head;
+		while (src_val != NULL)
+		{
+			jep_obj* dest_val = jep_create_object();
+			jep_copy_object(dest_val, src_val);
+			jep_add_object(dest, dest_val);
+			src_val = src_val->next;
+		}
+	}
 	else if (src->type == JEP_ARRAY)
 	{
-		static int count = 0;
-		count++;
 		jep_obj *array = (jep_obj *)(src->val);
 		jep_obj *dest_array = jep_create_object();
 		dest_array->type = JEP_LIST;

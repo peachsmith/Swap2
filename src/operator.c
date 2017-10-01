@@ -3087,6 +3087,14 @@ jep_obj *jep_paren(jep_ast_node node, jep_obj *list)
 
 	jep_destroy_object(arg_list);
 
+	if (o != NULL && o->ret & JEP_RETURN)
+	{
+		/* TODO: fix return bug where return statements bubble up */
+		/* remove the return flag when leaving a function */
+		/* o->ret ^= JEP_RETURN; */
+		int x = 0;
+	}
+
 	return o;
 }
 
@@ -3176,6 +3184,8 @@ jep_obj *jep_subscript(jep_ast_node node, jep_obj *list)
 		}
 
 		int s = *((int *)(size->val));
+
+		jep_destroy_object(size);
 
 		int i;
 		for (i = 0; i < s; i++)

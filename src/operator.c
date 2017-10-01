@@ -1782,9 +1782,56 @@ jep_obj *jep_and(jep_ast_node node, jep_obj *list)
 	}
 
 	l = jep_evaluate(node.leaves[0], list);
+
+	/* check result of left operand first */
+	if (l != NULL)
+	{
+		switch (l->type)
+		{
+		case JEP_INT:
+			if ((*(int *)(l->val)) == 0)
+			{
+				int *n = malloc(sizeof(int));
+				*n = 0;
+				result = jep_create_object();
+				result->val = (void *)n;
+				result->type = JEP_INT;
+				jep_destroy_object(l);
+				return result;
+			}
+			break;
+		case JEP_LONG:
+			if ((*(long *)(l->val)) == 0)
+			{
+				int *n = malloc(sizeof(int));
+				*n = 0;
+				result = jep_create_object();
+				result->val = (void *)n;
+				result->type = JEP_INT;
+				jep_destroy_object(l);
+				return result;
+			}
+			break;
+		case JEP_DOUBLE:
+			if ((*(double *)(l->val)) == 0)
+			{
+				int *n = malloc(sizeof(int));
+				*n = 0;
+				result = jep_create_object();
+				result->val = (void *)n;
+				result->type = JEP_INT;
+				jep_destroy_object(l);
+				return result;
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
 	r = jep_evaluate(node.leaves[1], list);
 
-	if (l != NULL && r != NULL)
+	if (l != NULL && r != NULL && result == NULL)
 	{
 		if (l->type == r->type)
 		{

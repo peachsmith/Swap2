@@ -4353,9 +4353,13 @@ jep_obj* jep_mod_sequence(jep_ast_node node, jep_obj *list, int mod)
 		o = jep_evaluate_local(l, list, mod);
 	}
 
-	if (o != NULL && o->ret & JEP_EXCEPTION)
+	if (o != NULL)
 	{
-		return o;
+		if (o->ret & JEP_EXCEPTION)
+		{
+			return o;
+		}
+		jep_destroy_object(o);
 	}
 
 	if (r.token.token_code == T_COMMA)

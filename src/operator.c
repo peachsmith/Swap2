@@ -3089,10 +3089,11 @@ jep_obj *jep_paren(jep_ast_node node, jep_obj *list)
 
 	if (o != NULL && o->ret & JEP_RETURN)
 	{
-		/* TODO: fix return bug where return statements bubble up */
-		/* remove the return flag when leaving a function */
-		/* o->ret ^= JEP_RETURN; */
-		int x = 0;
+		/*
+		 * mark a returned object as returned
+		 * so it doesn't returned recursively
+		 */
+		o->ret |= JEP_RETURNED;
 	}
 
 	return o;
@@ -3134,7 +3135,7 @@ jep_obj *jep_brace(jep_ast_node node, jep_obj *list)
 		for (i = 0; i < node.leaf_count; i++)
 		{
 			o = jep_evaluate(node.leaves[i], list);
-			if (o != NULL && o->ret)
+			if (o != NULL && o->ret && !(o->ret & JEP_RETURNED))
 			{
 				return o;
 			}
@@ -3569,10 +3570,6 @@ jep_obj *jep_reference(jep_ast_node node, jep_obj *list)
 
 	if (v != NULL)
 	{
-		//jep_obj *ref = jep_create_object();
-		//jep_copy_object(ref, v);
-		//jep_copy_self(ref, v);
-
 		o = jep_create_object();
 		o->type = JEP_REFERENCE;
 		o->val = v->self;
@@ -4507,6 +4504,11 @@ jep_obj *jep_evaluate_local(jep_ast_node ast, jep_obj *list, int mod)
 			printf("the object %s has already been declared in this scope\n",
 				ast.leaves[0].token.val->buffer);
 		}
+	}
+
+	if (o != NULL && o->ret)
+	{
+		o->ret ^= JEP_RETURN;
 	}
 
 	return o;

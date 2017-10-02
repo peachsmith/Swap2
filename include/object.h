@@ -27,6 +27,7 @@
 /* return flags */
 #define JEP_RETURN 1
 #define JEP_EXCEPTION 2
+#define JEP_RETURNED 4
 
 /* types of jep_objects */
 #define JEP_BYTE 1

@@ -1,0 +1,181 @@
+import "io";
+
+/**
+ * prints the contents of an array
+ *
+ * params:
+ *   a - the array to be printed
+ */
+function printArray(a) {
+	local i, l = len(a);
+	write("[");
+	for (i = 0; i < l; i++) {
+		if(typeof(a[i]) == "array") {
+			printArray(a[i]);
+		} else {
+			write(a[i]);	
+		}
+		if (i < l - 1) {
+			write(", ");
+		}
+	}
+	write("]");
+}
+
+/**
+ * converts an array into an array of runs for merge sort
+ *
+ * params:
+ *   a - the array to convert to runs
+ *
+ * returns:
+ *   array - an array of arrays. each array has a length of 1.
+ */
+function runnify(a) {
+	local l = len(a);
+	local runs = [l];
+	local i;
+	for (i = 0; i < l; i++) {
+		runs[i] = { a[i] };
+	}
+	return runs;
+}
+
+/**
+ * An implementation of the merge sort algorithm using pass by value
+ * and a comparator function passed as an argument
+ *
+ * params:
+ *   a - the array to be sorted
+ *   n - the number of runs
+ *   c - comparator function
+ */
+function mergeSortVal(a, n, c) {
+
+	if (n == 1) {
+		return a;
+	}
+
+	// TODO account for arrays of lengths that aren't a power of 2
+	local old_run_l = len(a[0]);
+	local half_n = n / 2;
+	local run_l = old_run_l * 2;
+	local A = [half_n];
+
+	local i;
+	for (i = 0; i < half_n; i++) {
+		A[i] = [run_l];
+	}
+
+	for (i = 0; i < half_n; i++) {
+
+		local j = 0, k = 0, count = 0;
+		while(j < old_run_l || k < old_run_l) {
+
+			if(j == old_run_l && k < old_run_l) {
+				A[i][count++] = a[i*2+1][k++];
+			} else if(j < old_run_l && k == old_run_l) {
+				A[i][count++] = a[i*2][j++];
+			} else if ( c(a[i*2][j], a[i*2+1][k]) ) {
+				A[i][count++] = a[i*2][j++];
+			} else {
+				A[i][count++] = a[i*2+1][k++];
+			}
+
+		}
+	}
+	
+	return mergeSortVal(A, half_n, c);
+}
+
+/**
+ * An implementation of the merge sort algorithm using pass by reference
+ *
+ * params:
+ *   a - a reference to the array to be sorted
+ *   n - the number of runs
+ */
+function mergeSortRef(a, n) {
+
+	if (n == 1) {
+		return ::a;
+	}
+
+	// TODO account for arrays of lengths that aren't a power of 2
+	local old_run_l = len((::a)[0]);
+	local half_n = n / 2;
+	local run_l = old_run_l * 2;
+	local A = [half_n];
+
+	local i;
+	for (i = 0; i < half_n; i++) {
+		A[i] = [run_l];
+	}
+
+	for (i = 0; i < half_n; i++) {
+
+		local j = 0, k = 0, count = 0;
+		while(j < old_run_l || k < old_run_l) {
+
+			if(j == old_run_l && k < old_run_l) {
+				A[i][count++] = (::a)[i*2+1][k++];
+			} else if(j < old_run_l && k == old_run_l) {
+				A[i][count++] = (::a)[i*2][j++];
+			} else if ( (::a)[i*2][j] < (::a)[i*2+1][k] ) {
+				A[i][count++] = (::a)[i*2][j++];
+			} else {
+				A[i][count++] = (::a)[i*2+1][k++];
+			}
+
+		}
+	}
+	
+	::a = mergeSortRef(:A, half_n);
+	return ::a;
+}
+
+function comparator(a, b) {
+	return a > b;
+}
+
+//local i; for (i = 0; i < 1000; i++) { // memory leak test
+
+	local array = { 6, -4, 3, -17, 0, 100, 5, 2 };
+
+	write("unsorted: ");
+	printArray(array);
+	writeln("");
+
+	local runs = runnify(array);
+
+	write("runs: ");
+	printArray(runs);
+	writeln("");
+
+	// BEGIN pass-by-value
+	local valRuns = mergeSortVal(runs, len(array), comparator);
+
+	write("pass by value runs: ");
+	printArray(valRuns);
+	writeln("");
+	// END pass-by-value
+
+	// BEGIN pass-by-reference
+	mergeSortRef(:runs, len(array));
+
+	write("runs: ");
+	printArray(runs);
+	writeln("");
+
+	array = runs[0];
+
+	write("sorted: ");
+	printArray(array);
+	writeln("");
+	// END pass-by-reference
+
+	writeln("---------------------------");
+//} // memory leak test
+
+writeln("done");
+readln();

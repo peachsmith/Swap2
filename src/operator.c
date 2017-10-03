@@ -3256,6 +3256,8 @@ jep_obj *jep_subscript(jep_ast_node node, jep_obj *list)
 			}
 			if (o == NULL)
 			{
+				jep_destroy_object(index);
+				jep_destroy_object(array);
 				o = jep_create_object();
 				o->type = JEP_STRING;
 				o->ret = JEP_RETURN | JEP_EXCEPTION;

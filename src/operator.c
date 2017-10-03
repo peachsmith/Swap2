@@ -18,6 +18,7 @@
 #include "operator.h"
 
 /* evaluates the nodes of an AST */
+/* TODO ensure that this doesn't return a NULL pointer */
 jep_obj *jep_evaluate(jep_ast_node ast, jep_obj *list)
 {
 	jep_obj *o = NULL;
@@ -3135,9 +3136,13 @@ jep_obj *jep_brace(jep_ast_node node, jep_obj *list)
 		for (i = 0; i < node.leaf_count; i++)
 		{
 			o = jep_evaluate(node.leaves[i], list);
-			if (o != NULL && o->ret && !(o->ret & JEP_RETURNED))
+			if (o != NULL && o->ret)// && !(o->ret & JEP_RETURNED))
 			{
-				return o;
+				if (o->ret & JEP_EXCEPTION || !(o->ret & JEP_RETURNED))
+				{
+					return o;
+				}
+				jep_destroy_object(o);
 			}
 			else if (o != NULL)
 			{
@@ -3209,6 +3214,17 @@ jep_obj *jep_subscript(jep_ast_node node, jep_obj *list)
 
 	if (index != NULL && array != NULL)
 	{
+		if (index->ret & JEP_EXCEPTION)
+		{
+			return index;
+		}
+
+		if (array->ret & JEP_EXCEPTION)
+		{
+			jep_destroy_object(index);
+			return array;
+		}
+
 		if (index->type != JEP_INT)
 		{
 			printf("array subscript must be an integer\n");
@@ -3240,7 +3256,13 @@ jep_obj *jep_subscript(jep_ast_node node, jep_obj *list)
 			}
 			if (o == NULL)
 			{
-				printf("array index out of bounds\n");
+				o = jep_create_object();
+				o->type = JEP_STRING;
+				o->ret = JEP_RETURN | JEP_EXCEPTION;
+				o->val = malloc(26);
+				strcpy(o->val, "array index out of bounds");
+				((char*)(o->val))[25] = '\0';
+				return o;
 			}
 		}
 		else
@@ -3518,7 +3540,7 @@ jep_obj *jep_return(jep_ast_node node, jep_obj *list)
 	if (node.leaf_count == 1)
 	{
 		o = jep_evaluate(node.leaves[0], list);
-		o->ret = 1;
+		o->ret |= 1;
 	}
 	else if (node.leaf_count == 0)
 	{
@@ -3600,8 +3622,14 @@ jep_obj *jep_dereference(jep_ast_node node, jep_obj *list)
 		}
 		else
 		{
-			printf("cannot dereference something that is not a reference\n");
 			jep_destroy_object(v);
+			o = jep_create_object();
+			o->type = JEP_STRING;
+			o->ret = JEP_RETURN | JEP_EXCEPTION;
+			o->val = malloc(53);
+			strcpy(o->val, "cannot dereference something that is not a reference");
+			((char*)(o->val))[52] = '\0';
+			return o;
 		}
 	}
 	else

@@ -21,6 +21,20 @@
 static int creation = 0;
 static int destruction = 0;
 
+/* TODO: implement memory error */
+jep_obj memory_error = {
+	NULL,
+	"memory error",
+	JEP_STRING,
+	NULL, NULL, NULL, NULL,
+	0,
+	2,
+	-1,
+	0,
+	NULL,
+	NULL
+};
+
 static void jep_print_array(jep_obj *array)
 {
 	printf("{ ");

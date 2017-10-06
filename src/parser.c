@@ -41,27 +41,27 @@ static void jep_err(int err, jep_token tok, jep_ast_node *root, char *val)
 
 	if (err == ERR_EXPRESSION)
 	{
-		printf("expected expression before '%s' at %d,%d\n",
+		printf("parser error: expected expression before '%s' at %d,%d\n",
 			val, tok.row, tok.column);
 	}
 	else if (err == ERR_IDENTIFIER)
 	{
-		printf("expected identifier at %s %d,%d but found %s\n",
+		printf("parser error: expected identifier at %s %d,%d but found %s\n",
 			tok.file, tok.row, tok.column, tok.val->buffer);
 	}
 	else if (err == ERR_UNEXPECTED)
 	{
-		printf("unexpected token '%s' at %s %d,%d\n",
+		printf("parser error: unexpected token '%s' at %s %d,%d\n",
 			tok.val->buffer, tok.file, tok.row, tok.column);
 	}
 	else if (err == ERR_EXPECTED)
 	{
-		printf("expected '%s' at %s %d,%d but found '%s'\n",
+		printf("parser error: expected '%s' at %s %d,%d but found '%s'\n",
 			val, tok.file, tok.row, tok.column, tok.val->buffer);
 	}
 	else if (err == ERR_UNIQUE)
 	{
-		printf("expected unique argument at %d,%d but found '%s'\n",
+		printf("parser error: expected unique argument at %d,%d but found '%s'\n",
 			tok.row, tok.column, tok.val->buffer);
 	}
 }

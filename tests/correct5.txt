@@ -1,1 +1,1 @@
-expected ')' at ./tests/test5.txt 1,5 but found ';'
+parser error: expected ')' at ./tests/test5.txt 1,5 but found ';'

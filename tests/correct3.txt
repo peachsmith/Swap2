@@ -1,1 +1,1 @@
-expected expression before ')' at 1,6
+parser error: expected expression before ')' at 1,6

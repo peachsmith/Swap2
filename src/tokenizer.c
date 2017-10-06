@@ -291,7 +291,7 @@ static int jep_escape(char c, char *esc)
 		break;
 
 	default:
-		printf("invalid escape character %c\n", c);
+		printf("tokenizer error: invalid escape character %c\n", c);
 		result = 0;
 		break;
 	}
@@ -378,7 +378,7 @@ void jep_append_token(jep_token_stream *ts, jep_token t)
 		{
 			if (!ts->error)
 			{
-				printf("failed to reallocate memory for token stream\n");
+				printf("tokenizer error: failed to reallocate memory for token stream\n");
 				ts->error = 1;
 			}
 			return;
@@ -415,7 +415,7 @@ void jep_append_directive(jep_token_stream *ts, jep_token d)
 		{
 			if (!ts->error)
 			{
-				printf("failed to reallocate memory for token stream\n");
+				printf("tokenizer error: failed to reallocate memory for token stream\n");
 				ts->error = 1;
 			}
 			return;
@@ -475,7 +475,7 @@ void jep_tokenize_file(jep_token_stream *ts, const char *file_name)
 		/* failed to open the input file */
 		if (!ts->error)
 		{
-			printf("could not open file: %s\n", file_name);
+			printf("tokenizer error: could not open file: %s\n", file_name);
 			ts->error = 2;
 		}
 		return;

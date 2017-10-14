@@ -1,19 +1,19 @@
 /*
-    Functions for evaluating and modifying an abstract syntax tree
-    Copyright (C) 2016 John Powell
+	Functions for evaluating and modifying an abstract syntax tree
+	Copyright (C) 2016 John Powell
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #ifndef JEP_AST_H
 #define JEP_AST_H
@@ -28,23 +28,23 @@
 /* a node in an AST */
 typedef struct ASTNode
 {
-	jep_token token;
-	int leaf_count;
-	int cap;
-	struct ASTNode* leaves;
-	int error;
-	int array;
-	int loop;
-	int mod;
+	jep_token token;        /* the token                            */
+	int leaf_count;         /* number of leaves                     */
+	int cap;                /* capacity                             */
+	struct ASTNode* leaves; /* the leaves of the AST                */
+	int error;              /* whether or not an error has occurred */
+	int array;              /* whether or not something is an array */
+	int loop;               /* keeps track of loop expressions      */
+	int mod;                /* modifiers                            */
 }jep_ast_node;
 
 /* a stack of nodes */
 typedef struct Stack
 {
-	int size;
-	int cap;
-	jep_ast_node* top;
-	jep_ast_node** nodes;
+	int size;             /* number of elements in the stack */
+	int cap;              /* capacity                        */
+	jep_ast_node* top;    /* the top element of the stack    */
+	jep_ast_node** nodes; /* the contents of the stack       */
 }jep_stack;
 
 /**

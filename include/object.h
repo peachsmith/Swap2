@@ -87,60 +87,100 @@ typedef struct File
 	unsigned int refs; /* amount of objects referencing this */
 } jep_file;
 
-/* allocates memory for a new object */
+/**
+ * allocates memory for a new object
+ */
 jep_obj *jep_create_object();
 
-/* frees the memory used by an object */
+/**
+ * frees the memory used by an object
+ */
 void jep_destroy_object(jep_obj *obj);
 
-/* creates a string representation of an object */
+/**
+ * creates a string representation of an object
+ */
 char *jep_to_string(jep_obj *o);
 
-/* converts an object into an array of bytes */
+/**
+ * converts an object into an array of bytes
+ */
 jep_obj *jep_get_bytes(jep_obj *o);
 
-/* compares the values of two objects */
+/**
+ * compares the values of two objects
+ */
 int jep_compare_object(jep_obj *a, jep_obj *b);
 
-/* adds an object to a list */
+/**
+ * adds an object to a list
+ */
 void jep_add_object(jep_obj *list, jep_obj *o);
 
-/* removes the last object from a list */
+/**
+ * removes the last object from a list
+ */
 void jep_pop_object(jep_obj *list);
 
-/* retreives an object from a list */
+/**
+ * retreives an object from a list
+ */
 jep_obj *jep_get_object(const char *ident, jep_obj *list);
 
-/* copies the value of one obect into another */
+/**
+ * copies the value of one obect into another
+ */
 void jep_copy_object(jep_obj *dest, jep_obj *src);
 
-/* copies the value of the self pointer of an object */
+/**
+ * copies the value of the self pointer of an object
+ */
 void jep_copy_self(jep_obj *dest, jep_obj *src);
 
-/* frees the memory in a list of objects */
+/**
+ * frees the memory in a list of objects
+ */
 void jep_destroy_list(jep_obj *list);
 
-/* converts a token into a number object */
+/**
+ * converts a token into a number object
+ */
 jep_obj *jep_number(const char *s);
 
-/* converts a token into a character object */
+/**
+ * converts a token into a character object
+ */
 jep_obj *jep_character(const char *s);
 
-/* converts a token into a string object */
+/**
+ * converts a token into a string object
+ */
 jep_obj *jep_string(const char *s);
 
-/* convertes an ast into an array */
+/**
+ * convertes an ast into an array
+ */
 jep_obj *jep_array(jep_ast_node *ast);
 
-/* prints an object to stdout */
+/**
+ * prints an object to stdout
+ */
 void jep_print_object(jep_obj *obj);
 
-/* prints a list of objects to stdout */
+/**
+ * prints a list of objects to stdout
+ */
 void jep_print_list(jep_obj *list);
 
-/* removes the scope list off the tail of a list */
+/**
+ * removes the scope list off the tail of a list
+ */
 void jep_remove_scope(jep_obj *list);
 
+/**
+ * writes the values of the static integers incremented
+ * by the object creation and destruction functions to standard out
+ */
 void print_call_counts();
 
 #endif

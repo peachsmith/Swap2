@@ -2578,26 +2578,6 @@ jep_obj *jep_dec(jep_ast_node node, jep_obj *list)
 	jep_obj *o = NULL;
 	jep_obj *obj = jep_evaluate(node.leaves[0], list);
 
-	jep_ast_node struc = node.leaves[0];
-	/* handle parentheses */
-	if (struc.token.token_code == T_LPAREN)
-	{
-		while (struc.token.token_code == T_LPAREN)
-		{
-			struc = struc.leaves[0];
-			if (struc.token.token_code == T_COMMA)
-			{
-				while (struc.token.token_code == T_COMMA)
-				{
-					struc = struc.leaves[1];
-				}
-			}
-		}
-	}
-	jep_destroy_object(obj);
-	obj = NULL;
-	obj = jep_get_data_member(struc, list);
-
 	if (obj != NULL)
 	{
 		if ((obj->ident == NULL && obj->index == -1) || (obj->type != JEP_INT && obj->type != JEP_BYTE && obj->type != JEP_LONG) || obj->val == NULL)
@@ -2606,52 +2586,21 @@ jep_obj *jep_dec(jep_ast_node node, jep_obj *list)
 			jep_destroy_object(obj);
 			return NULL;
 		}
-		if (obj->index >= 0)
+
+		jep_obj *actual = obj->self;
+		o = jep_create_object();
+
+		int cur_val = *(int *)(actual->val);
+		int new_val = cur_val - 1;
+		*(int *)(actual->val) = new_val;
+
+		jep_copy_object(o, actual);
+
+		if (node.token.postfix)
 		{
-			o = jep_create_object();
-
-			int cur_val = *(int *)(obj->val);
-			int new_val = cur_val - 1;
-			*(int *)(obj->val) = new_val;
-
-			jep_copy_object(o, obj);
-
-			if (node.token.postfix)
-			{
-				*(int *)(o->val) = cur_val;
-			}
+			*(int *)(o->val) = cur_val;
 		}
-		else if (obj->index == -2)
-		{
-			o = jep_create_object();
 
-			int cur_val = *(int *)(obj->val);
-			int new_val = cur_val - 1;
-			*(int *)(obj->val) = new_val;
-
-			jep_copy_object(o, obj);
-
-			if (node.token.postfix)
-			{
-				*(int *)(o->val) = cur_val;
-			}
-		}
-		else
-		{
-			jep_obj *actual = jep_get_object(obj->ident, list);
-			o = jep_create_object();
-
-			int cur_val = *(int *)(actual->val);
-			int new_val = cur_val - 1;
-			*(int *)(actual->val) = new_val;
-
-			jep_copy_object(o, actual);
-
-			if (node.token.postfix)
-			{
-				*(int *)(o->val) = cur_val;
-			}
-		}
 		jep_destroy_object(obj);
 	}
 

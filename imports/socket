@@ -1,0 +1,81 @@
+/**
+ * functions for performing socket IO
+ */
+
+ #{__SOCKET__}
+ 
+/**
+ * creates a socket object
+ *
+ * params:
+ *   host - the host address
+ *   port - the port
+ * 
+ * return:
+ *   a newly created socket
+ */
+function createSocket(host, port);
+
+/**
+ * binds a server socket
+ *
+ * params:
+ *   socket - the server socket
+ */
+function bindSocket(socket);
+
+/**
+ * listens for connections to a socket
+ *
+ * params:
+ *   socket - the server socket
+ */
+function listenSocket(socket);
+
+/**
+ * accepts a connection from a client
+ * 
+ * params:
+ *   socket - the server socket
+ */
+function acceptSocket(socket);
+
+/**
+ * connects to a server socket
+ * 
+ * params:
+ *   socket - the client socket
+ */
+function connectSocket(socket);
+
+/**
+ * reads data from a socket
+ *
+ * params:
+ *   socket - the socket to read from
+ *   buffer - reference to a buffer
+ *   n - the number of bytes to read
+ * return:
+ *   the number of bytes read
+ */
+function readSocket(socket, buffer, n);
+
+/**
+ * writes data to a socket
+ *
+ * params:
+ *   socket - the socket to write to
+ *   buffer - the data to write
+ *   n - the number of bytes to write
+ * return:
+ *   the number of bytes written
+ */
+function writeSocket(socket, buffer, n);
+
+/**
+ * closes a socket object
+ * 
+ * params:
+ *   socket - the socket to be closed
+ */
+function closeSocket(socket);

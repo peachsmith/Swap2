@@ -26,18 +26,20 @@
     <ClCompile Include="..\src\object.c" />
     <ClCompile Include="..\src\operator.c" />
     <ClCompile Include="..\src\parser.c" />
+    <ClCompile Include="..\src\socket.c" />
     <ClCompile Include="..\src\stringbuilder.c" />
     <ClCompile Include="..\src\tokenizer.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\ast.h" />
-    <ClInclude Include="..\include\import.h" />
-    <ClInclude Include="..\include\native.h" />
-    <ClInclude Include="..\include\object.h" />
-    <ClInclude Include="..\include\operator.h" />
-    <ClInclude Include="..\include\parser.h" />
-    <ClInclude Include="..\include\stringbuilder.h" />
-    <ClInclude Include="..\include\tokenizer.h" />
+    <ClInclude Include="..\include\swap\ast.h" />
+    <ClInclude Include="..\include\swap\import.h" />
+    <ClInclude Include="..\include\swap\native.h" />
+    <ClInclude Include="..\include\swap\object.h" />
+    <ClInclude Include="..\include\swap\operator.h" />
+    <ClInclude Include="..\include\swap\parser.h" />
+    <ClInclude Include="..\include\swap\socket.h" />
+    <ClInclude Include="..\include\swap\stringbuilder.h" />
+    <ClInclude Include="..\include\swap\tokenizer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -120,6 +122,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -132,6 +135,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -148,6 +152,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -164,6 +169,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

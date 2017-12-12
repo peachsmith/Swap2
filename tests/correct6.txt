@@ -1,5 +1,7 @@
 [null]  SwapNative
 [function] byte ()
+[function] bytes ()
+[function] char ()
 [function] int ()
 [function] double ()
 [function] typeof ()

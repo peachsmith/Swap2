@@ -15,7 +15,7 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "operator.h"
+#include "swap/operator.h"
 
 /* evaluates the nodes of an AST */
 /* TODO ensure that this doesn't return a NULL pointer */
@@ -1399,7 +1399,19 @@ jep_obj *jep_equiv(jep_ast_node node, jep_obj *list)
 		if (l->type == r->type)
 		{
 			/* more types may be comparable in the future */
-			if (l->type != JEP_INT && l->type != JEP_LONG && l->type != JEP_DOUBLE && r->type != JEP_INT && r->type != JEP_LONG && r->type != JEP_DOUBLE && l->type != JEP_NULL && r->type != JEP_NULL && l->type != JEP_STRING && r->type != JEP_STRING)
+			if (l->type != JEP_INT && r->type != JEP_INT
+				&& l->type != JEP_LONG
+				&& r->type != JEP_LONG
+				&& l->type != JEP_DOUBLE
+				&& r->type != JEP_DOUBLE
+				&& l->type != JEP_NULL
+				&& r->type != JEP_NULL
+				&& l->type != JEP_BYTE
+				&& r->type != JEP_BYTE
+				&& l->type != JEP_CHARACTER
+				&& r->type != JEP_CHARACTER
+				&& l->type != JEP_STRING
+				&& r->type != JEP_STRING)
 			{
 				printf("invalid operand types for operation ==\n");
 			}
@@ -1431,6 +1443,22 @@ jep_obj *jep_equiv(jep_ast_node node, jep_obj *list)
 			{
 				int *n = malloc(sizeof(int));
 				*n = 1;
+				result = jep_create_object();
+				result->val = (void *)n;
+				result->type = JEP_INT;
+			}
+			else if (l->type == JEP_BYTE)
+			{
+				int *n = malloc(sizeof(int));
+				*n = (*(unsigned char *)(l->val)) == (*(unsigned char *)(r->val));
+				result = jep_create_object();
+				result->val = (void *)n;
+				result->type = JEP_INT;
+			}
+			else if (l->type == JEP_CHARACTER)
+			{
+				int *n = malloc(sizeof(int));
+				*n = (*(char *)(l->val)) == (*(char *)(r->val));
 				result = jep_create_object();
 				result->val = (void *)n;
 				result->type = JEP_INT;

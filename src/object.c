@@ -15,8 +15,8 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "object.h"
-#include "tokenizer.h"
+#include "swap/object.h"
+#include "swap/tokenizer.h"
 
 static int creation = 0;
 static int destruction = 0;
@@ -596,7 +596,16 @@ void jep_copy_object(jep_obj *dest, jep_obj *src)
 			{
 				if (file_obj->open)
 				{
-					fclose(file_obj->file);
+					/* call the appropriate close function */
+					if (file_obj->type == 0)
+					{
+						fclose(file_obj->file);
+					}
+					else if (file_obj->type == 1)
+					{
+						jep_socket_close(file_obj->socket);
+						jep_free_addrinf(file_obj->info);
+					}
 				}
 				free(dest->val);
 			}
@@ -866,7 +875,16 @@ void jep_destroy_object(jep_obj *obj)
 			{
 				if (file_obj->open)
 				{
-					fclose(file_obj->file);
+					/* call the appropriate close function */
+					if (file_obj->type == 0)
+					{
+						fclose(file_obj->file);
+					}
+					else if (file_obj->type == 1)
+					{
+						jep_socket_close(file_obj->socket);
+						jep_free_addrinf(file_obj->info);
+					}
 				}
 				free(file_obj);
 			}

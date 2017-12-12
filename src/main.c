@@ -15,9 +15,9 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "ast.h"
-#include "parser.h"
-#include "operator.h"
+#include "swap/ast.h"
+#include "swap/parser.h"
+#include "swap/operator.h"
 
 /* command line flag indices */
 #define JEP_TOK 0
@@ -188,6 +188,18 @@ int main(int argc, char **argv)
 			f_byte->size = 1;
 			jep_add_object(list, f_byte);
 
+			jep_obj *f_bytes = jep_create_object();
+			f_bytes->type = JEP_FUNCTION;
+			f_bytes->ident = "bytes";
+			f_bytes->size = 1;
+			jep_add_object(list, f_bytes);
+
+			jep_obj *f_char = jep_create_object();
+			f_char->type = JEP_FUNCTION;
+			f_char->ident = "char";
+			f_char->size = 1;
+			jep_add_object(list, f_char);
+
 			jep_obj *f_int = jep_create_object();
 			f_int->type = JEP_FUNCTION;
 			f_int->ident = "int";
@@ -211,6 +223,9 @@ int main(int argc, char **argv)
 			f_len->ident = "len";
 			f_len->size = 1;
 			jep_add_object(list, f_len);
+
+			/* initialize sockets */
+			jep_socket_init();
 
 			/* traverse and interpret the AST */
 			jep_obj *o;
@@ -281,6 +296,9 @@ int main(int argc, char **argv)
 
 	/* destroy the tokens */
 	jep_destroy_token_stream(ts);
+
+	/* quit sockets */
+	jep_socket_quit();
 
 	/* for debugging */
 	/* print_call_counts(); */

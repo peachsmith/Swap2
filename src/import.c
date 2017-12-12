@@ -20,15 +20,15 @@
 #include <errno.h>
 
 #if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-#include <windows.h>
+//#include <windows.h>
 #elif defined(__linux__) || defined(__unix__)
 #include <unistd.h>
 #elif defined(__APPLE__) || defined(__MACH__)
 /* TODO: implement mac functionality */
 #endif
 
-#include "import.h"
-#include "native.h"
+#include "swap/import.h"
+#include "swap/native.h"
 
 /**
  * gets the path of an import

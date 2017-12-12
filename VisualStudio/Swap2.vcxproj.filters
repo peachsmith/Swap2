@@ -42,30 +42,36 @@
     <ClCompile Include="..\src\tokenizer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\socket.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\ast.h">
+    <ClInclude Include="..\include\swap\ast.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\import.h">
+    <ClInclude Include="..\include\swap\import.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\native.h">
+    <ClInclude Include="..\include\swap\native.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\object.h">
+    <ClInclude Include="..\include\swap\object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\operator.h">
+    <ClInclude Include="..\include\swap\operator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\parser.h">
+    <ClInclude Include="..\include\swap\parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\stringbuilder.h">
+    <ClInclude Include="..\include\swap\socket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\tokenizer.h">
+    <ClInclude Include="..\include\swap\stringbuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\swap\tokenizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

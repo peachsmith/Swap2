@@ -15,7 +15,7 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "native.h"
+#include "swap/native.h"
 
 /* calls a native function */
 jep_obj *jep_call_native(const char *ident, jep_obj *args)

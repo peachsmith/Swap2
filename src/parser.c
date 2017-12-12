@@ -15,7 +15,7 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "parser.h"
+#include "swap/parser.h"
 
 static int jep_accept(int, jep_ast_node **);
 static jep_ast_node *jep_expression(jep_ast_node *, jep_ast_node **);

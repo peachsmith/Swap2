@@ -24,9 +24,15 @@
     <ClCompile Include="..\..\src\SwapNative.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\stringbuilder.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\socket.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\SwapNative.h">
+    <ClInclude Include="..\..\include\swap\SwapNative.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

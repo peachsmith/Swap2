@@ -15,8 +15,8 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "tokenizer.h"
-#include "import.h"
+#include "swap/tokenizer.h"
+#include "swap/import.h"
 
 /**
  * one-character symbols

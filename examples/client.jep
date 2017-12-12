@@ -1,0 +1,37 @@
+/*
+ * client socket demo application
+ */
+import "io";
+import "socket";
+
+local port = "8081";
+local host = "localhost";
+local buf_size = 512;        // buffer size
+local inBuffer = [buf_size]; // buffer for response
+
+client = createSocket(host, port);
+
+connectSocket(client);
+
+local done = 0;
+
+while (!done){
+
+	local input = readln();
+	if (input == "END") {
+		done = 1;
+	}
+	writeSocket(client, bytes(input), len(input));
+	local result = readSocket(client, :inBuffer, buf_size);
+if (result > 0) {
+	local i;
+	for (i = 0; i < result; i++) {
+		write(char(inBuffer[i]));
+	}
+	writeln("");
+} else {
+	writeln("nothing received from server");
+}
+}
+
+closeSocket(client);

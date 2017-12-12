@@ -1,0 +1,57 @@
+/*
+ * server socket demo application
+ */
+import "io";
+import "socket";
+
+local port = "8081";
+local buf_size = 512;        // buffer size
+local inBuffer = [buf_size]; // buffer
+local response = {           // response data
+	'H', 'e', 'l', 'l', 'o'
+};
+local goodbye = "good bye";  // good bye
+
+// create the server socket
+server = createSocket(null, port);
+
+// bind the server socket
+bindSocket(server);
+
+// listen for connections
+listenSocket(server);
+writeln("listening on port " + port);
+
+// accept the first connection that comes along
+client = acceptSocket(server);
+
+local done = 0;
+
+while(!done){
+	// read in data from the client into the buffer
+	result = readSocket(client, :inBuffer, buf_size);
+	if (result > 0) {
+		local i;
+		for (i = 0; i < result; i++) {
+			write(char(inBuffer[i]));
+		}
+		writeln("");
+		// write a response to the client
+		writeSocket(client, response, 5);
+		
+		// check for the byte sequence "END"
+		if(char(inBuffer[0]) == 'E' 
+			&& char(inBuffer[1]) == 'N' 
+			&& char(inBuffer[2]) == 'D') {
+			done = 1;
+			writeSocket(client, bytes(goodbye), len(goodbye));
+		}
+	} else {
+		writeln("no data was read from the socket");
+		//done = 1;
+	}
+}
+
+// close the sockets
+closeSocket(server);
+closeSocket(client);

@@ -1,3 +1,6 @@
+/*
+ * merge sort implementation
+ */
 import "io";
 
 /**

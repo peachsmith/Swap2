@@ -4,9 +4,9 @@ VERIFY=./verify.sh
 CC=gcc
 
 # *nix
-#SHARED=libSwapNative.so
+SHARED=libSwapNative.so
 # Windows / Cygwin
-SHARED=SwapNative.dll
+#SHARED=SwapNative.dll
 
 all: build clean
 
@@ -24,12 +24,12 @@ build:
 	$(CC) $(FLAGS) src/socket.c
 	$(CC) $(FLAGS) src/main.c
 #Unix-like systems
-#$(CC) main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o socket.o -o swap -ldl
+	$(CC) main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o socket.o -o swap -ldl
 #Windows
-	$(CC) main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o socket.o -o swap
+#$(CC) main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o socket.o -o swap
 
 debug:
-	$(CC) -Iinclude src/SwapNative.c src/object.c src/ast.c -g -fpic -shared -o $(SHARED)
+	$(CC) -Iinclude src/SwapNative.c src/object.c src/ast.c src/stringbuilder.c src/socket.c -g -fpic -shared -o $(SHARED)
 	$(CC) -g $(FLAGS) src/SwapNative.c
 	$(CC) -g $(FLAGS) src/stringbuilder.c
 	$(CC) -g $(FLAGS) src/import.c
@@ -39,11 +39,12 @@ debug:
 	$(CC) -g $(FLAGS) src/ast.c
 	$(CC) -g $(FLAGS) src/operator.c
 	$(CC) -g $(FLAGS) src/native.c
+	$(CC) -g $(FLAGS) src/socket.c
 	$(CC) -g $(FLAGS) src/main.c
 #Unix-like systems
-	$(CC) main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap -ldl
+	$(CC) main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o socket.o -o swap -ldl
 #Windows
-#$(CC) main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o -o swap
+#$(CC) main.o stringbuilder.o import.o tokenizer.o parser.o object.o ast.o operator.o native.o socket.o -o swap
 
 clean:
 	rm *.o

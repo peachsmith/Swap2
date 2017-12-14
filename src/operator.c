@@ -2923,12 +2923,13 @@ jep_obj *jep_paren(jep_ast_node node, jep_obj *list)
 					jep_obj* local_a = jep_create_object();
 					jep_copy_object(local_a, a);
 					jep_destroy_object(a);
+					/* jep_destroy_object removes the excess reference
 					if (a->type == JEP_FILE && a->val != NULL)
 					{
-						/* function arguments don't count towards references */
 						jep_file *file_obj = (jep_file *)(a->val);
 						(file_obj->refs)--;
 					}
+					*/
 					jep_add_object(arg_list, local_a);
 				}
 				else
@@ -2946,12 +2947,13 @@ jep_obj *jep_paren(jep_ast_node node, jep_obj *list)
 				jep_obj* local_a = jep_create_object();
 				jep_copy_object(local_a, a);
 				jep_destroy_object(a);
+				/* jep_destroy_object removes the excess reference
 				if (a->type == JEP_FILE && a->val != NULL)
 				{
-					/* function arguments don't count towards references */
 					jep_file *file_obj = (jep_file *)(a->val);
 					(file_obj->refs)--;
 				}
+				*/
 				jep_add_object(arg_list, local_a);
 			}
 			else

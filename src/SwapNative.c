@@ -1361,6 +1361,10 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_readSocket(jep_obj* args)
 
 	if (result)
 	{
+		if (in_buffer->val != NULL)
+		{
+			jep_destroy_object((jep_obj*)in_buffer->val);
+		}
 		bytes = jep_create_object();
 		bytes->type = JEP_LIST;
 

@@ -310,9 +310,10 @@ jep_obj *jep_add(jep_ast_node node, jep_obj *list)
 			return result;
 		}
 
-		if (l->type != JEP_INT && l->type != JEP_LONG && l->type != JEP_DOUBLE && r->type != JEP_INT && r->type != JEP_LONG && r->type != JEP_DOUBLE)
+		if (l->type != JEP_INT && l->type != JEP_LONG && l->type != JEP_DOUBLE && l->type != JEP_BYTE
+			&& r->type != JEP_INT && r->type != JEP_LONG && r->type != JEP_DOUBLE && r->type != JEP_BYTE)
 		{
-			printf("invalid operand types for operation +\n");
+			printf("invalid operand types for operation -\n");
 		}
 		else if (l->type == r->type)
 		{
@@ -336,6 +337,14 @@ jep_obj *jep_add(jep_ast_node node, jep_obj *list)
 			{
 				double *n = malloc(sizeof(double));
 				*n = (*(double *)(l->val)) + (*(double *)(r->val));
+				result = jep_create_object();
+				result->val = (void *)n;
+				result->type = JEP_DOUBLE;
+			}
+			else if (l->type == JEP_BYTE)
+			{
+				unsigned char *n = malloc(sizeof(unsigned char));
+				*n = (*(unsigned char *)(l->val)) + (*(unsigned char *)(r->val));
 				result = jep_create_object();
 				result->val = (void *)n;
 				result->type = JEP_DOUBLE;
@@ -399,6 +408,35 @@ jep_obj *jep_add(jep_ast_node node, jep_obj *list)
 			result->val = (void *)n;
 			result->type = JEP_LONG;
 		}
+		else if (l->type == JEP_BYTE || r->type == JEP_BYTE)
+		{
+			long *n = malloc(sizeof(long));
+			if (l->type == JEP_BYTE)
+			{
+				if (r->type == JEP_INT)
+				{
+					*n = (*(unsigned char *)(l->val)) + (*(int *)(r->val));
+				}
+				else if (r->type == JEP_BYTE)
+				{
+					*n = (*(unsigned char *)(l->val)) + (*(unsigned char *)(r->val));
+				}
+			}
+			else if (r->type == JEP_BYTE)
+			{
+				if (l->type == JEP_INT)
+				{
+					*n = (*(int *)(l->val)) + (*(unsigned char *)(r->val));
+				}
+				else if (l->type == JEP_BYTE)
+				{
+					*n = (*(unsigned char *)(l->val)) + (*(unsigned char *)(r->val));
+				}
+			}
+			result = jep_create_object();
+			result->val = (void *)n;
+			result->type = JEP_BYTE;
+		}
 	}
 	else
 	{
@@ -439,7 +477,7 @@ jep_obj *jep_sub(jep_ast_node node, jep_obj *list)
 
 	if (node.leaf_count == 1 && l != NULL)
 	{
-		if (l->type != JEP_INT && l->type != JEP_LONG && l->type != JEP_DOUBLE)
+		if (l->type != JEP_INT && l->type != JEP_LONG && l->type != JEP_DOUBLE && l->type != JEP_BYTE)
 		{
 			printf("invalid operand types for operation -\n");
 			result = jep_create_object();
@@ -469,10 +507,19 @@ jep_obj *jep_sub(jep_ast_node node, jep_obj *list)
 			result->val = (void *)n;
 			result->type = JEP_DOUBLE;
 		}
+		else if (l->type == JEP_BYTE)
+		{
+			unsigned char *n = malloc(sizeof(unsigned char));
+			*n = 0 - (*(unsigned char *)(l->val));
+			result = jep_create_object();
+			result->val = (void *)n;
+			result->type = JEP_BYTE;
+		}
 	}
 	else if (l != NULL && r != NULL)
 	{
-		if (l->type != JEP_INT && l->type != JEP_LONG && l->type != JEP_DOUBLE && r->type != JEP_INT && r->type != JEP_LONG && r->type != JEP_DOUBLE)
+		if (l->type != JEP_INT && l->type != JEP_LONG && l->type != JEP_DOUBLE && l->type != JEP_BYTE
+			&& r->type != JEP_INT && r->type != JEP_LONG && r->type != JEP_DOUBLE && r->type != JEP_BYTE)
 		{
 			printf("invalid operand types for operation -\n");
 		}
@@ -501,6 +548,14 @@ jep_obj *jep_sub(jep_ast_node node, jep_obj *list)
 				result = jep_create_object();
 				result->val = (void *)n;
 				result->type = JEP_DOUBLE;
+			}
+			else if (l->type == JEP_BYTE)
+			{
+				unsigned char *n = malloc(sizeof(unsigned char));
+				*n = (*(unsigned char *)(l->val)) - (*(unsigned char *)(r->val));
+				result = jep_create_object();
+				result->val = (void *)n;
+				result->type = JEP_BYTE;
 			}
 		}
 		else if (l->type == JEP_DOUBLE || r->type == JEP_DOUBLE)
@@ -561,6 +616,35 @@ jep_obj *jep_sub(jep_ast_node node, jep_obj *list)
 			result->val = (void *)n;
 			result->type = JEP_LONG;
 		}
+		else if (l->type == JEP_BYTE || r->type == JEP_BYTE)
+		{
+			long *n = malloc(sizeof(long));
+			if (l->type == JEP_BYTE)
+			{
+				if (r->type == JEP_INT)
+				{
+					*n = (*(unsigned char *)(l->val)) - (*(int *)(r->val));
+				}
+				else if (r->type == JEP_BYTE)
+				{
+					*n = (*(unsigned char *)(l->val)) - (*(unsigned char *)(r->val));
+				}
+			}
+			else if (r->type == JEP_BYTE)
+			{
+				if (l->type == JEP_INT)
+				{
+					*n = (*(int *)(l->val)) - (*(unsigned char *)(r->val));
+				}
+				else if (l->type == JEP_BYTE)
+				{
+					*n = (*(unsigned char *)(l->val)) - (*(unsigned char *)(r->val));
+				}
+			}
+			result = jep_create_object();
+			result->val = (void *)n;
+			result->type = JEP_BYTE;
+		}
 	}
 	else
 	{
@@ -597,9 +681,10 @@ jep_obj *jep_mul(jep_ast_node node, jep_obj *list)
 
 	if (l != NULL && r != NULL)
 	{
-		if (l->type != JEP_INT && l->type != JEP_LONG && l->type != JEP_DOUBLE && r->type != JEP_INT && r->type != JEP_LONG && r->type != JEP_DOUBLE)
+		if (l->type != JEP_INT && l->type != JEP_LONG && l->type != JEP_DOUBLE && l->type != JEP_BYTE
+			&& r->type != JEP_INT && r->type != JEP_LONG && r->type != JEP_DOUBLE && r->type != JEP_BYTE)
 		{
-			printf("invalid operand types for operation *\n");
+			printf("invalid operand types for operation -\n");
 		}
 		if (l->type == r->type)
 		{
@@ -626,6 +711,14 @@ jep_obj *jep_mul(jep_ast_node node, jep_obj *list)
 				result = jep_create_object();
 				result->val = (void *)n;
 				result->type = JEP_DOUBLE;
+			}
+			else if (l->type == JEP_BYTE)
+			{
+				unsigned char *n = malloc(sizeof(unsigned char));
+				*n = (*(unsigned char *)(l->val)) * (*(unsigned char *)(r->val));
+				result = jep_create_object();
+				result->val = (void *)n;
+				result->type = JEP_BYTE;
 			}
 		}
 		else if (l->type == JEP_DOUBLE || r->type == JEP_DOUBLE)
@@ -687,6 +780,35 @@ jep_obj *jep_mul(jep_ast_node node, jep_obj *list)
 			result->val = (void *)n;
 			result->type = JEP_LONG;
 		}
+		else if (l->type == JEP_BYTE || r->type == JEP_BYTE)
+		{
+			long *n = malloc(sizeof(long));
+			if (l->type == JEP_BYTE)
+			{
+				if (r->type == JEP_INT)
+				{
+					*n = (*(unsigned char *)(l->val)) * (*(int *)(r->val));
+				}
+				else if (r->type == JEP_BYTE)
+				{
+					*n = (*(unsigned char *)(l->val)) * (*(unsigned char *)(r->val));
+				}
+			}
+			else if (r->type == JEP_BYTE)
+			{
+				if (l->type == JEP_INT)
+				{
+					*n = (*(int *)(l->val)) * (*(unsigned char *)(r->val));
+				}
+				else if (l->type == JEP_BYTE)
+				{
+					*n = (*(unsigned char *)(l->val)) * (*(unsigned char *)(r->val));
+				}
+			}
+			result = jep_create_object();
+			result->val = (void *)n;
+			result->type = JEP_BYTE;
+		}
 	}
 	else
 	{
@@ -725,9 +847,10 @@ jep_obj *jep_div(jep_ast_node node, jep_obj *list)
 	{
 		if (l->type == r->type)
 		{
-			if (l->type != JEP_INT && l->type != JEP_LONG && l->type != JEP_DOUBLE && r->type != JEP_INT && r->type != JEP_LONG && r->type != JEP_DOUBLE)
+			if (l->type != JEP_INT && l->type != JEP_LONG && l->type != JEP_DOUBLE && l->type != JEP_BYTE
+				&& r->type != JEP_INT && r->type != JEP_LONG && r->type != JEP_DOUBLE && r->type != JEP_BYTE)
 			{
-				printf("invalid operand types for operation /\n");
+				printf("invalid operand types for operation -\n");
 			}
 			if (l->type == JEP_INT)
 			{
@@ -752,6 +875,14 @@ jep_obj *jep_div(jep_ast_node node, jep_obj *list)
 				result = jep_create_object();
 				result->val = (void *)n;
 				result->type = JEP_DOUBLE;
+			}
+			else if (l->type == JEP_BYTE)
+			{
+				unsigned char *n = malloc(sizeof(unsigned char));
+				*n = (*(unsigned char *)(l->val)) / (*(unsigned char *)(r->val));
+				result = jep_create_object();
+				result->val = (void *)n;
+				result->type = JEP_BYTE;
 			}
 		}
 		else if (l->type == JEP_DOUBLE || r->type == JEP_DOUBLE)
@@ -811,6 +942,35 @@ jep_obj *jep_div(jep_ast_node node, jep_obj *list)
 			result = jep_create_object();
 			result->val = (void *)n;
 			result->type = JEP_LONG;
+		}
+		else if (l->type == JEP_BYTE || r->type == JEP_BYTE)
+		{
+			long *n = malloc(sizeof(long));
+			if (l->type == JEP_BYTE)
+			{
+				if (r->type == JEP_INT)
+				{
+					*n = (*(unsigned char *)(l->val)) / (*(int *)(r->val));
+				}
+				else if (r->type == JEP_BYTE)
+				{
+					*n = (*(unsigned char *)(l->val)) / (*(unsigned char *)(r->val));
+				}
+			}
+			else if (r->type == JEP_BYTE)
+			{
+				if (l->type == JEP_INT)
+				{
+					*n = (*(int *)(l->val)) / (*(unsigned char *)(r->val));
+				}
+				else if (l->type == JEP_BYTE)
+				{
+					*n = (*(unsigned char *)(l->val)) / (*(unsigned char *)(r->val));
+				}
+			}
+			result = jep_create_object();
+			result->val = (void *)n;
+			result->type = JEP_BYTE;
 		}
 	}
 	else
@@ -898,9 +1058,10 @@ jep_obj *jep_less(jep_ast_node node, jep_obj *list)
 	{
 		if (l->type == r->type)
 		{
-			if (l->type != JEP_INT && l->type != JEP_LONG && l->type != JEP_DOUBLE && r->type != JEP_INT && r->type != JEP_LONG && r->type != JEP_DOUBLE)
+			if (l->type != JEP_INT && l->type != JEP_LONG && l->type != JEP_DOUBLE && l->type != JEP_BYTE
+				&& r->type != JEP_INT && r->type != JEP_LONG && r->type != JEP_DOUBLE && r->type != JEP_BYTE)
 			{
-				printf("invalid operand types for operation <\n");
+				printf("invalid operand types for operation -\n");
 			}
 			if (l->type == JEP_INT)
 			{
@@ -925,6 +1086,14 @@ jep_obj *jep_less(jep_ast_node node, jep_obj *list)
 				result = jep_create_object();
 				result->val = (void *)n;
 				result->type = JEP_INT;
+			}
+			else if (l->type == JEP_BYTE)
+			{
+				int *n = malloc(sizeof(int));
+				*n = (*(unsigned char *)(l->val)) > (*(unsigned char *)(r->val));
+				result = jep_create_object();
+				result->val = (void *)n;
+				result->type = JEP_BYTE;
 			}
 		}
 		else if (l->type == JEP_DOUBLE || r->type == JEP_DOUBLE)
@@ -985,6 +1154,35 @@ jep_obj *jep_less(jep_ast_node node, jep_obj *list)
 			result->val = (void *)n;
 			result->type = JEP_INT;
 		}
+		else if (l->type == JEP_BYTE || r->type == JEP_BYTE)
+		{
+			int *n = malloc(sizeof(int));
+			if (l->type == JEP_BYTE)
+			{
+				if (r->type == JEP_INT)
+				{
+					*n = (*(unsigned char *)(l->val)) < (*(int *)(r->val));
+				}
+				else if (r->type == JEP_BYTE)
+				{
+					*n = (*(unsigned char *)(l->val)) < (*(unsigned char *)(r->val));
+				}
+			}
+			else if (r->type == JEP_BYTE)
+			{
+				if (l->type == JEP_INT)
+				{
+					*n = (*(int *)(l->val)) < (*(unsigned char *)(r->val));
+				}
+				else if (l->type == JEP_BYTE)
+				{
+					*n = (*(unsigned char *)(l->val)) < (*(unsigned char *)(r->val));
+				}
+			}
+			result = jep_create_object();
+			result->val = (void *)n;
+			result->type = JEP_INT;
+		}
 	}
 	else
 	{
@@ -1023,9 +1221,10 @@ jep_obj *jep_greater(jep_ast_node node, jep_obj *list)
 	{
 		if (l->type == r->type)
 		{
-			if (l->type != JEP_INT && l->type != JEP_LONG && l->type != JEP_DOUBLE && r->type != JEP_INT && r->type != JEP_LONG && r->type != JEP_DOUBLE)
+			if (l->type != JEP_INT && l->type != JEP_LONG && l->type != JEP_DOUBLE && l->type != JEP_BYTE
+				&& r->type != JEP_INT && r->type != JEP_LONG && r->type != JEP_DOUBLE && r->type != JEP_BYTE)
 			{
-				printf("invalid operand types for operation >\n");
+				printf("invalid operand types for operation -\n");
 			}
 			if (l->type == JEP_INT)
 			{
@@ -1050,6 +1249,14 @@ jep_obj *jep_greater(jep_ast_node node, jep_obj *list)
 				result = jep_create_object();
 				result->val = (void *)n;
 				result->type = JEP_INT;
+			}
+			else if (l->type == JEP_BYTE)
+			{
+				int *n = malloc(sizeof(int));
+				*n = (*(unsigned char *)(l->val)) > (*(unsigned char *)(r->val));
+				result = jep_create_object();
+				result->val = (void *)n;
+				result->type = JEP_BYTE;
 			}
 		}
 		else if (l->type == JEP_DOUBLE || r->type == JEP_DOUBLE)
@@ -1110,6 +1317,35 @@ jep_obj *jep_greater(jep_ast_node node, jep_obj *list)
 			result->val = (void *)n;
 			result->type = JEP_INT;
 		}
+		else if (l->type == JEP_BYTE || r->type == JEP_BYTE)
+		{
+			int *n = malloc(sizeof(int));
+			if (l->type == JEP_BYTE)
+			{
+				if (r->type == JEP_INT)
+				{
+					*n = (*(unsigned char *)(l->val)) > (*(int *)(r->val));
+				}
+				else if (r->type == JEP_BYTE)
+				{
+					*n = (*(unsigned char *)(l->val)) > (*(unsigned char *)(r->val));
+				}
+			}
+			else if (r->type == JEP_BYTE)
+			{
+				if (l->type == JEP_INT)
+				{
+					*n = (*(int *)(l->val)) > (*(unsigned char *)(r->val));
+				}
+				else if (l->type == JEP_BYTE)
+				{
+					*n = (*(unsigned char *)(l->val)) > (*(unsigned char *)(r->val));
+				}
+			}
+			result = jep_create_object();
+			result->val = (void *)n;
+			result->type = JEP_INT;
+		}
 	}
 	else
 	{
@@ -1148,9 +1384,10 @@ jep_obj *jep_lorequal(jep_ast_node node, jep_obj *list)
 	{
 		if (l->type == r->type)
 		{
-			if (l->type != JEP_INT && l->type != JEP_LONG && l->type != JEP_DOUBLE && r->type != JEP_INT && r->type != JEP_LONG && r->type != JEP_DOUBLE)
+			if (l->type != JEP_INT && l->type != JEP_LONG && l->type != JEP_DOUBLE && l->type != JEP_BYTE
+				&& r->type != JEP_INT && r->type != JEP_LONG && r->type != JEP_DOUBLE && r->type != JEP_BYTE)
 			{
-				printf("invalid operand types for operation <=\n");
+				printf("invalid operand types for operation >=\n");
 			}
 			if (l->type == JEP_INT)
 			{
@@ -1175,6 +1412,14 @@ jep_obj *jep_lorequal(jep_ast_node node, jep_obj *list)
 				result = jep_create_object();
 				result->val = (void *)n;
 				result->type = JEP_INT;
+			}
+			else if (l->type == JEP_BYTE)
+			{
+				int *n = malloc(sizeof(int));
+				*n = (*(unsigned char *)(l->val)) <= (*(unsigned char *)(r->val));
+				result = jep_create_object();
+				result->val = (void *)n;
+				result->type = JEP_BYTE;
 			}
 		}
 		else if (l->type == JEP_DOUBLE || r->type == JEP_DOUBLE)
@@ -1235,6 +1480,35 @@ jep_obj *jep_lorequal(jep_ast_node node, jep_obj *list)
 			result->val = (void *)n;
 			result->type = JEP_INT;
 		}
+		else if (l->type == JEP_BYTE || r->type == JEP_BYTE)
+		{
+			int *n = malloc(sizeof(int));
+			if (l->type == JEP_BYTE)
+			{
+				if (r->type == JEP_INT)
+				{
+					*n = (*(unsigned char *)(l->val)) <= (*(int *)(r->val));
+				}
+				else if (r->type == JEP_BYTE)
+				{
+					*n = (*(unsigned char *)(l->val)) <= (*(unsigned char *)(r->val));
+				}
+			}
+			else if (r->type == JEP_BYTE)
+			{
+				if (l->type == JEP_INT)
+				{
+					*n = (*(int *)(l->val)) <= (*(unsigned char *)(r->val));
+				}
+				else if (l->type == JEP_BYTE)
+				{
+					*n = (*(unsigned char *)(l->val)) <= (*(unsigned char *)(r->val));
+				}
+			}
+			result = jep_create_object();
+			result->val = (void *)n;
+			result->type = JEP_INT;
+		}
 	}
 	else
 	{
@@ -1273,7 +1547,8 @@ jep_obj *jep_gorequal(jep_ast_node node, jep_obj *list)
 	{
 		if (l->type == r->type)
 		{
-			if (l->type != JEP_INT && l->type != JEP_LONG && l->type != JEP_DOUBLE && r->type != JEP_INT && r->type != JEP_LONG && r->type != JEP_DOUBLE)
+			if (l->type != JEP_INT && l->type != JEP_LONG && l->type != JEP_DOUBLE && l->type != JEP_BYTE
+				&& r->type != JEP_INT && r->type != JEP_LONG && r->type != JEP_DOUBLE && r->type != JEP_BYTE)
 			{
 				printf("invalid operand types for operation >=\n");
 			}
@@ -1300,6 +1575,14 @@ jep_obj *jep_gorequal(jep_ast_node node, jep_obj *list)
 				result = jep_create_object();
 				result->val = (void *)n;
 				result->type = JEP_INT;
+			}
+			else if (l->type == JEP_BYTE)
+			{
+				int *n = malloc(sizeof(int));
+				*n = (*(unsigned char *)(l->val)) >= (*(unsigned char *)(r->val));
+				result = jep_create_object();
+				result->val = (void *)n;
+				result->type = JEP_BYTE;
 			}
 		}
 		else if (l->type == JEP_DOUBLE || r->type == JEP_DOUBLE)
@@ -1354,6 +1637,35 @@ jep_obj *jep_gorequal(jep_ast_node node, jep_obj *list)
 				else if (l->type == JEP_LONG)
 				{
 					*n = (*(long *)(l->val)) >= (*(long *)(r->val));
+				}
+			}
+			result = jep_create_object();
+			result->val = (void *)n;
+			result->type = JEP_INT;
+		}
+		else if (l->type == JEP_BYTE || r->type == JEP_BYTE)
+		{
+			int *n = malloc(sizeof(int));
+			if (l->type == JEP_BYTE)
+			{
+				if (r->type == JEP_INT)
+				{
+					*n = (*(unsigned char *)(l->val)) >= (*(int *)(r->val));
+				}
+				else if (r->type == JEP_BYTE)
+				{
+					*n = (*(unsigned char *)(l->val)) >= (*(unsigned char *)(r->val));
+				}
+			}
+			else if (r->type == JEP_BYTE)
+			{
+				if (l->type == JEP_INT)
+				{
+					*n = (*(int *)(l->val)) >= (*(unsigned char *)(r->val));
+				}
+				else if (l->type == JEP_BYTE)
+				{
+					*n = (*(unsigned char *)(l->val)) >= (*(unsigned char *)(r->val));
 				}
 			}
 			result = jep_create_object();

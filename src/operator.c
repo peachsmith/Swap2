@@ -1090,7 +1090,7 @@ jep_obj *jep_less(jep_ast_node node, jep_obj *list)
 			else if (l->type == JEP_BYTE)
 			{
 				int *n = malloc(sizeof(int));
-				*n = (*(unsigned char *)(l->val)) > (*(unsigned char *)(r->val));
+				*n = (*(unsigned char *)(l->val)) < (*(unsigned char *)(r->val));
 				result = jep_create_object();
 				result->val = (void *)n;
 				result->type = JEP_BYTE;

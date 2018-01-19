@@ -70,6 +70,11 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_typeof(jep_obj *args)
 
 	switch (args->head->type)
 	{
+	case JEP_BYTE:
+		str = malloc(5);
+		strcpy(str, "byte");
+		break;
+
 	case JEP_INT:
 		str = malloc(4);
 		strcpy(str, "int");
@@ -460,7 +465,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_byte(jep_obj *args)
 
 	jep_obj *arg = args->head;
 
-	if (arg == NULL || arg->val == NULL || (arg->type != JEP_INT && arg->type != JEP_LONG && arg->type != JEP_CHARACTER))
+	if (arg == NULL || arg->val == NULL || (arg->type != JEP_INT && arg->type != JEP_LONG && arg->type != JEP_CHARACTER && arg->type != JEP_BYTE))
 	{
 		o = jep_create_object();
 		o->type = JEP_STRING;
@@ -491,7 +496,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_byte(jep_obj *args)
 		}
 		*b = i & UCHAR_MAX;
 	}
-	else if (arg->type == JEP_CHARACTER)
+	else if (arg->type == JEP_CHARACTER || arg->type == JEP_BYTE)
 	{
 		unsigned char i = *((unsigned char *)(arg->val));
 		*b = i & UCHAR_MAX;

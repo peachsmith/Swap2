@@ -156,7 +156,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\ast.c" />
+    <ClCompile Include="..\..\src\thread.c" />
+    <ClCompile Include="..\..\src\native.c" />
     <ClCompile Include="..\..\src\object.c" />
+    <ClCompile Include="..\..\src\operator.c" />
     <ClCompile Include="..\..\src\socket.c" />
     <ClCompile Include="..\..\src\stringbuilder.c" />
     <ClCompile Include="..\..\src\SwapNative.c" />

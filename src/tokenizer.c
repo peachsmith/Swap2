@@ -56,7 +56,7 @@ const char *keywords[] =
  */
 const char escapes[] =
 {
-	'a', 'b', 'f', 'n', 'r', 't', 'v', '\\', '\'', '"', '?' };
+	'a', 'b', 'f', 'n', 'r', 't', 'v', '\\', '\'', '"', '?', '0' };
 
 /**
  * checks for an escape character
@@ -64,7 +64,7 @@ const char escapes[] =
 static int jep_is_escape(char c)
 {
 	int i;
-	for (i = 0; i < 11; i++)
+	for (i = 0; i < 12; i++)
 	{
 		if (escapes[i] == c)
 		{
@@ -288,6 +288,10 @@ static int jep_escape(char c, char *esc)
 
 	case 10:
 		*esc = '\?';
+		break;
+
+	case 11:
+		*esc = '\0';
 		break;
 
 	default:

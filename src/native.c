@@ -71,7 +71,7 @@ jep_obj *jep_call_native(const char *ident, jep_obj *args)
 /**
 * calls a function from a shared library
 */
-jep_obj* jep_call_shared(jep_lib lib, const char* ident, jep_obj* args)
+jep_obj* jep_call_shared(jep_lib lib, const char* ident, jep_obj* args, jep_obj* list)
 {
 	jep_obj* o = NULL;
 	size_t ident_len = strlen(ident);
@@ -82,7 +82,7 @@ jep_obj* jep_call_shared(jep_lib lib, const char* ident, jep_obj* args)
 
 	if (func != NULL)
 	{
-		o = func(args);
+		o = func(args, list);
 	}
 	else
 	{

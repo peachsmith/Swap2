@@ -96,6 +96,10 @@ static void jep_print_array(jep_obj *array)
 			{
 				printf("[null]");
 			}
+			else if (elem->type == JEP_THREAD)
+			{
+				printf("[thread]");
+			}
 			if (elem->next != NULL)
 			{
 				printf(", ");
@@ -264,6 +268,11 @@ char *jep_to_string(jep_obj *o)
 	{
 		str = malloc(12);
 		strcpy(str, "[structdef]");
+	}
+	else if (o->type == JEP_THREAD)
+	{
+		str = malloc(9);
+		strcpy(str, "[thread]");
 	}
 
 	return str;
@@ -615,6 +624,10 @@ void jep_copy_object(jep_obj *dest, jep_obj *src)
 			jep_destroy_list((jep_obj *)(dest->val));
 			free(dest->val);
 		}
+		else if (dest->type == JEP_THREAD)
+		{
+			free(dest->val);
+		}
 		else
 		{
 			free(dest->val);
@@ -700,14 +713,17 @@ void jep_copy_object(jep_obj *dest, jep_obj *src)
 		jep_obj *body = NULL;
 
 		jep_obj *src_args = src->head;
-		jep_obj *a = src_args->head;
-		while (a != NULL)
+		if (src_args != NULL)
 		{
-			jep_obj *arg = jep_create_object();
-			arg->type = JEP_ARGUMENT;
-			arg->ident = a->ident;
-			jep_add_object(args, arg);
-			a = a->next;
+			jep_obj *a = src_args->head;
+			while (a != NULL)
+			{
+				jep_obj *arg = jep_create_object();
+				arg->type = JEP_ARGUMENT;
+				arg->ident = a->ident;
+				jep_add_object(args, arg);
+				a = a->next;
+			}
 		}
 
 		if (src->size == 2)
@@ -753,9 +769,119 @@ void jep_copy_object(jep_obj *dest, jep_obj *src)
 		}
 		dest->val = members;
 	}
+	else if (src->type == JEP_THREAD)
+	{
+		jep_thread* src_thread = (jep_thread*)(src->val);
+		jep_thread_args* src_args = (jep_thread_args*)(src_thread->args);
+
+		jep_thread* dest_thread = malloc(sizeof(jep_thread));
+		jep_thread_args* dest_args = malloc(sizeof(jep_thread_args));
+
+		dest_args->proc = src_args->proc;
+		dest_args->args = src_args->args;
+		dest_args->list = src_args->list;
+
+		dest_thread->thread_ptr = src_thread->thread_ptr;
+		dest_thread->proc = src_thread->proc;
+		dest_thread->args = dest_args;
+		dest_thread->started = src_thread->started;
+
+		dest->val = dest_thread;
+	}
+	else if (src->type == JEP_LIBRARY)
+	{
+		dest->val = src->val;
+	}
 	else if (src->type == JEP_NULL)
 	{
 		dest->val = NULL;
+	}
+}
+
+void jep_copy_main_list(jep_obj *dest, jep_obj *src)
+{
+	if (dest == NULL || src == NULL)
+	{
+		return;
+	}
+
+	if (dest->val != NULL)
+	{
+		if (dest->type == JEP_ARRAY)
+		{
+			/* frees the memory used by an array */
+			jep_free_array((jep_obj *)(dest->val));
+			dest->size = 0;
+			free(dest->val);
+		}
+		else if (dest->type == JEP_FUNCTION)
+		{
+			jep_obj *args = dest->head;
+
+			/* destroy the body of non-native functions */
+			if (dest->size == 2)
+			{
+				jep_obj *body = args->next;
+				jep_destroy_object(body);
+			}
+
+			jep_destroy_object(args);
+		}
+		else if (dest->type == JEP_REFERENCE)
+		{
+		}
+		else if (dest->type == JEP_FILE)
+		{
+			jep_file *file_obj = (jep_file *)(dest->val);
+			(file_obj->refs)--;
+			if (file_obj->refs <= 0)
+			{
+				if (file_obj->open)
+				{
+					/* call the appropriate close function */
+					if (file_obj->type == 0)
+					{
+						fclose(file_obj->file);
+					}
+					else if (file_obj->type == 1)
+					{
+						jep_socket_close(file_obj->socket);
+						jep_free_addrinf(file_obj->info);
+					}
+				}
+				free(dest->val);
+			}
+		}
+		else if (dest->type == JEP_STRUCT || dest->type == JEP_STRUCTDEF)
+		{
+			jep_destroy_list((jep_obj *)(dest->val));
+			free(dest->val);
+		}
+		else if (dest->type == JEP_THREAD)
+		{
+			free(dest->val);
+		}
+		else
+		{
+			free(dest->val);
+		}
+	}
+
+	dest->type = src->type;
+	dest->ret = src->ret;
+
+	if (src->type == JEP_LIST)
+	{
+		dest->size = 0;
+		jep_obj* src_val = src->head;
+		while (src_val != NULL)
+		{
+			jep_obj* dest_val = jep_create_object();
+			jep_copy_object(dest_val, src_val);
+			dest_val->ident = src_val->ident;
+			jep_add_object(dest, dest_val);
+			src_val = src_val->next;
+		}
 	}
 }
 
@@ -893,9 +1019,32 @@ void jep_destroy_object(jep_obj *obj)
 		{
 			jep_destroy_object((jep_obj *)(obj->val));
 		}
+		else if (obj->type == JEP_THREAD && obj->val != NULL)
+		{
+			/*
+			thread cleanup can probably be done in the base proc
+			duh_thread_args* obj_args = (duh_thread_args*)(((duh_thread*)(obj->val))->args);
+
+			jep_destroy_object(obj_args->proc);
+			jep_destroy_object(obj_args->args);
+
+			free(((duh_thread*)obj->val)->args);
+			*/
+
+			free(obj->val);
+		}
 		else if (obj->type == JEP_LIST)
 		{
 			jep_destroy_list(obj);
+		}
+		else if (obj->type == JEP_LIBRARY)
+		{
+			/*
+			 * currently the only object of this type
+			 * is the SwapNative shared library. The memory
+			 * containing its value is freed by the functionality
+			 * provided by the OS
+			 */
 		}
 		else
 		{
@@ -1037,16 +1186,26 @@ jep_obj *jep_character(const char *s)
 	obj = jep_create_object();
 	obj->type = JEP_CHARACTER;
 
-	if (s == NULL || s[0] == '\0')
+	/*
+	 * NOTE: this function used to expect
+	 * that a string of characters have more
+	 * than just the '\0' character.
+	 * It was modified to allow for the use of
+	 * the '\0' character.
+	 */
+
+	if (s == NULL) /* || s[0] == '\0') */
 	{
 		obj->val = NULL;
 	}
+	/*
 	else if (strlen(s) != 1)
 	{
 		printf("invalid character length\n");
 		free(obj);
 		obj = NULL;
 	}
+	*/
 	else
 	{
 		char *c = malloc(1);

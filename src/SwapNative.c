@@ -1,6 +1,6 @@
 #include "swap/SwapNative.h"
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_len(jep_obj *args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_len(jep_obj *args, jep_obj* list)
 {
 	jep_obj *length;
 	jep_obj *obj;
@@ -44,7 +44,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_len(jep_obj *args)
 	return length;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_typeof(jep_obj *args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_typeof(jep_obj *args, jep_obj* list)
 {
 	jep_obj *i = NULL;
 
@@ -141,7 +141,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_typeof(jep_obj *args)
 	return type;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_int(jep_obj *args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_int(jep_obj *args, jep_obj* list)
 {
 	jep_obj *i = NULL;
 
@@ -270,7 +270,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_int(jep_obj *args)
 	return i;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_char(jep_obj *args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_char(jep_obj *args, jep_obj* list)
 {
 	jep_obj *c = NULL;
 
@@ -323,7 +323,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_char(jep_obj *args)
 	return c;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_double(jep_obj *args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_double(jep_obj *args, jep_obj* list)
 {
 	jep_obj *i = NULL;
 
@@ -448,7 +448,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_double(jep_obj *args)
 	return i;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_byte(jep_obj *args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_byte(jep_obj *args, jep_obj* list)
 {
 	jep_obj *o = NULL;
 
@@ -509,7 +509,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_byte(jep_obj *args)
 	return o;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_bytes(jep_obj *args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_bytes(jep_obj *args, jep_obj* list)
 {
 	jep_obj *byte_obj = NULL;
 	char* str = NULL;
@@ -566,7 +566,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_bytes(jep_obj *args)
 	return byte_obj;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_write(jep_obj* args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_write(jep_obj* args, jep_obj* list)
 {
 	if (args == NULL || args->size != 1)
 	{
@@ -587,7 +587,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_write(jep_obj* args)
 	return NULL;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_writeln(jep_obj* args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_writeln(jep_obj* args, jep_obj* list)
 {
 	if (args == NULL || args->size != 1)
 	{
@@ -608,7 +608,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_writeln(jep_obj* args)
 	return NULL;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_readln(jep_obj* args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_readln(jep_obj* args, jep_obj* list)
 {
 	if (args != NULL && args->size > 0)
 	{
@@ -634,7 +634,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_readln(jep_obj* args)
 	file_args->head = file_obj;
 	file_args->size = 1;
 
-	o = jep_freadln(file_args);
+	o = jep_freadln(file_args, list);
 
 	file_val->open = 0; /* prevent cleanup from trying to close stdin */
 	jep_destroy_object(file_obj);
@@ -643,7 +643,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_readln(jep_obj* args)
 	return o;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_freadln(jep_obj* args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_freadln(jep_obj* args, jep_obj* list)
 {
 	if (args == NULL || args->size != 1)
 	{
@@ -737,7 +737,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_freadln(jep_obj* args)
 	return o;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_fopen(jep_obj* args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_fopen(jep_obj* args, jep_obj* list)
 {
 	if (args == NULL || args->size != 2)
 	{
@@ -804,7 +804,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_fopen(jep_obj* args)
 	return o;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_fwrite(jep_obj* args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_fwrite(jep_obj* args, jep_obj* list)
 {
 	if (args == NULL || args->size != 2)
 	{
@@ -844,7 +844,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_fwrite(jep_obj* args)
 	return NULL;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_fwriteln(jep_obj* args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_fwriteln(jep_obj* args, jep_obj* list)
 {
 	if (args == NULL || args->size != 2)
 	{
@@ -884,7 +884,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_fwriteln(jep_obj* args)
 	return NULL;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_freadb(jep_obj* args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_freadb(jep_obj* args, jep_obj* list)
 {
 	if (args == NULL || args->size != 2)
 	{
@@ -955,7 +955,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_freadb(jep_obj* args)
 	return byte_array;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_fwriteb(jep_obj* args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_fwriteb(jep_obj* args, jep_obj* list)
 {
 	if (args == NULL || args->size != 2)
 	{
@@ -1023,7 +1023,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_fwriteb(jep_obj* args)
 	return written;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_createSocket(jep_obj* args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_createSocket(jep_obj* args, jep_obj* list)
 {
 	jep_obj *s = NULL;
 	jep_addrinf *address_info = NULL;
@@ -1099,7 +1099,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_createSocket(jep_obj* args)
 	return s;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_bindSocket(jep_obj* args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_bindSocket(jep_obj* args, jep_obj* list)
 {
 	jep_obj *s = NULL;
 	jep_file *file = NULL;
@@ -1146,7 +1146,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_bindSocket(jep_obj* args)
 	return s;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_listenSocket(jep_obj* args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_listenSocket(jep_obj* args, jep_obj* list)
 {
 	jep_obj *s = NULL;
 	jep_file *file = NULL;
@@ -1194,7 +1194,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_listenSocket(jep_obj* args)
 	return s;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_acceptSocket(jep_obj* args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_acceptSocket(jep_obj* args, jep_obj* list)
 {
 	jep_obj *s = NULL;
 	jep_addrinf *address_info = NULL;
@@ -1253,7 +1253,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_acceptSocket(jep_obj* args)
 	return s;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_connectSocket(jep_obj* args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_connectSocket(jep_obj* args, jep_obj* list)
 {
 	jep_obj *s = NULL;
 	jep_file* file = NULL;
@@ -1300,7 +1300,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_connectSocket(jep_obj* args)
 	return s;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_readSocket(jep_obj* args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_readSocket(jep_obj* args, jep_obj* list)
 {
 	jep_obj *read = NULL;
 	jep_file* file = NULL;
@@ -1398,7 +1398,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_readSocket(jep_obj* args)
 	return read;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_writeSocket(jep_obj* args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_writeSocket(jep_obj* args, jep_obj* list)
 {
 	jep_obj *read = NULL;
 	jep_file* file = NULL;
@@ -1454,7 +1454,7 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_writeSocket(jep_obj* args)
 	return read;
 }
 
-SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_closeSocket(jep_obj* args)
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_closeSocket(jep_obj* args, jep_obj* list)
 {
 	jep_obj *result = NULL;
 	jep_socket socket;
@@ -1480,8 +1480,241 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_closeSocket(jep_obj* args)
 }
 
 /**
-* prints the number of times an an object was created in the native library
-*/
+ * the function that allows threads to run code
+ */
+static void JEP_THREAD_PROC base_thread_proc(jep_thread_args* args)
+{
+	jep_obj* o = NULL; /* return value */
+
+	if (args == NULL) return o;
+
+	jep_obj* func = args->proc;
+
+	if (func != NULL)
+	{
+		jep_obj *fargs = func->head;
+		jep_obj *farg = NULL;
+
+		if (fargs != NULL)
+		{
+			farg = fargs->head;
+		}
+
+		/* native function call */
+		if (func->size == 1)
+		{
+			jep_obj* l_native = jep_get_object(" SwapNative", args->list);
+
+			jep_obj* native_result = jep_call_shared((jep_lib)(l_native->val), func->ident, args->args, args->list);
+
+			if (args != NULL)
+			{
+				jep_destroy_object(args);
+			}
+
+			return native_result;
+		}
+
+		/* non-native function call */
+		jep_ast_node body = *((jep_ast_node *)(func->head->next->val));
+		if (args != NULL)
+		{
+			jep_obj *arg = ((jep_obj*)(((jep_obj*)(args->args))->val))->head;
+			while (arg != NULL && farg != NULL)
+			{
+				arg->ident = farg->ident;
+				farg = farg->next;
+				arg = arg->next;
+			}
+			if (arg != NULL || farg != NULL)
+			{
+				printf("woops, apparently there weren't the right amount of arguments!\n");
+			}
+			else
+			{
+				jep_add_object(args->list, args->args->val);
+
+				o = jep_evaluate(body, args->list);
+
+				/* remove the argument list from the main list */
+				jep_remove_scope(args->list);
+			}
+		}
+		else
+		{
+			if (farg != NULL)
+			{
+				printf("woops, apparently there weren't the right amount of arguments!\n");
+			}
+			else
+			{
+				args = jep_create_object();
+				args->args->type = JEP_LIST;
+
+				jep_add_object(args->list, args->args);
+
+				o = jep_evaluate(body, args->list);
+
+				/* remove the argument list from the main list */
+				jep_remove_scope(args->list);
+			}
+		}
+	}
+	else
+	{
+		printf("couldn't find a function with the specified identifer\n");
+	}
+
+	if (o != NULL && o->ret & JEP_RETURN)
+	{
+		/*
+		* mark a returned object as returned
+		* so it doesn't returned recursively
+		*/
+		o->ret |= JEP_RETURNED;
+	}
+
+	/* thread cleanup */
+	jep_destroy_object(args->proc);
+	jep_destroy_object(args->args);
+
+	return o;
+}
+
+/**
+ * Creates a thread
+ */
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_createThread(jep_obj* args, jep_obj* list)
+{
+	jep_obj* the_thread;
+
+
+	if (args == NULL || args->size != 2)
+	{
+		the_thread = jep_create_object();
+		the_thread->type = JEP_STRING;
+		the_thread->ret = JEP_RETURN | JEP_EXCEPTION;
+		the_thread->val = malloc(28);
+		strcpy(the_thread->val, "invalid number of arguments");
+		((char*)(the_thread->val))[27] = '\0';
+		return the_thread;
+	}
+
+	jep_obj *thread_proc = args->head;
+	jep_obj* thread_proc_args = thread_proc->next;
+
+	if (thread_proc->type != JEP_FUNCTION || thread_proc_args->type != JEP_ARRAY)
+	{
+		the_thread = jep_create_object();
+		the_thread->type = JEP_STRING;
+		the_thread->ret = JEP_RETURN | JEP_EXCEPTION;
+		the_thread->val = malloc(22);
+		strcpy(the_thread->val, "invalid argument type");
+		((char*)(the_thread->val))[21] = '\0';
+		return the_thread;
+	}
+
+	/*
+	 * create a copy of the thread proc and arguments
+	 * since the incoming values will be destroyed immediately
+	 * after returning from this function
+	 */
+	jep_obj* local_proc = jep_create_object(); /* TODO destroy this object */
+	jep_obj* local_args = jep_create_object(); /* TODO destroy this object */
+
+	jep_copy_object(local_proc, thread_proc);
+	jep_copy_object(local_args, thread_proc_args);
+
+	the_thread = jep_create_object();
+	the_thread->type = JEP_THREAD;
+
+	jep_thread* t = malloc(sizeof(jep_thread));
+	jep_thread_args* thread_args = malloc(sizeof(jep_thread_args));
+	thread_args->proc = local_proc;
+	thread_args->args = local_args;
+
+	thread_args->list = jep_create_object(); /* TODO destroy this object */
+	jep_copy_main_list(thread_args->list, list);
+
+	*t = jep_thread_create(base_thread_proc, thread_args);
+
+	the_thread->val = t;
+
+	return the_thread;
+}
+
+/**
+ * Starts a thread
+ */
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_startThread(jep_obj* args, jep_obj* list)
+{
+	jep_obj* result = NULL;
+
+	if (args == NULL || args->size != 1)
+	{
+		result = jep_create_object();
+		result->type = JEP_STRING;
+		result->ret = JEP_RETURN | JEP_EXCEPTION;
+		result->val = malloc(28);
+		strcpy(result->val, "invalid number of arguments");
+		((char*)(result->val))[27] = '\0';
+		return result;
+	}
+
+	jep_obj *the_thread = args->head;
+
+	if (the_thread->type != JEP_THREAD)
+	{
+		result = jep_create_object();
+		result->type = JEP_STRING;
+		result->ret = JEP_RETURN | JEP_EXCEPTION;
+		result->val = malloc(22);
+		strcpy(result->val, "invalid argument type");
+		((char*)(result->val))[21] = '\0';
+		return result;
+	}
+
+	jep_thread_start((jep_thread*)(the_thread->val));
+
+	return result;
+}
+
+SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_sleep(jep_obj* args, jep_obj* list)
+{
+	jep_obj* result = NULL;
+
+	if (args == NULL || args->size != 1)
+	{
+		result = jep_create_object();
+		result->type = JEP_STRING;
+		result->ret = JEP_RETURN | JEP_EXCEPTION;
+		result->val = malloc(28);
+		strcpy(result->val, "invalid number of arguments");
+		((char*)(result->val))[27] = '\0';
+		return result;
+	}
+
+	jep_obj *ms = args->head;
+
+	if (ms->type != JEP_INT && ms->type != JEP_LONG)
+	{
+		result = jep_create_object();
+		result->type = JEP_STRING;
+		result->ret = JEP_RETURN | JEP_EXCEPTION;
+		result->val = malloc(22);
+		strcpy(result->val, "invalid argument type");
+		((char*)(result->val))[21] = '\0';
+		return result;
+	}
+
+	jep_thread_sleep((*(int*)(ms->val)));
+
+	return result;
+}
+
+/**
+ * prints the number of times an an object was created in the native library
+ */
 SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_print_native_call_count()
 {
 	print_call_counts();

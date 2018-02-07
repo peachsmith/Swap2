@@ -32,6 +32,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\swap\ast.h" />
+    <ClInclude Include="..\include\swap\thread.h" />
     <ClInclude Include="..\include\swap\import.h" />
     <ClInclude Include="..\include\swap\native.h" />
     <ClInclude Include="..\include\swap\object.h" />

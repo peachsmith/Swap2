@@ -171,7 +171,7 @@ int main(int argc, char **argv)
 			if (native_lib != NULL)
 			{
 				jep_obj *l_native = jep_create_object();
-				l_native->type = JEP_NULL;
+				l_native->type = JEP_LIBRARY;
 				l_native->ident = " SwapNative"; /* prevent code from obtaining a reference to this */
 				l_native->val = native_lib;
 				jep_add_object(list, l_native);

@@ -1,0 +1,17 @@
+#{__THREAD__}
+
+/**
+ * creates a thread
+ */
+function createThread();
+
+/**
+ * starts a thread
+ */
+function startThread();
+
+/**
+ * sleeps for approximately the specified
+ * amount of milliseconds
+ */
+function sleep(ms);

@@ -171,6 +171,16 @@ jep_obj* jep_or_assign(jep_ast_node node, jep_obj* list);
 jep_obj* jep_xor_assign(jep_ast_node node, jep_obj* list);
 
 /**
+ * performs a bitwise left shift assignment on an integer
+ */
+jep_obj *jep_lshift_assign(jep_ast_node node, jep_obj *list);
+
+/**
+ * performs a bitwise right shift assignment on an integer
+ */
+jep_obj *jep_rshift_assign(jep_ast_node node, jep_obj *list);
+
+/**
  * evaluates an assignment
  */
 jep_obj* jep_assign(jep_ast_node node, jep_obj* list);

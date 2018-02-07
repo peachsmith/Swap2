@@ -48,7 +48,7 @@ jep_obj* jep_call_native(const char* ident, jep_obj* args);
 /**
 * calls a function from a shared library
 */
-jep_obj* jep_call_shared(jep_lib lib, const char* ident, jep_obj* args);
+jep_obj* jep_call_shared(jep_lib lib, const char* ident, jep_obj* args, jep_obj* list);
 
 /**
  * loads a shared library

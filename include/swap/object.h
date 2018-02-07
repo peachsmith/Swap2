@@ -24,6 +24,7 @@
 #include <limits.h>
 #include "swap/ast.h"
 #include "swap/socket.h"
+#include "swap/thread.h"
 
 /* return flags */
 #define JEP_RETURN 1
@@ -48,6 +49,8 @@
 #define JEP_NULL 15
 #define JEP_STRUCT 16
 #define JEP_STRUCTDEF 17
+#define JEP_THREAD 18
+#define JEP_LIBRARY 19
 
 /* file modes */
 #define JEP_READ 1
@@ -141,6 +144,13 @@ jep_obj *jep_get_object(const char *ident, jep_obj *list);
  * copies the value of one obect into another
  */
 void jep_copy_object(jep_obj *dest, jep_obj *src);
+
+/**
+ * copies the main list
+ * this is basically the same as copying a regular list,
+ * but the identifiers are also copied
+ */
+void jep_copy_main_list(jep_obj *dest, jep_obj *src);
 
 /**
  * copies the value of the self pointer of an object

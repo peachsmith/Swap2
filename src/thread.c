@@ -52,7 +52,7 @@ jep_mutex_result jep_mutex_lock(jep_mutex m)
 #if defined(_WIN32) || defined(__CYGWIN__)
 	result = WaitForSingleObject(m, INFINITE);
 #elif defined(__linux__)
-	pthread_mutex_lock(m);
+	result = pthread_mutex_lock(m);
 #endif
 
 	return result;
@@ -65,7 +65,7 @@ int jep_mutex_release(jep_mutex m)
 #if defined(_WIN32) || defined(__CYGWIN__)
 	result = ReleaseMutex(m);
 #elif defined(__linux__)
-	pthread_mutex_unlock(m);
+	result = pthread_mutex_unlock(m);
 #endif
 
 	return result;

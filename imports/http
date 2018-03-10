@@ -1,0 +1,148 @@
+/*
+ * http stuff
+ */
+
+#{__HTTP__}
+
+import "io";
+import "socket";
+
+struct HttpConnection {
+	host;
+	port;
+	socket;
+}
+
+struct HttpRequest {
+	url;
+	resource;
+	method;
+	headers;
+	header_count;
+	body;
+}
+
+struct HttpResponse {
+	url;
+	resource;
+	method;
+	headers;
+	header_count;
+	length;
+	body;
+	raw;
+}
+
+/*
+ * opens an http connection
+ *
+ * params:
+ *   host - the base url
+ *   port - the port
+ *
+ * returns:
+ *   a new http connection
+ */
+function connect(host, port) {
+	local conn = new HttpConnection;
+
+	conn.socket = createSocket(host, port);
+	connectSocket(conn.socket);
+
+	return conn;
+}
+
+/*
+ * closes an http connection
+ *
+ * params:
+ *   conn - the http connection to close
+ */
+function disconnect(conn) {
+	closeSocket(conn.socket);
+}
+
+/*
+ * adds a header to an http request
+ *
+ * params:
+ *   req - reference to an http request
+ *   name - the name of the header
+ *   value - the value of the header
+ */
+function addHeader(req, name, value) {
+	local hc = len(::req.headers);
+	if (::req.header_count == null) {
+		::req.headers = [10];
+		::req.header_count = 0;
+	} else if (::req.header_count >= hc) {
+		local i;
+		local new_length = ::req.header_count + ::req.header_count / 2;
+		local copy = [::req.header_count];
+		
+		for (i = 0; i < ::req.header_count; i ++) {
+			copy[i] = ::req.headers[i];
+		}
+
+		::req.headers = [new_length];
+
+		for (i = 0; i < ::req.header_count; i ++) {
+			::req.headers[i] = copy[i];
+		}
+	}
+	::req.headers[::req.header_count] = name + ": " + value;
+	::req.header_count = ::req.header_count + 1;
+}
+
+/*
+ * sends an http request
+ *
+ * params:
+ *   conn - the connection over which to send the requests
+ *   req - the http request to send
+ *
+ * returns:
+ *   an http response
+ */
+function sendRequest(conn, req) {
+	
+	local raw = req.method + " " + req.resource + " HTTP/1.1\r\n"
+		+ "Host: " + req.url + "\r\n";
+
+	local i;
+	for (i = 0; i < req.header_count; i++) {
+		raw += req.headers[i] + "\r\n";
+	}
+	raw += "\r\n";
+	if (req.body != null) raw += req.body;
+
+	local buffer_size = 1024;              // buffer size
+	local response_buffer = [buffer_size]; // buffer for response
+	
+	writeSocket(conn.socket, bytes(raw), len(raw));
+
+	local result = readSocket(conn.socket, :response_buffer, buffer_size);
+	
+	local response_string = "";
+
+	if (result > 0) {
+		local i;
+		for (i = 0; i < result; i++) {
+			response_string += char(response_buffer[i]);
+		}
+		while (result == buffer_size) {
+			result = readSocket(conn.socket, :response_buffer, buffer_size);
+			for (i = 0; i < result; i++) {
+				response_string += char(response_buffer[i]);
+			}
+		}
+
+		local response = new HttpResponse;
+		response.length = result;
+		response.body = response_buffer;
+		response.raw = response_string;
+		return response;
+	}
+
+	return null;
+}

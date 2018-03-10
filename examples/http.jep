@@ -1,0 +1,51 @@
+/*
+ * sends an http request and prints the response
+ */
+import "http";
+
+local port = "80";
+local host = "www.example.com";
+local resource = "/services/cashreceipt";
+
+local conn = connect(host, port);
+
+local body = "{\"data\" \"test data\"}";
+	
+local req = new HttpRequest {
+	host,
+	resource,
+	"GET",
+	[10],
+	0,
+	null
+};
+
+//addHeader(:req, "Connection", "Keep-Alive");
+//addHeader(:req, "Content-Length", len(body));
+
+res = sendRequest(conn, req);
+
+writeln(res.raw);
+
+// writeln("response:");
+// local i;
+// for (i = 0; i < res.length; i++) {
+// 	write(char(res.body[i]));
+// }
+// writeln("");
+
+disconnect(conn);
+
+// local lower_a = 'A';
+// local upper_a = 'Z';
+
+// function is_alpha(c) {
+// 	local b = byte(c);
+// 	writeln(b);
+// 	if (b >= 97 && b <= 122) return 1;
+// 	if (b >= 65 && b <= 90) return 1;
+// 	return 0;
+// }
+
+// writeln(is_alpha(lower_a));
+// writeln(is_alpha(upper_a));

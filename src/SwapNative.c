@@ -1,4 +1,5 @@
 #include "swap/SwapNative.h"
+#include "swap/operator.h"
 
 SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_len(jep_obj *args, jep_obj* list)
 {
@@ -1480,13 +1481,13 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_closeSocket(jep_obj* args, jep_obj* 
 }
 
 /**
- * the function that allows threads to run code
- */
+* the function that allows threads to run code
+*/
 static void JEP_THREAD_PROC base_thread_proc(jep_thread_args* args)
 {
-	jep_obj* o = NULL; /* return value */
+	jep_obj* o = NULL;
 
-	if (args == NULL) return o;
+	if (args == NULL) return;
 
 	jep_obj* func = args->proc;
 
@@ -1507,17 +1508,17 @@ static void JEP_THREAD_PROC base_thread_proc(jep_thread_args* args)
 
 			jep_obj* native_result = jep_call_shared((jep_lib)(l_native->val), func->ident, args->args, args->list);
 
-			if (args != NULL)
+			if (native_result != NULL)
 			{
-				jep_destroy_object(args);
+				jep_destroy_object(native_result);
 			}
 
-			return native_result;
+			return;
 		}
 
 		/* non-native function call */
 		jep_ast_node body = *((jep_ast_node *)(func->head->next->val));
-		if (args != NULL)
+		if (args->args != NULL)
 		{
 			jep_obj *arg = ((jep_obj*)(((jep_obj*)(args->args))->val))->head;
 			while (arg != NULL && farg != NULL)
@@ -1548,7 +1549,7 @@ static void JEP_THREAD_PROC base_thread_proc(jep_thread_args* args)
 			}
 			else
 			{
-				args = jep_create_object();
+				args->args = jep_create_object();
 				args->args->type = JEP_LIST;
 
 				jep_add_object(args->list, args->args);
@@ -1565,25 +1566,26 @@ static void JEP_THREAD_PROC base_thread_proc(jep_thread_args* args)
 		printf("couldn't find a function with the specified identifer\n");
 	}
 
-	if (o != NULL && o->ret & JEP_RETURN)
+	if (o != NULL)
 	{
-		/*
-		* mark a returned object as returned
-		* so it doesn't returned recursively
-		*/
-		o->ret |= JEP_RETURNED;
+		jep_destroy_object(o);
 	}
+
+	// if (o != NULL && o->ret & JEP_RETURN)
+	// {
+	// 	o->ret |= JEP_RETURNED;
+	// }
 
 	/* thread cleanup */
 	jep_destroy_object(args->proc);
 	jep_destroy_object(args->args);
 
-	return o;
+	//return o;
 }
 
 /**
- * Creates a thread
- */
+* Creates a thread
+*/
 SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_createThread(jep_obj* args, jep_obj* list)
 {
 	jep_obj* the_thread;
@@ -1615,10 +1617,10 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_createThread(jep_obj* args, jep_obj*
 	}
 
 	/*
-	 * create a copy of the thread proc and arguments
-	 * since the incoming values will be destroyed immediately
-	 * after returning from this function
-	 */
+	* create a copy of the thread proc and arguments
+	* since the incoming values will be destroyed immediately
+	* after returning from this function
+	*/
 	jep_obj* local_proc = jep_create_object(); /* TODO destroy this object */
 	jep_obj* local_args = jep_create_object(); /* TODO destroy this object */
 
@@ -1644,8 +1646,8 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_createThread(jep_obj* args, jep_obj*
 }
 
 /**
- * Starts a thread
- */
+* Starts a thread
+*/
 SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_startThread(jep_obj* args, jep_obj* list)
 {
 	jep_obj* result = NULL;
@@ -1713,8 +1715,8 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_sleep(jep_obj* args, jep_obj* list)
 }
 
 /**
- * prints the number of times an an object was created in the native library
- */
+* prints the number of times an an object was created in the native library
+*/
 SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_print_native_call_count()
 {
 	print_call_counts();

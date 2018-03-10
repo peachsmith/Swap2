@@ -1,0 +1,64 @@
+/**
+ * an example of threading
+ *
+ * usage:
+ *   a - start a new thread
+ *   s - sleep for approximately 3000 milliseconds
+ *   q - quit
+ *
+ * notes:
+ *   currently, there is a memory leak somewhere
+ *   in the thread life cycle
+ *
+ *   there is currently no synchronization mechanism
+ *
+ *   the arguments to the thread's procedure
+ *   are passed in as an array as the second arguments
+ *   of the createThread function
+ */
+import "io";
+import "thread";
+
+local input = "";
+
+// data to be accessed from multiple threads
+local shared_data = 4;
+
+/**
+ * a thread procedure
+ */
+function my_proc(a, b) {
+	writeln("a + b: " + (a + b));
+	writeln("shared data: " + shared_data);
+	writeln("started a new thread");
+	sleep(3000);
+	writeln("the thread is now done");
+}
+
+/**
+ * a thread proc without arguments
+ */
+function bloof() {
+	writeln("this function doesn't have any arguments");
+}
+
+while (input != "q") {
+	
+	// get input from stdin
+	input = readln();
+	
+	if (input == "a") {
+		// create a new thread with 3 and 5 as its arguments
+		local tmp_thread = createThread(my_proc, {3, 5});
+		startThread(tmp_thread);
+	} else if (input == "b") {
+		// create a new thread without arguments
+		local tmp_thread = createThread(bloof, {});
+		startThread(tmp_thread);
+	} else if (input == "s") {
+		// sleep for 3000 milliseconds
+		writeln("sleeping for 3000 milliseconds");
+		sleep(3000);
+		writeln("done sleeping");
+	}
+}

@@ -1,4 +1,4 @@
-[null]  SwapNative
+[library]  SwapNative
 [function] byte ()
 [function] bytes ()
 [function] char ()

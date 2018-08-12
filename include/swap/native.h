@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#	include <windows.h>
 #	define SWAP_NATIVE_LIB "SwapNative.dll"
 typedef HINSTANCE jep_lib;
-typedef jep_obj* (__cdecl *jep_func)(jep_obj*);
+typedef jep_obj* (__cdecl *jep_func)(jep_obj*, jep_obj*);
 #elif defined(__CYGWIN__)
 #	include <windows.h>
 #	include <unistd.h>

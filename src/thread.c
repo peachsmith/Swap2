@@ -13,7 +13,7 @@ jep_thread jep_thread_create(void* proc, void* args)
 void jep_thread_start(jep_thread* t)
 {
 #if defined(_WIN32)
-	t->thread_ptr = _beginthreadex(NULL, 0, t->proc, t->args, NULL, NULL);
+	t->thread_ptr = _beginthreadex(NULL, 0, t->proc, t->args, 0, NULL);
 #elif defined (__linux__) || defined(__CYGWIN__)
 	pthread_create(&(t->thread_ptr), NULL, t->proc, t->args);
 #endif

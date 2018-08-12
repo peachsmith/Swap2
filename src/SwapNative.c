@@ -1480,108 +1480,112 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_closeSocket(jep_obj* args, jep_obj* 
 	return result;
 }
 
+/************************************************
+* BEGIN thread functions                        *
+************************************************/
+
 /**
 * the function that allows threads to run code
 */
-static void JEP_THREAD_PROC base_thread_proc(jep_thread_args* args)
-{
-	jep_obj* o = NULL;
-
-	if (args == NULL) return;
-
-	jep_obj* func = args->proc;
-
-	if (func != NULL)
-	{
-		jep_obj *fargs = func->head;
-		jep_obj *farg = NULL;
-
-		if (fargs != NULL)
-		{
-			farg = fargs->head;
-		}
-
-		/* native function call */
-		if (func->size == 1)
-		{
-			jep_obj* l_native = jep_get_object(" SwapNative", args->list);
-
-			jep_obj* native_result = jep_call_shared((jep_lib)(l_native->val), func->ident, args->args, args->list);
-
-			if (native_result != NULL)
-			{
-				jep_destroy_object(native_result);
-			}
-
-			return;
-		}
-
-		/* non-native function call */
-		jep_ast_node body = *((jep_ast_node *)(func->head->next->val));
-		if (args->args != NULL)
-		{
-			jep_obj *arg = ((jep_obj*)(((jep_obj*)(args->args))->val))->head;
-			while (arg != NULL && farg != NULL)
-			{
-				arg->ident = farg->ident;
-				farg = farg->next;
-				arg = arg->next;
-			}
-			if (arg != NULL || farg != NULL)
-			{
-				printf("woops, apparently there weren't the right amount of arguments!\n");
-			}
-			else
-			{
-				jep_add_object(args->list, args->args->val);
-
-				o = jep_evaluate(body, args->list);
-
-				/* remove the argument list from the main list */
-				jep_remove_scope(args->list);
-			}
-		}
-		else
-		{
-			if (farg != NULL)
-			{
-				printf("woops, apparently there weren't the right amount of arguments!\n");
-			}
-			else
-			{
-				args->args = jep_create_object();
-				args->args->type = JEP_LIST;
-
-				jep_add_object(args->list, args->args);
-
-				o = jep_evaluate(body, args->list);
-
-				/* remove the argument list from the main list */
-				jep_remove_scope(args->list);
-			}
-		}
-	}
-	else
-	{
-		printf("couldn't find a function with the specified identifer\n");
-	}
-
-	if (o != NULL)
-	{
-		jep_destroy_object(o);
-	}
-
-	// if (o != NULL && o->ret & JEP_RETURN)
-	// {
-	// 	o->ret |= JEP_RETURNED;
-	// }
-
-	/* thread cleanup */
-	jep_destroy_object(args->proc);
-	jep_destroy_object(args->args);
-
-	//return o;
-}
+//static void JEP_THREAD_PROC base_thread_proc(jep_thread_args* args)
+//{
+//	jep_obj* o = NULL;
+//
+//	if (args == NULL) return;
+//
+//	jep_obj* func = args->proc;
+//
+//	if (func != NULL)
+//	{
+//		jep_obj *fargs = func->head;
+//		jep_obj *farg = NULL;
+//
+//		if (fargs != NULL)
+//		{
+//			farg = fargs->head;
+//		}
+//
+//		/* native function call */
+//		if (func->size == 1)
+//		{
+//			jep_obj* l_native = jep_get_object(" SwapNative", args->list);
+//
+//			jep_obj* native_result = jep_call_shared((jep_lib)(l_native->val), func->ident, args->args, args->list);
+//
+//			if (native_result != NULL)
+//			{
+//				jep_destroy_object(native_result);
+//			}
+//
+//			return;
+//		}
+//
+//		/* non-native function call */
+//		jep_ast_node body = *((jep_ast_node *)(func->head->next->val));
+//		if (args->args != NULL)
+//		{
+//			jep_obj *arg = ((jep_obj*)(((jep_obj*)(args->args))->val))->head;
+//			while (arg != NULL && farg != NULL)
+//			{
+//				arg->ident = farg->ident;
+//				farg = farg->next;
+//				arg = arg->next;
+//			}
+//			if (arg != NULL || farg != NULL)
+//			{
+//				printf("woops, apparently there weren't the right amount of arguments!\n");
+//			}
+//			else
+//			{
+//				jep_add_object(args->list, args->args->val);
+//
+//				o = jep_evaluate(body, args->list);
+//
+//				/* remove the argument list from the main list */
+//				jep_remove_scope(args->list);
+//			}
+//		}
+//		else
+//		{
+//			if (farg != NULL)
+//			{
+//				printf("woops, apparently there weren't the right amount of arguments!\n");
+//			}
+//			else
+//			{
+//				args->args = jep_create_object();
+//				args->args->type = JEP_LIST;
+//
+//				jep_add_object(args->list, args->args);
+//
+//				o = jep_evaluate(body, args->list);
+//
+//				/* remove the argument list from the main list */
+//				jep_remove_scope(args->list);
+//			}
+//		}
+//	}
+//	else
+//	{
+//		printf("couldn't find a function with the specified identifer\n");
+//	}
+//
+//	if (o != NULL)
+//	{
+//		jep_destroy_object(o);
+//	}
+//
+//	// if (o != NULL && o->ret & JEP_RETURN)
+//	// {
+//	// 	o->ret |= JEP_RETURNED;
+//	// }
+//
+//	/* thread cleanup */
+//	jep_destroy_object(args->proc);
+//	jep_destroy_object(args->args);
+//
+//	//return o;
+//}
 
 /**
 * Creates a thread
@@ -1590,59 +1594,67 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_createThread(jep_obj* args, jep_obj*
 {
 	jep_obj* the_thread;
 
-
-	if (args == NULL || args->size != 2)
-	{
-		the_thread = jep_create_object();
-		the_thread->type = JEP_STRING;
-		the_thread->ret = JEP_RETURN | JEP_EXCEPTION;
-		the_thread->val = malloc(28);
-		strcpy(the_thread->val, "invalid number of arguments");
-		((char*)(the_thread->val))[27] = '\0';
-		return the_thread;
-	}
-
-	jep_obj *thread_proc = args->head;
-	jep_obj* thread_proc_args = thread_proc->next;
-
-	if (thread_proc->type != JEP_FUNCTION || thread_proc_args->type != JEP_ARRAY)
-	{
-		the_thread = jep_create_object();
-		the_thread->type = JEP_STRING;
-		the_thread->ret = JEP_RETURN | JEP_EXCEPTION;
-		the_thread->val = malloc(22);
-		strcpy(the_thread->val, "invalid argument type");
-		((char*)(the_thread->val))[21] = '\0';
-		return the_thread;
-	}
-
-	/*
-	* create a copy of the thread proc and arguments
-	* since the incoming values will be destroyed immediately
-	* after returning from this function
-	*/
-	jep_obj* local_proc = jep_create_object(); /* TODO destroy this object */
-	jep_obj* local_args = jep_create_object(); /* TODO destroy this object */
-
-	jep_copy_object(local_proc, thread_proc);
-	jep_copy_object(local_args, thread_proc_args);
-
 	the_thread = jep_create_object();
-	the_thread->type = JEP_THREAD;
-
-	jep_thread* t = malloc(sizeof(jep_thread));
-	jep_thread_args* thread_args = malloc(sizeof(jep_thread_args));
-	thread_args->proc = local_proc;
-	thread_args->args = local_args;
-
-	thread_args->list = jep_create_object(); /* TODO destroy this object */
-	jep_copy_main_list(thread_args->list, list);
-
-	*t = jep_thread_create(base_thread_proc, thread_args);
-
-	the_thread->val = t;
-
+	the_thread->type = JEP_STRING;
+	the_thread->ret = JEP_RETURN | JEP_EXCEPTION;
+	the_thread->val = malloc(37);
+	strcpy(the_thread->val, "method not implemented: createThread");
+	((char*)(the_thread->val))[36] = '\0';
 	return the_thread;
+
+	//if (args == NULL || args->size != 2)
+	//{
+	//	the_thread = jep_create_object();
+	//	the_thread->type = JEP_STRING;
+	//	the_thread->ret = JEP_RETURN | JEP_EXCEPTION;
+	//	the_thread->val = malloc(28);
+	//	strcpy(the_thread->val, "invalid number of arguments");
+	//	((char*)(the_thread->val))[27] = '\0';
+	//	return the_thread;
+	//}
+
+	//jep_obj *thread_proc = args->head;
+	//jep_obj* thread_proc_args = thread_proc->next;
+
+	//if (thread_proc->type != JEP_FUNCTION || thread_proc_args->type != JEP_ARRAY)
+	//{
+	//	the_thread = jep_create_object();
+	//	the_thread->type = JEP_STRING;
+	//	the_thread->ret = JEP_RETURN | JEP_EXCEPTION;
+	//	the_thread->val = malloc(22);
+	//	strcpy(the_thread->val, "invalid argument type");
+	//	((char*)(the_thread->val))[21] = '\0';
+	//	return the_thread;
+	//}
+
+	///*
+	// * create a copy of the thread proc and arguments
+	// * since the incoming values will be destroyed immediately
+	// * after returning from this function
+	// */
+	//jep_obj* local_proc = jep_create_object(); /* TODO destroy this object */
+	//jep_obj* local_args = jep_create_object(); /* TODO destroy this object */
+
+	//jep_copy_object(local_proc, thread_proc);
+	//jep_copy_object(local_args, thread_proc_args);
+
+	//the_thread = jep_create_object();
+	//the_thread->type = JEP_THREAD;
+
+	//jep_thread* t = malloc(sizeof(jep_thread));
+	//jep_thread_args* thread_args = malloc(sizeof(jep_thread_args));
+	//thread_args->proc = local_proc;
+	//thread_args->args = local_args;
+
+	//thread_args->list = jep_create_object(); /* TODO destroy this object */
+	//jep_copy_main_list(thread_args->list, list);
+
+	//*t = jep_thread_create(base_thread_proc, thread_args);
+
+	//the_thread->val = t;
+
+	//return the_thread;
+
 }
 
 /**
@@ -1652,6 +1664,14 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_startThread(jep_obj* args, jep_obj* 
 {
 	jep_obj* result = NULL;
 
+	result = jep_create_object();
+	result->type = JEP_STRING;
+	result->ret = JEP_RETURN | JEP_EXCEPTION;
+	result->val = malloc(36);
+	strcpy(result->val, "method not implemented: startThread");
+	((char*)(result->val))[35] = '\0';
+	return result;
+/*
 	if (args == NULL || args->size != 1)
 	{
 		result = jep_create_object();
@@ -1679,7 +1699,12 @@ SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_startThread(jep_obj* args, jep_obj* 
 	jep_thread_start((jep_thread*)(the_thread->val));
 
 	return result;
+*/
 }
+
+/************************************************
+ * END thread functions                         *
+ ************************************************/
 
 SWAPNATIVE_API jep_obj* SWAPNATIVE_CALL jep_sleep(jep_obj* args, jep_obj* list)
 {

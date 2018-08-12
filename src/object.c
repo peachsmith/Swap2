@@ -1320,6 +1320,10 @@ void jep_print_object(jep_obj *obj)
 		{
 			printf("[structdef] %s\n", obj->ident);
 		}
+		else if (obj->type == JEP_LIBRARY)
+		{
+			printf("[library] %s\n", obj->ident);
+		}
 		else
 		{
 			printf("unrecognized type while printing object %d\n", obj->type);

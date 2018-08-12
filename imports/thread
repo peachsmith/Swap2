@@ -2,13 +2,18 @@
 
 /**
  * creates a thread
+ *
+ * proc - the thread procedure
+ * args - the arguments for the thread procedure
  */
-function createThread();
+function createThread(proc, args);
 
 /**
  * starts a thread
+ *
+ * thread - the thread to be started
  */
-function startThread();
+function startThread(thread);
 
 /**
  * sleeps for approximately the specified

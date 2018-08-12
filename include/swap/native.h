@@ -31,7 +31,7 @@ typedef jep_obj* (__cdecl *jep_func)(jep_obj*);
 #	include <dlfcn.h>
 #	define SWAP_NATIVE_LIB "SwapNative.dll"
 typedef void* jep_lib;
-typedef jep_obj* (*jep_func)(jep_obj*);
+typedef jep_obj* (*jep_func)(jep_obj*, jep_obj*);
 #elif defined(__linux__) || defined(__unix__)
 #	include <unistd.h>
 #	include <dlfcn.h>

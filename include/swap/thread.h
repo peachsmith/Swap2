@@ -3,7 +3,7 @@
 
 #include "swap/object.h"
 
-#if defined(_WIN32) || defined(__CYGWIN__)
+#if defined(_WIN32)
 #include <windows.h>
 #include <tchar.h>
 #include <strsafe.h>
@@ -23,7 +23,7 @@ typedef DWORD jep_mutex_result;
 
 #endif // _WIN32
 
-#if defined (__linux__)
+#if defined (__linux__) || defined(__CYGWIN__)
 
 #include <stdlib.h>
 #include <unistd.h>

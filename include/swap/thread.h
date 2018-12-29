@@ -23,7 +23,7 @@ typedef DWORD jep_mutex_result;
 
 #endif // _WIN32
 
-#if defined (__linux__) || defined(__CYGWIN__)
+#if defined (__linux__) || defined(__CYGWIN__) || defined(__MACH__)
 
 #include <stdlib.h>
 #include <unistd.h>

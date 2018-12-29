@@ -39,7 +39,7 @@ typedef struct addrinfo jep_addrinf;
 
 #endif // _WIN32
 
-#if defined(__unix__) || defined(__linux__)
+#if defined(__unix__) || defined(__linux__) || defined(__MACH__)
 
 #include <unistd.h>
 #include <sys/types.h> 

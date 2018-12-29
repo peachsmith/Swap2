@@ -57,7 +57,7 @@ int jep_get_addr_info(jep_addrinf **inf, const char* address, const char* port)
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_flags = AI_PASSIVE;
 	result = getaddrinfo(address, port, &hints, inf);
-#elif defined(__unix__) || defined(__linux__)
+#elif defined(__unix__) || defined(__linux__) || defined(__MACH__)
 	jep_addrinf hints;
 	hints.ai_flags = AI_PASSIVE;
 	hints.ai_family = AF_INET;
@@ -77,7 +77,7 @@ void jep_free_addrinf(jep_addrinf* inf)
 {
 #ifdef _WIN32
 	freeaddrinfo(inf);
-#elif defined(__unix__) || defined(__linux__)
+#elif defined(__unix__) || defined(__linux__) || defined(__MACH__)
 	freeaddrinfo(inf);
 #endif
 }
@@ -88,7 +88,7 @@ jep_socket jep_socket_create(jep_addrinf *inf)
 
 #ifdef _WIN32
 	s = socket(inf->ai_family, inf->ai_socktype, inf->ai_protocol);
-#elif defined(__unix__) || defined(__linux__)
+#elif defined(__unix__) || defined(__linux__) || defined(__MACH__)
 	s = socket(inf->ai_family, inf->ai_socktype, inf->ai_protocol);
 #endif
 	return s;
@@ -100,7 +100,7 @@ int jep_socket_bind(jep_socket s, jep_addrinf *inf)
 
 #ifdef _WIN32
 	result = bind(s, inf->ai_addr, (int)inf->ai_addrlen);
-#elif defined(__unix__) || defined(__linux__)
+#elif defined(__unix__) || defined(__linux__) || defined(__MACH__)
 	result = bind(s, inf->ai_addr, inf->ai_addrlen);
 #endif
 
@@ -113,7 +113,7 @@ int jep_socket_listen(jep_socket s, int backlog)
 
 #ifdef _WIN32
 	result = listen(s, backlog);
-#elif defined(__unix__) || defined(__linux__)
+#elif defined(__unix__) || defined(__linux__) || defined(__MACH__)
 	result = listen(s, backlog);
 #endif
 
@@ -126,7 +126,7 @@ int jep_socket_connect(jep_socket s, jep_addrinf* inf)
 
 #ifdef _WIN32
 	result = connect(s, inf->ai_addr, (int)inf->ai_addrlen);
-#elif defined(__unix__) || defined(__linux__)
+#elif defined(__unix__) || defined(__linux__) || defined(__MACH__)
 	result = connect(s, inf->ai_addr, inf->ai_addrlen);
 #endif
 
@@ -139,7 +139,7 @@ jep_socket jep_socket_accept(jep_socket s, jep_addr* addr, int* addrlen)
 
 #ifdef _WIN32
 	result = accept(s, addr, addrlen);
-#elif defined(__unix__) || defined(__linux__)
+#elif defined(__unix__) || defined(__linux__) || defined(__MACH__)
 	result = accept(s, addr, (socklen_t*)addrlen);
 #endif
 
@@ -152,7 +152,7 @@ int jep_socket_send(jep_socket s, char* buffer, size_t len, int flags)
 
 #ifdef _WIN32
 	result = send(s, buffer, len, flags);
-#elif defined(__unix__) || defined(__linux__)
+#elif defined(__unix__) || defined(__linux__) || defined(__MACH__)
 	result = write(s, buffer, len);
 #endif
 
@@ -165,7 +165,7 @@ int jep_socket_receive(jep_socket s, unsigned char* buffer, size_t len, int flag
 
 #ifdef _WIN32
 	result = recv(s, buffer, len, flags);
-#elif defined(__unix__) || defined(__linux__)
+#elif defined(__unix__) || defined(__linux__) || defined(__MACH__)
 	result = read(s, buffer, len);
 #endif
 
@@ -176,7 +176,7 @@ int jep_socket_close(jep_socket s)
 {
 #ifdef _WIN32
 	return closesocket(s);
-#elif defined(__unix__) || defined(__linux__)
+#elif defined(__unix__) || defined(__linux__) || defined(__MACH__)
 	return close(s);
 #endif
 }
@@ -187,7 +187,7 @@ int jep_socket_shutdown(jep_socket s, int how)
 
 #ifdef _WIN32
 	result = shutdown(s, how);
-#elif defined(__unix__) || defined(__linux__)
+#elif defined(__unix__) || defined(__linux__) || defined(__MACH__)
 	result = shutdown(s, how);
 #endif
 

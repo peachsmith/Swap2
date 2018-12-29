@@ -14,7 +14,7 @@ void jep_thread_start(jep_thread* t)
 {
 #if defined(_WIN32)
 	t->thread_ptr = _beginthreadex(NULL, 0, t->proc, t->args, 0, NULL);
-#elif defined (__linux__) || defined(__CYGWIN__)
+#elif defined (__linux__) || defined(__CYGWIN__) || defined(__MACH__)
 	pthread_create(&(t->thread_ptr), NULL, t->proc, t->args);
 #endif
 
@@ -27,7 +27,7 @@ jep_mutex jep_mutex_create()
 
 #if defined(_WIN32)
 	m = CreateMutex(NULL, FALSE, NULL);
-#elif defined(__linux__) || defined(__CYGWIN__)
+#elif defined(__linux__) || defined(__CYGWIN__) || defined(__MACH__)
 	m = malloc(sizeof(pthread_mutex_t));
 	pthread_mutex_init(m, NULL);
 #endif
@@ -39,7 +39,7 @@ void jep_mutex_destroy(jep_mutex m)
 {
 #if defined(_WIN32)
 	CloseHandle(m);
-#elif defined(__linux__) || defined(__CYGWIN__)
+#elif defined(__linux__) || defined(__CYGWIN__) || defined(__MACH__)
 	pthread_mutex_destroy(m);
 	free(m);
 #endif
@@ -51,7 +51,7 @@ jep_mutex_result jep_mutex_lock(jep_mutex m)
 
 #if defined(_WIN32)
 	result = WaitForSingleObject(m, INFINITE);
-#elif defined(__linux__) || defined(__CYGWIN__)
+#elif defined(__linux__) || defined(__CYGWIN__) || defined(__MACH__)
 	result = pthread_mutex_lock(m);
 #endif
 
@@ -64,7 +64,7 @@ int jep_mutex_release(jep_mutex m)
 
 #if defined(_WIN32)
 	result = ReleaseMutex(m);
-#elif defined(__linux__) || defined(__CYGWIN__)
+#elif defined(__linux__) || defined(__CYGWIN__) || defined(__MACH__)
 	result = pthread_mutex_unlock(m);
 #endif
 
@@ -75,7 +75,7 @@ void jep_thread_sleep(int ms)
 {
 #if defined(_WIN32)
 	Sleep(ms);
-#elif defined(__linux__) || defined(__CYGWIN__)
+#elif defined(__linux__) || defined(__CYGWIN__) || defined(__MACH__)
 	sleep(ms / 1000);
 #endif
 }

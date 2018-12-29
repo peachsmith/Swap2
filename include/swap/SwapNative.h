@@ -12,7 +12,7 @@
 #		define SWAPNATIVE_API __declspec(dllimport)
 #	endif
 #	define SWAPNATIVE_CALL __cdecl
-#elif defined(__linux__) || defined(__unix__)
+#elif defined(__linux__) || defined(__unix__) || defined(__MACH__)
 #	define SWAPNATIVE_API
 #	define SWAPNATIVE_CALL
 #endif

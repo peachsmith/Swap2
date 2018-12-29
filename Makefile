@@ -3,8 +3,10 @@ SWAP=./swap
 VERIFY=./verify.sh
 CC=gcc
 
-# *nix
+# Linux
 SHARED=libSwapNative.so
+# Mac
+#SHARED=libSwapNative.dylib
 # Windows / Cygwin
 #SHARED=SwapNative.dll
 

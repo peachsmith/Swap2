@@ -38,6 +38,12 @@ typedef jep_obj* (*jep_func)(jep_obj*, jep_obj*);
 #	define SWAP_NATIVE_LIB "libSwapNative.so"
 typedef void* jep_lib;
 typedef jep_obj* (*jep_func)(jep_obj*, jep_obj*);
+#elif defined(__MACH__) && defined(__APPLE__)
+#	include <dlfcn.h>
+#   include <mach-o/dyld.h>
+#   define SWAP_NATIVE_LIB "libSwapNative.dylib"
+typedef void* jep_lib;
+typedef jep_obj* (*jep_func)(jep_obj*, jep_obj*);
 #endif
 
 /**

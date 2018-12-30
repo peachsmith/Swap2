@@ -199,6 +199,13 @@ char *jep_get_app_path()
 		}
 		_NSGetExecutablePath(app_path, &size);
 	}
+
+	/* remove the application name from the path */
+	int i = strlen(app_path);
+	for (; app_path[i] != '/' && i > 0; i--)
+	{
+		app_path[i] = '\0';
+	}
 #endif
 
 	return app_path;

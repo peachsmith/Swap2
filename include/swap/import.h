@@ -1,5 +1,5 @@
 /*
-    Opens a file for tokenization
+    Functions for importing other Swap source files
     Copyright (C) 2016 John Powell
 
     This program is free software: you can redistribute it and/or modify

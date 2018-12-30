@@ -1,3 +1,20 @@
+/*
+	Functions for performing thread-related operations
+	Copyright (C) 2016 John Powell
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #ifndef JEP_THREAD_H
 #define JEP_THREAD_H
 
@@ -50,33 +67,33 @@ typedef struct ThreadArguments {
 } jep_thread_args;
 
 /**
-* creates a new thread
-*/
+ * creates a new thread
+ */
 jep_thread jep_thread_create(void* proc, void* args);
 
 /**
-* starts a thread
-*/
+ * starts a thread
+ */
 void jep_thread_start(jep_thread* t);
 
 /**
-* creates a mutex
-*/
+ * creates a mutex
+ */
 jep_mutex jep_mutex_create();
 
 /**
-* destroys a mutex
-*/
+ * destroys a mutex
+ */
 void jep_mutex_destroy(jep_mutex m);
 
 /**
-* attempts to obtain a mutex lock
-*/
+ * attempts to obtain a mutex lock
+ */
 jep_mutex_result jep_mutex_lock(jep_mutex m);
 
 /**
-* releases a mutex lock
-*/
+ * releases a mutex lock
+ */
 int jep_mutex_release(jep_mutex m);
 
 void jep_thread_sleep(int ms);
